@@ -2,15 +2,15 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System.IO;
 using MonoGame.Framework.Utilities;
+using System.IO;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
     /// Internal helper for accessing the bytecode for stock effects.
     /// </summary>
-    internal partial class EffectResource
+    public partial class EffectResource
     {
         public static readonly EffectResource AlphaTestEffect = new EffectResource(AlphaTestEffectName);
         public static readonly EffectResource BasicEffect = new EffectResource(BasicEffectName);

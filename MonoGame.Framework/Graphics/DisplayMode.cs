@@ -38,50 +38,33 @@ namespace Microsoft.Xna.Framework.Graphics
     public class DisplayMode
     {
         #region Fields
-
         private SurfaceFormat format;
         private int height;
         private int width;
-
         #endregion Fields
 
         #region Properties
-        
-        public float AspectRatio {
-            get { return (float)width / (float)height; }
-        }
+        public float AspectRatio => width / (float)height;
 
-        public SurfaceFormat Format {
-            get { return format; }
-        }
+        public SurfaceFormat Format => format;
 
-        public int Height {
-            get { return this.height; }
-        }
+        public int Height => height;
 
-        public int Width {
-            get { return this.width; }
-        }
-        
-        public Rectangle TitleSafeArea {
-            get { return GraphicsDevice.GetTitleSafeArea(0, 0, width, height); }
-        }
+        public int Width => width;
 
+        public Rectangle TitleSafeArea => GraphicsDevice.GetTitleSafeArea(0, 0, width, height);
         #endregion Properties
 
         #region Constructors
-        
         internal DisplayMode(int width, int height, SurfaceFormat format)
         {
             this.width = width;
             this.height = height;
             this.format = format;
         }
-
         #endregion Constructors
 
         #region Operators
-
         public static bool operator !=(DisplayMode left, DisplayMode right)
         {
             return !(left == right);
@@ -97,30 +80,27 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 return false;
             }
-            return (left.format == right.format) &&
-                (left.height == right.height) &&
-                (left.width == right.width);
+            return left.format == right.format &&
+                   left.height == right.height &&
+                   left.width == right.width;
         }
-
         #endregion Operators
 
         #region Public Methods
-
         public override bool Equals(object obj)
         {
-            return obj is DisplayMode && this == (DisplayMode)obj;
+            return obj is DisplayMode mode && this == mode;
         }
 
         public override int GetHashCode()
         {
-            return (this.width.GetHashCode() ^ this.height.GetHashCode() ^ this.format.GetHashCode());
+            return width.GetHashCode() ^ height.GetHashCode() ^ format.GetHashCode();
         }
 
         public override string ToString()
         {
-            return "{Width:" + this.width + " Height:" + this.height + " Format:" + this.Format + " AspectRatio:" + this.AspectRatio + "}";
+            return "{Width:" + width + " Height:" + height + " Format:" + Format + " AspectRatio:" + AspectRatio + "}";
         }
-
         #endregion Public Methods
     }
 }

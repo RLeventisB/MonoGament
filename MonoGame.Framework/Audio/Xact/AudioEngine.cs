@@ -30,7 +30,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal List<Cue> ActiveCues = new List<Cue>();
 
-        internal AudioCategory[] Categories { get { return _categories; } }
+        internal AudioCategory[] Categories => _categories;
 
         internal Dictionary<string, WaveBank> Wavebanks = new Dictionary<string, WaveBank>();
 
@@ -316,8 +316,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException("name");
 
-            int i;
-            if (!_categoryLookup.TryGetValue(name, out i))
+            if (!_categoryLookup.TryGetValue(name, out int i))
                 throw new InvalidOperationException("This resource could not be created.");
 
             return _categories[i];
@@ -332,8 +331,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException("name");
 
-            int i;
-            if (!_variableLookup.TryGetValue(name, out i) || !_variables[i].IsPublic)
+            if (!_variableLookup.TryGetValue(name, out int i) || !_variables[i].IsPublic)
                 throw new IndexOutOfRangeException("The specified variable index is invalid.");
 
             lock (UpdateLock)
@@ -354,8 +352,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException("name");
 
-            int i;
-            if (!_variableLookup.TryGetValue(name, out i) || !_variables[i].IsPublic)
+            if (!_variableLookup.TryGetValue(name, out int i) || !_variables[i].IsPublic)
                 throw new IndexOutOfRangeException("The specified variable index is invalid.");
 
             lock (UpdateLock)

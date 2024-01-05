@@ -17,11 +17,11 @@ namespace Microsoft.Xna.Framework.Graphics
 #if GLES
             throw new NotSupportedException("OpenGL ES 2.0 doesn't support 3D textures.");
 #else
-            this.glTarget = TextureTarget.Texture3D;
+            glTarget = TextureTarget.Texture3D;
 
             Threading.BlockOnUIThread(() =>
             {
-                GL.GenTextures(1, out this.glTexture);
+                GL.GenTextures(1, out glTexture);
                 GraphicsExtensions.CheckGLError();
 
                 GL.BindTexture(glTarget, glTexture);

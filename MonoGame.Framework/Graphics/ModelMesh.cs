@@ -11,7 +11,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
 		private GraphicsDevice graphicsDevice;
 
-		public ModelMesh(GraphicsDevice graphicsDevice, System.Collections.Generic.List<ModelMeshPart> parts)
+		public ModelMesh(GraphicsDevice graphicsDevice, List<ModelMeshPart> parts)
 		{
 			// TODO: Complete member initialization
 			this.graphicsDevice = graphicsDevice;
@@ -78,8 +78,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 				if (part.PrimitiveCount > 0)
 				{
-                    this.graphicsDevice.SetVertexBuffer(part.VertexBuffer);
-                    this.graphicsDevice.Indices = part.IndexBuffer;
+                    graphicsDevice.SetVertexBuffer(part.VertexBuffer);
+                    graphicsDevice.Indices = part.IndexBuffer;
                     
                     for (int j = 0; j < effect.CurrentTechnique.Passes.Count; j++)
                     {

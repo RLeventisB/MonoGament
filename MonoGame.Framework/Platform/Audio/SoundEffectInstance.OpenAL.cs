@@ -2,32 +2,32 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using MonoGame.OpenAL;
+using System;
 
 namespace Microsoft.Xna.Framework.Audio
 {
     public partial class SoundEffectInstance : IDisposable
     {
-		internal SoundState SoundState = SoundState.Stopped;
-		private bool _looped = false;
-		private float _alVolume = 1f;
+        internal SoundState SoundState = SoundState.Stopped;
+        private bool _looped;
+        private float _alVolume = 1f;
 
-		internal int SourceId;
-        private float reverb = 0f;
-        bool applyFilter = false;
+        internal int SourceId;
+        private float reverb;
+        bool applyFilter;
         EfxFilterType filterType;
         float filterQ;
         float frequency;
         int pauseCount;
 
         internal readonly object sourceMutex = new object();
-        
-        internal OpenALSoundController controller;
-        
-        internal bool HasSourceId = false;
 
-#region Initialization
+        internal OpenALSoundController controller;
+
+        internal bool HasSourceId;
+
+        #region Initialization
 
         /// <summary>
         /// Creates a standalone SoundEffectInstance from given wavedata.
@@ -46,7 +46,7 @@ namespace Microsoft.Xna.Framework.Audio
             controller = OpenALSoundController.Instance;
         }
 
-#endregion // Initialization
+        #endregion // Initialization
 
         /// <summary>
         /// Converts the XNA [-1, 1] pitch range to OpenAL pitch (0, INF) or Android SoundPool playback rate [0.5, 2].
@@ -62,8 +62,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (!HasSourceId)
                 return;
             // get AL's listener position
-            float x, y, z;
-            AL.GetListener(ALListener3f.Position, out x, out y, out z);
+            AL.GetListener(ALListener3f.Position, out float x, out float y, out float z);
             ALHelper.CheckError("Failed to get source position.");
 
             // get the emitter offset from origin
@@ -109,37 +108,37 @@ namespace Microsoft.Xna.Framework.Audio
             SourceId = controller.ReserveSource();
             HasSourceId = true;
 
-            int bufferId = _effect.SoundBuffer.OpenALDataBuffer;
+            int bufferId = _effect.soundBuffer.OpenALDataBuffer;
             AL.Source(SourceId, ALSourcei.Buffer, bufferId);
             ALHelper.CheckError("Failed to bind buffer to source.");
 
             // Send the position, gain, looping, pitch, and distance model to the OpenAL driver.
             if (!HasSourceId)
-				return;
+                return;
 
             AL.Source(SourceId, ALSourcei.SourceRelative, 1);
             ALHelper.CheckError("Failed set source relative.");
             // Distance Model
-			AL.DistanceModel (ALDistanceModel.InverseDistanceClamped);
+            AL.DistanceModel(ALDistanceModel.InverseDistanceClamped);
             ALHelper.CheckError("Failed set source distance.");
-			// Pan
-			AL.Source (SourceId, ALSource3f.Position, _pan, 0f, 0f);
+            // Pan
+            AL.Source(SourceId, ALSource3f.Position, _pan, 0f, MathF.Sqrt(1f - _pan * _pan));
             ALHelper.CheckError("Failed to set source pan.");
             // Velocity
-			AL.Source (SourceId, ALSource3f.Velocity, 0f, 0f, 0f);
+            AL.Source(SourceId, ALSource3f.Velocity, 0f, 0f, 0f);
             ALHelper.CheckError("Failed to set source pan.");
-			// Volume
+            // Volume
             AL.Source(SourceId, ALSourcef.Gain, _alVolume);
             ALHelper.CheckError("Failed to set source volume.");
-			// Looping
-			AL.Source (SourceId, ALSourceb.Looping, IsLooped);
+            // Looping
+            AL.Source(SourceId, ALSourceb.Looping, IsLooped);
             ALHelper.CheckError("Failed to set source loop state.");
-			// Pitch
-			AL.Source (SourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
+            // Pitch
+            AL.Source(SourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
             ALHelper.CheckError("Failed to set source pitch.");
 
-            ApplyReverb ();
-            ApplyFilter ();
+            ApplyReverb();
+            ApplyFilter();
 
             AL.SourcePlay(SourceId);
             ALHelper.CheckError("Failed to play source.");
@@ -239,7 +238,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             if (!HasSourceId)
                 return SoundState.Stopped;
-            
+
             var alState = AL.GetSourceState(SourceId);
             ALHelper.CheckError("Failed to get source state.");
 
@@ -305,20 +304,20 @@ namespace Microsoft.Xna.Framework.Audio
                 ALHelper.CheckError("Failed to set filter.");
                 switch (filterType)
                 {
-                case EfxFilterType.Lowpass:
-                    efx.Filter(controller.Filter, EfxFilterf.LowpassGainHF, freq);
-                    ALHelper.CheckError("Failed to set LowpassGainHF.");
-                    break;
-                case EfxFilterType.Highpass:
-                    efx.Filter(controller.Filter, EfxFilterf.HighpassGainLF, freq);
-                    ALHelper.CheckError("Failed to set HighpassGainLF.");
-                    break;
-                case EfxFilterType.Bandpass:
-                    efx.Filter(controller.Filter, EfxFilterf.BandpassGainHF, freq);
-                    ALHelper.CheckError("Failed to set BandpassGainHF.");
-                    efx.Filter(controller.Filter, EfxFilterf.BandpassGainLF, lf);
-                    ALHelper.CheckError("Failed to set BandpassGainLF.");
-                    break;
+                    case EfxFilterType.Lowpass:
+                        efx.Filter(controller.Filter, EfxFilterf.LowpassGainHF, freq);
+                        ALHelper.CheckError("Failed to set LowpassGainHF.");
+                        break;
+                    case EfxFilterType.Highpass:
+                        efx.Filter(controller.Filter, EfxFilterf.HighpassGainLF, freq);
+                        ALHelper.CheckError("Failed to set HighpassGainLF.");
+                        break;
+                    case EfxFilterType.Bandpass:
+                        efx.Filter(controller.Filter, EfxFilterf.BandpassGainHF, freq);
+                        ALHelper.CheckError("Failed to set BandpassGainHF.");
+                        efx.Filter(controller.Filter, EfxFilterf.BandpassGainLF, lf);
+                        ALHelper.CheckError("Failed to set BandpassGainLF.");
+                        break;
                 }
                 AL.Source(SourceId, ALSourcei.EfxDirectFilter, controller.Filter);
                 ALHelper.CheckError("Failed to set DirectFilter.");
@@ -333,15 +332,15 @@ namespace Microsoft.Xna.Framework.Audio
             applyFilter = true;
             switch (mode)
             {
-            case FilterMode.BandPass:
-                filterType = EfxFilterType.Bandpass;
-                break;
+                case FilterMode.BandPass:
+                    filterType = EfxFilterType.Bandpass;
+                    break;
                 case FilterMode.LowPass:
-                filterType = EfxFilterType.Lowpass;
-                break;
+                    filterType = EfxFilterType.Lowpass;
+                    break;
                 case FilterMode.HighPass:
-                filterType = EfxFilterType.Highpass;
-                break;
+                    filterType = EfxFilterType.Highpass;
+                    break;
             }
             this.filterQ = filterQ;
             this.frequency = frequency;

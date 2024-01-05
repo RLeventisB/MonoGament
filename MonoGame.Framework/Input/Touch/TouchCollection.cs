@@ -12,25 +12,20 @@ namespace Microsoft.Xna.Framework.Input.Touch
     /// Provides state information for a touch screen enabled device.
     /// </summary>
     public struct TouchCollection : IList<TouchLocation>
-	{
+    {
         private readonly TouchLocation[] _collection;
 
-        private TouchLocation[] Collection
-        {
-            get { return _collection ?? EmptyLocationArray; }
-        }
+        private TouchLocation[] Collection => _collection ?? EmptyLocationArray;
 
         #region Properties
-
         /// <summary>
         /// States if a touch screen is available.
         /// </summary>
-        public bool IsConnected { get { return TouchPanel.GetCapabilities().IsConnected; } }
+        public bool IsConnected => TouchPanel.GetCapabilities().IsConnected;
 
         private static readonly TouchLocation[] EmptyLocationArray = new TouchLocation[0];
         internal static readonly TouchCollection Empty = new TouchCollection(EmptyLocationArray);
-
-		#endregion
+        #endregion
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TouchCollection"/> with a pre-determined set of touch locations.
@@ -51,7 +46,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <param name="touchLocation"></param>
         /// <returns></returns>
         public bool FindById(int id, out TouchLocation touchLocation)
-		{
+        {
             for (var i = 0; i < Collection.Length; i++)
             {
                 var location = Collection[i];
@@ -64,17 +59,13 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
             touchLocation = default(TouchLocation);
             return false;
-		}
+        }
 
         #region IList<TouchLocation>
-
         /// <summary>
         /// States if touch collection is read only.
         /// </summary>
-        public bool IsReadOnly
-        {
-            get { return true; }
-        }
+        public bool IsReadOnly => true;
 
         /// <summary>
         /// Returns the index of the first occurrence of specified <see cref="TouchLocation"/> item in the collection.
@@ -118,14 +109,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <returns><see cref="TouchLocation"/></returns>
         public TouchLocation this[int index]
         {
-            get
-            {
-                return Collection[index];
-            }
-            set
-            {
-                throw new NotSupportedException();
-            }
+            get => Collection[index];
+            set => throw new NotSupportedException();
         }
 
         /// <summary>
@@ -174,13 +159,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <summary>
         /// Returns the number of <see cref="TouchLocation"/> items that exist in the collection.
         /// </summary>
-        public int Count
-        {
-            get
-            {
-                return Collection.Length;
-            }
-        }
+        public int Count => Collection.Length;
 
         /// <summary>
         /// Removes the specified <see cref="TouchLocation"/> item from the collection.
@@ -218,7 +197,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             return new Enumerator(this);
         }
-
         #endregion // IList<TouchLocation>
 
         /// <summary>
@@ -238,7 +216,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             /// <summary>
             /// Gets the current element in the TouchCollection.
             /// </summary>
-            public TouchLocation Current { get { return _collection[_position]; } }
+            public TouchLocation Current => _collection[_position];
 
             /// <summary>
             /// Advances the enumerator to the next element of the TouchCollection.
@@ -246,32 +224,25 @@ namespace Microsoft.Xna.Framework.Input.Touch
             public bool MoveNext()
             {
                 _position++;
-                return (_position < _collection.Count);
+                return _position < _collection.Count;
             }
 
             #region IDisposable
-
             /// <summary>
             /// Immediately releases the unmanaged resources used by this object.
             /// </summary>
             public void Dispose()
             {
             }
-
             #endregion
 
             #region IEnumerator Members
-
-            object IEnumerator.Current
-            {
-                get { return _collection[_position]; }
-            }
+            object IEnumerator.Current => _collection[_position];
 
             public void Reset()
             {
                 _position = -1;
             }
-
             #endregion
         }
     }

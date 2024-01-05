@@ -25,27 +25,21 @@ namespace Microsoft.Xna.Framework.Input
         private readonly Vector2 _left, _right;
 
         /// <summary>
-        /// Gets a value indicating the position of the left stick (thumbstick). 
+        /// Gets a value indicating the position of the left stick (thumbstick).
         /// </summary>
         /// <value>A <see cref="Vector2"/> indicating the current position of the left stick (thumbstick).</value>
-        public Vector2 Left
-        {
-            get { return _left; }
-        }
+        public Vector2 Left => _left;
 
         /// <summary>
-        /// Gets a value indicating the position of the right stick (thumbstick). 
+        /// Gets a value indicating the position of the right stick (thumbstick).
         /// </summary>
         /// <value>A <see cref="Vector2"/> indicating the current position of the right stick (thumbstick).</value>
-        public Vector2 Right
-        {
-            get { return _right; }
-        }
+        public Vector2 Right => _right;
 
         public GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition)
             : this(leftPosition, rightPosition, GamePadDeadZone.None, GamePadDeadZone.None)
         {
-            
+
         }
 
         internal GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition, GamePadDeadZone leftDeadZoneMode, GamePadDeadZone rightDeadZoneMode) : this()
@@ -54,7 +48,7 @@ namespace Microsoft.Xna.Framework.Input
             _left = ApplyDeadZone(leftDeadZoneMode, leftThumbDeadZone, leftPosition);
             _right = ApplyDeadZone(rightDeadZoneMode, rightThumbDeadZone, rightPosition);
 
-            // VirtualButtons should always behave like deadzone is IndependentAxes. 
+            // VirtualButtons should always behave like deadzone is IndependentAxes.
             // This is consistent with XNA behaviour and generally most convenient (e.g. for menu navigation)
             _virtualButtons = 0;
 
@@ -143,7 +137,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>true if <paramref name="left"/> and <paramref name="right"/> are equal; otherwise, false.</returns>
         public static bool operator ==(GamePadThumbSticks left, GamePadThumbSticks right)
         {
-            return (left.Left == right.Left) && (left.Right == right.Right);
+            return left.Left == right.Left && left.Right == right.Right;
         }
 
         /// <summary>
@@ -164,7 +158,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>true if <paramref name="obj"/> is a <see cref="GamePadThumbSticks"/> and has the same value as this instance; otherwise, false.</returns>
         public override bool Equals(object obj)
         {
-            return (obj is GamePadThumbSticks) && (this == (GamePadThumbSticks)obj);
+            return obj is GamePadThumbSticks sticks && this == sticks;
         }
 
         /// <summary>
@@ -176,7 +170,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             unchecked
             {
-                return (Left.GetHashCode() * 397) ^ Right.GetHashCode();
+                return Left.GetHashCode() * 397 ^ Right.GetHashCode();
             }
         }
 

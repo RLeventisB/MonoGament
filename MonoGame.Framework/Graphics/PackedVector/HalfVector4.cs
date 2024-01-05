@@ -51,10 +51,10 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         /// <returns>The ulong containing the packed values.</returns>
         static ulong PackHelper(ref Vector4 vector)
         {
-            ulong num4 = (ulong)HalfTypeHelper.Convert(vector.X);
-            ulong num3 = ((ulong)HalfTypeHelper.Convert(vector.Y) << 0x10);
-            ulong num2 = ((ulong)HalfTypeHelper.Convert(vector.Z) << 0x20);
-            ulong num1 = ((ulong)HalfTypeHelper.Convert(vector.W) << 0x30);
+            ulong num4 = HalfTypeHelper.Convert(vector.X);
+            ulong num3 = (ulong)HalfTypeHelper.Convert(vector.Y) << 0x10;
+            ulong num2 = (ulong)HalfTypeHelper.Convert(vector.Z) << 0x20;
+            ulong num1 = (ulong)HalfTypeHelper.Convert(vector.W) << 0x30;
             return num4 | num3 | num2 | num1;
         }
 
@@ -78,14 +78,8 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         [CLSCompliant(false)]
         public ulong PackedValue
         {
-            get
-            {
-                return packedValue;
-            }
-            set
-            {
-                packedValue = value;
-            }
+            get => packedValue;
+            set => packedValue = value;
         }
 
         /// <summary>
@@ -113,7 +107,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         /// <returns>true if the current instance is equal to the specified object; false otherwise.</returns>
         public override bool Equals(object obj)
         {
-            return ((obj is HalfVector4) && Equals((HalfVector4)obj));
+            return obj is HalfVector4 vector4 && Equals(vector4);
         }
 
         /// <summary>

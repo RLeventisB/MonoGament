@@ -63,7 +63,7 @@ namespace Microsoft.Xna.Framework.Graphics
         protected internal override void OnApply()
         {
             var vp = GraphicsDevice.Viewport;
-            if ((vp.Width != _lastViewport.Width) || (vp.Height != _lastViewport.Height))
+            if (vp.Width != _lastViewport.Width || vp.Height != _lastViewport.Height)
             {
                 // Normal 3D cameras look into the -z direction (z = 1 is in front of z = 0). The
                 // sprite batch layer depth is the opposite (z = 0 is in front of z = 1).

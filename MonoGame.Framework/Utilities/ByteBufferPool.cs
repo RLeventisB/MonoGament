@@ -2,18 +2,12 @@
 
 namespace MonoGame.Framework.Utilities
 {
-    internal class ByteBufferPool
+    public class ByteBufferPool
     {
         private readonly int _minBufferSize;
         private readonly int _maxBuffers;
-
-        public int FreeAmount
-        {
-            get { return _freeBuffers.Count; }
-        }
-
+        public int FreeAmount => _freeBuffers.Count;
         private readonly List<byte[]> _freeBuffers;
-
         public ByteBufferPool(int minBufferSize = 0, int maxBuffers = int.MaxValue)
         {
             _minBufferSize = minBufferSize;
@@ -76,7 +70,7 @@ namespace MonoGame.Framework.Utilities
 
             while (l <= r)
             {
-                var m = (l + r)/2;
+                var m = (l + r) / 2;
                 var buffer = _freeBuffers[m];
                 if (buffer.Length < size)
                 {
@@ -94,6 +88,10 @@ namespace MonoGame.Framework.Utilities
             }
 
             return -1;
+        }
+        public void ClearPool()
+        {
+            _freeBuffers.Clear();
         }
     }
 }

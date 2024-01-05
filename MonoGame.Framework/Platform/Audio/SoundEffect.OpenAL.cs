@@ -1,13 +1,14 @@
 // MonoGame - Copyright (C) The MonoGame Team
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
-﻿
+
 using System;
 using System.IO;
 
 #if OPENAL
 using MonoGame.OpenAL;
 #endif
+
 #if IOS
 using AudioToolbox;
 using AudioUnit;
@@ -18,29 +19,19 @@ namespace Microsoft.Xna.Framework.Audio
     public sealed partial class SoundEffect : IDisposable
     {
         internal const int MAX_PLAYING_INSTANCES = OpenALSoundController.MAX_NUMBER_OF_SOURCES;
-        internal static uint ReverbSlot = 0;
-        internal static uint ReverbEffect = 0;
+        internal static uint ReverbSlot;
+        internal static uint ReverbEffect;
 
-        internal OALSoundBuffer SoundBuffer;
-
+        internal OALSoundBuffer soundBuffer;
+        public OALSoundBuffer SoundBuffer => soundBuffer;
         #region Public Constructors
-
         private void PlatformLoadAudioStream(Stream stream, out TimeSpan duration)
         {
-            byte[] buffer;
+            byte[] Data = AudioLoader.Load(stream, out ALFormat format, out int freq, out int channels, out int blockAlignment, out int bitsPerSample, out int samplesPerBlock, out int sampleCount);
 
-            ALFormat format;
-            int freq;
-            int channels;
-            int blockAlignment;
-            int bitsPerSample;
-            int samplesPerBlock;
-            int sampleCount;
-            buffer = AudioLoader.Load(stream, out format, out freq, out channels, out blockAlignment, out bitsPerSample, out samplesPerBlock, out sampleCount);
-
-            duration = TimeSpan.FromSeconds((float)sampleCount / (float)freq);
-
-            PlatformInitializeBuffer(buffer, buffer.Length, format, channels, freq, blockAlignment, bitsPerSample, 0, 0);
+            duration = TimeSpan.FromSeconds(sampleCount / (float)freq);
+            SetCommonData(channels, freq, 0, 0);
+            PlatformInitializeBuffer(Data, Data.Length, format, channels, freq, blockAlignment, bitsPerSample, 0, 0);
         }
 
         private void PlatformInitializePcm(byte[] buffer, int offset, int count, int sampleBits, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
@@ -55,10 +46,11 @@ namespace Microsoft.Xna.Framework.Audio
             }
 
             var format = AudioLoader.GetSoundFormat(AudioLoader.FormatPcm, (int)channels, sampleBits);
+            SetCommonData((int)channels, sampleRate, loopStart, loopLength);
 
             // bind buffer
-            SoundBuffer = new OALSoundBuffer();
-            SoundBuffer.BindDataBuffer(buffer, format, count, sampleRate);
+            soundBuffer = new OALSoundBuffer();
+            soundBuffer.BindDataBuffer(buffer, format, count, sampleRate, 0, loopStart, loopLength);
         }
 
         private void PlatformInitializeIeeeFloat(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
@@ -72,10 +64,11 @@ namespace Microsoft.Xna.Framework.Audio
             }
 
             var format = AudioLoader.GetSoundFormat(AudioLoader.FormatIeee, (int)channels, 32);
+            SetCommonData((int)channels, sampleRate, loopStart, loopLength);
 
             // bind buffer
-            SoundBuffer = new OALSoundBuffer();
-            SoundBuffer.BindDataBuffer(buffer, format, count, sampleRate);
+            soundBuffer = new OALSoundBuffer();
+            soundBuffer.BindDataBuffer(buffer, format, count, sampleRate, 0, loopStart, loopLength);
         }
 
         private void PlatformInitializeAdpcm(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int blockAlignment, int loopStart, int loopLength)
@@ -92,10 +85,11 @@ namespace Microsoft.Xna.Framework.Audio
             int sampleAlignment = AudioLoader.SampleAlignment(format, blockAlignment);
 
             // bind buffer
-            SoundBuffer = new OALSoundBuffer();
+            soundBuffer = new OALSoundBuffer();
             // Buffer length must be aligned with the block alignment
-            int alignedCount = count - (count % blockAlignment);
-            SoundBuffer.BindDataBuffer(buffer, format, alignedCount, sampleRate, sampleAlignment);
+            int alignedCount = count - count % blockAlignment;
+            SetCommonData((int)channels, sampleRate, loopStart, loopLength);
+            soundBuffer.BindDataBuffer(buffer, format, alignedCount, sampleRate, sampleAlignment, loopStart, loopLength);
         }
 
         private void PlatformInitializeIma4(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int blockAlignment, int loopStart, int loopLength)
@@ -112,8 +106,9 @@ namespace Microsoft.Xna.Framework.Audio
             int sampleAlignment = AudioLoader.SampleAlignment(format, blockAlignment);
 
             // bind buffer
-            SoundBuffer = new OALSoundBuffer();
-            SoundBuffer.BindDataBuffer(buffer, format, count, sampleRate, sampleAlignment);
+            SetCommonData((int)channels, sampleRate, loopStart, loopLength);
+            soundBuffer = new OALSoundBuffer();
+            soundBuffer.BindDataBuffer(buffer, format, count, sampleRate, sampleAlignment, loopStart, loopLength);
         }
 
         private void PlatformInitializeFormat(byte[] header, byte[] buffer, int bufferSize, int loopStart, int loopLength)
@@ -160,22 +155,19 @@ namespace Microsoft.Xna.Framework.Audio
             if (codec == MiniFormatTag.Adpcm)
             {
                 PlatformInitializeAdpcm(buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, (blockAlignment + 22) * channels, loopStart, loopLength);
-                duration = TimeSpan.FromSeconds(SoundBuffer.Duration);
+                duration = TimeSpan.FromSeconds(soundBuffer.Duration);
                 return;
             }
 
             throw new NotSupportedException("Unsupported sound format!");
         }
-
         #endregion
 
         #region Additional SoundEffect/SoundEffectInstance Creation Methods
-
         private void PlatformSetupInstance(SoundEffectInstance inst)
         {
             inst.InitializeSound();
         }
-
         #endregion
 
         internal static void PlatformSetReverbSettings(ReverbSettings reverbSettings)
@@ -185,26 +177,26 @@ namespace Microsoft.Xna.Framework.Audio
 
             if (ReverbEffect != 0)
                 return;
-            
+
             var efx = OpenALSoundController.Efx;
-            efx.GenAuxiliaryEffectSlots (1, out ReverbSlot);
-            efx.GenEffect (out ReverbEffect);
-            efx.Effect (ReverbEffect, EfxEffecti.EffectType, (int)EfxEffectType.Reverb);
-            efx.Effect (ReverbEffect, EfxEffectf.EaxReverbReflectionsDelay, reverbSettings.ReflectionsDelayMs / 1000.0f);
-            efx.Effect (ReverbEffect, EfxEffectf.LateReverbDelay, reverbSettings.ReverbDelayMs / 1000.0f);
+            efx.GenAuxiliaryEffectSlots(1, out ReverbSlot);
+            efx.GenEffect(out ReverbEffect);
+            efx.Effect(ReverbEffect, EfxEffecti.EffectType, (int)EfxEffectType.Reverb);
+            efx.Effect(ReverbEffect, EfxEffectf.EaxReverbReflectionsDelay, reverbSettings.ReflectionsDelayMs / 1000.0f);
+            efx.Effect(ReverbEffect, EfxEffectf.LateReverbDelay, reverbSettings.ReverbDelayMs / 1000.0f);
             // map these from range 0-15 to 0-1
-            efx.Effect (ReverbEffect, EfxEffectf.EaxReverbDiffusion, reverbSettings.EarlyDiffusion / 15f);
-            efx.Effect (ReverbEffect, EfxEffectf.EaxReverbDiffusion, reverbSettings.LateDiffusion / 15f);
-            efx.Effect (ReverbEffect, EfxEffectf.EaxReverbGainLF, Math.Min (XactHelpers.ParseVolumeFromDecibels (reverbSettings.LowEqGain - 8f), 1.0f));
-            efx.Effect (ReverbEffect, EfxEffectf.EaxReverbLFReference, (reverbSettings.LowEqCutoff * 50f) + 50f);
-            efx.Effect (ReverbEffect, EfxEffectf.EaxReverbGainHF, XactHelpers.ParseVolumeFromDecibels (reverbSettings.HighEqGain - 8f));
-            efx.Effect (ReverbEffect, EfxEffectf.EaxReverbHFReference, (reverbSettings.HighEqCutoff * 500f) + 1000f);
+            efx.Effect(ReverbEffect, EfxEffectf.EaxReverbDiffusion, reverbSettings.EarlyDiffusion / 15f);
+            efx.Effect(ReverbEffect, EfxEffectf.EaxReverbDiffusion, reverbSettings.LateDiffusion / 15f);
+            efx.Effect(ReverbEffect, EfxEffectf.EaxReverbGainLF, Math.Min(XactHelpers.ParseVolumeFromDecibels(reverbSettings.LowEqGain - 8f), 1.0f));
+            efx.Effect(ReverbEffect, EfxEffectf.EaxReverbLFReference, reverbSettings.LowEqCutoff * 50f + 50f);
+            efx.Effect(ReverbEffect, EfxEffectf.EaxReverbGainHF, XactHelpers.ParseVolumeFromDecibels(reverbSettings.HighEqGain - 8f));
+            efx.Effect(ReverbEffect, EfxEffectf.EaxReverbHFReference, reverbSettings.HighEqCutoff * 500f + 1000f);
             // According to Xamarin docs EaxReverbReflectionsGain Unit: Linear gain Range [0.0f .. 3.16f] Default: 0.05f
-            efx.Effect (ReverbEffect, EfxEffectf.EaxReverbReflectionsGain, Math.Min (XactHelpers.ParseVolumeFromDecibels (reverbSettings.ReflectionsGainDb), 3.16f));
-            efx.Effect (ReverbEffect, EfxEffectf.EaxReverbGain, Math.Min (XactHelpers.ParseVolumeFromDecibels (reverbSettings.ReverbGainDb), 1.0f));
+            efx.Effect(ReverbEffect, EfxEffectf.EaxReverbReflectionsGain, Math.Min(XactHelpers.ParseVolumeFromDecibels(reverbSettings.ReflectionsGainDb), 3.16f));
+            efx.Effect(ReverbEffect, EfxEffectf.EaxReverbGain, Math.Min(XactHelpers.ParseVolumeFromDecibels(reverbSettings.ReverbGainDb), 1.0f));
             // map these from 0-100 down to 0-1
-            efx.Effect (ReverbEffect, EfxEffectf.EaxReverbDensity, reverbSettings.DensityPct / 100f);
-            efx.AuxiliaryEffectSlot (ReverbSlot, EfxEffectSlotf.EffectSlotGain, reverbSettings.WetDryMixPct / 200f);
+            efx.Effect(ReverbEffect, EfxEffectf.EaxReverbDensity, reverbSettings.DensityPct / 100f);
+            efx.AuxiliaryEffectSlot(ReverbSlot, EfxEffectSlotf.EffectSlotGain, reverbSettings.WetDryMixPct / 200f);
 
             // Dont know what to do with these EFX has no mapping for them. Just ignore for now
             // we can enable them as we go. 
@@ -219,21 +211,19 @@ namespace Microsoft.Xna.Framework.Audio
             //efx.SetEffectParam (ReverbEffect, EfxEffectf.LowFrequencyReference, reverbSettings.DecayTimeSec);
             //efx.SetEffectParam (ReverbEffect, EfxEffectf.LowFrequencyReference, reverbSettings.RoomSizeFeet);
 
-            efx.BindEffectToAuxiliarySlot (ReverbSlot, ReverbEffect);
+            efx.BindEffectToAuxiliarySlot(ReverbSlot, ReverbEffect);
         }
 
-#region IDisposable Members
-
+        #region IDisposable Members
         private void PlatformDispose(bool disposing)
         {
-            if (SoundBuffer != null)
+            if (soundBuffer != null)
             {
-                SoundBuffer.Dispose();
-                SoundBuffer = null;
+                soundBuffer.Dispose();
+                soundBuffer = null;
             }
         }
-
-#endregion
+        #endregion
 
         internal static void PlatformInitialize()
         {
@@ -251,4 +241,3 @@ namespace Microsoft.Xna.Framework.Audio
         }
     }
 }
-

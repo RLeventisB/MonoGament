@@ -2,9 +2,10 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using MonoGame.OpenAL;
+
 using System;
 using System.Collections.Generic;
-using MonoGame.OpenAL;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -85,7 +86,7 @@ namespace Microsoft.Xna.Framework.Audio
                 // BindDataBuffer does not support offset
                 var offsetBuffer = new byte[count];
                 Array.Copy(buffer, offset, offsetBuffer, 0, count);
-                oalBuffer.BindDataBuffer(offsetBuffer, _format, count, _sampleRate);
+                oalBuffer.BindDataBuffer(buffer, _format, count, _sampleRate);
             }
 
             // Queue the buffer
@@ -123,8 +124,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             // Get the completed buffers
             AL.GetError();
-            int numBuffers;
-            AL.GetSource(SourceId, ALGetSourcei.BuffersProcessed, out numBuffers);
+            AL.GetSource(SourceId, ALGetSourcei.BuffersProcessed, out int numBuffers);
             ALHelper.CheckError("Failed to get processed buffer count.");
 
             // Unqueue them

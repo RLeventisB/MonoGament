@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework;
 namespace Microsoft.Devices.Sensors
 {
     /// <summary>
-    /// Provides Android applications access to the device’s compass sensor.
+    /// Provides Android applications access to the deviceâ€™s compass sensor.
     /// </summary>
     public sealed class Compass : SensorBase<CompassReading>
     {
@@ -20,7 +20,7 @@ namespace Microsoft.Devices.Sensors
         static Sensor sensorAccelerometer;
         SensorListener listener;
         SensorState state;
-        bool started = false;
+        bool started;
         static int instanceCount;
 
         /// <summary>
@@ -111,10 +111,7 @@ namespace Microsoft.Devices.Sensors
                 state = SensorState.Ready;
                 return;
             }
-            else
-            {
-                throw new SensorFailedException("Failed to start compass data acquisition. Data acquisition already started.");
-            }
+            throw new SensorFailedException("Failed to start compass data acquisition. Data acquisition already started.");
         }
 
         /// <summary>

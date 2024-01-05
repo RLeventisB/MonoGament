@@ -34,7 +34,7 @@ namespace Microsoft.Xna.Framework.Input
         /// Gets the joystick hat values.
         /// </summary>
         /// <value>An array list of <see cref="JoystickHat"/> that indicate hat values.</value>
-        public JoystickHat[] Hats{ get; internal set; }
+        public JoystickHat[] Hats { get; internal set; }
 
         /// <summary>
         /// Determines whether a specified instance of <see cref="Microsoft.Xna.Framework.Input.JoystickState"/> is
@@ -46,9 +46,9 @@ namespace Microsoft.Xna.Framework.Input
         public static bool operator ==(JoystickState left, JoystickState right)
         {
             return left.IsConnected == right.IsConnected &&
-               left.Axes.SequenceEqual(right.Axes) &&
-               left.Buttons.SequenceEqual(right.Buttons) &&
-               left.Hats.SequenceEqual(right.Hats);
+                   left.Axes.SequenceEqual(right.Axes) &&
+                   left.Buttons.SequenceEqual(right.Buttons) &&
+                   left.Hats.SequenceEqual(right.Hats);
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <see cref="T:Microsoft.Xna.Framework.Input.JoystickState"/>; otherwise, <c>false</c>.</returns>
         public override bool Equals(object obj)
         {
-            return (obj is JoystickState) && (this == (JoystickState)obj);
+            return obj is JoystickState state && this == state;
         }
 
         /// <summary>
@@ -88,13 +88,13 @@ namespace Microsoft.Xna.Framework.Input
                 unchecked
                 {
                     foreach (var axis in Axes)
-                        hash = (hash * 397) ^ axis;
+                        hash = hash * 397 ^ axis;
 
                     for (int i = 0; i < Buttons.Length; i++)
-                        hash = hash ^ ((int)Buttons[i] << (i % 32));
+                        hash = hash ^ (int)Buttons[i] << i % 32;
 
                     foreach (var hat in Hats)
-                        hash = (hash * 397) ^ hat.GetHashCode();
+                        hash = hash * 397 ^ hat.GetHashCode();
                 }
             }
 
@@ -132,4 +132,3 @@ namespace Microsoft.Xna.Framework.Input
         }
     }
 }
-

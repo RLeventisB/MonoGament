@@ -28,8 +28,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                ModelMesh ret;
-                if (!TryGetValue(meshName, out ret))
+                if (!TryGetValue(meshName, out ModelMesh ret))
                     throw new KeyNotFoundException();
                 return ret;
             }
@@ -86,7 +85,7 @@ namespace Microsoft.Xna.Framework.Graphics
             /// <summary>
             /// Gets the current element in the ModelMeshCollection.
             /// </summary>
-            public ModelMesh Current { get { return _collection[_position]; } }
+            public ModelMesh Current => _collection[_position];
 
             /// <summary>
             /// Advances the enumerator to the next element of the ModelMeshCollection.
@@ -94,32 +93,25 @@ namespace Microsoft.Xna.Framework.Graphics
             public bool MoveNext()
             {
                 _position++;
-                return (_position < _collection.Count);
+                return _position < _collection.Count;
             }
 
             #region IDisposable
-
             /// <summary>
             /// Immediately releases the unmanaged resources used by this object.
             /// </summary>
             public void Dispose()
             {
             }
-
             #endregion
 
             #region IEnumerator Members
-
-            object IEnumerator.Current
-            {
-                get { return _collection[_position]; }
-            }
+            object IEnumerator.Current => _collection[_position];
 
             public void Reset()
             {
                 _position = -1;
             }
-
             #endregion
         }
     }

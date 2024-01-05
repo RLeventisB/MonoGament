@@ -4,29 +4,24 @@
 
 using System;
 using System.Runtime.InteropServices;
+
 using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public partial class TextureCube : Texture
-	{
-		internal int size;
+    public partial class TextureCube : Texture
+    {
+        internal int size;
 
         /// <summary>
         /// Gets the width and height of the cube map face in pixels.
         /// </summary>
         /// <value>The width and height of a cube map face in pixels.</value>
-        public int Size
-        {
-            get
-            {
-                return size;
-            }
-        }
-		
-		public TextureCube (GraphicsDevice graphicsDevice, int size, bool mipMap, SurfaceFormat format)
+        public int Size => size;
+
+        public TextureCube(GraphicsDevice graphicsDevice, int size, bool mipMap, SurfaceFormat format)
             : this(graphicsDevice, size, mipMap, format, false)
-		{
+        {
         }
 
         internal TextureCube(GraphicsDevice graphicsDevice, int size, bool mipMap, SurfaceFormat format, bool renderTarget)
@@ -34,12 +29,12 @@ namespace Microsoft.Xna.Framework.Graphics
             if (graphicsDevice == null)
                 throw new ArgumentNullException("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
             if (size <= 0)
-                throw new ArgumentOutOfRangeException("size","Cube size must be greater than zero");
+                throw new ArgumentOutOfRangeException("size", "Cube size must be greater than zero");
 
-            this.GraphicsDevice = graphicsDevice;
-			this.size = size;
-            this._format = format;
-            this._levelCount = mipMap ? CalculateMipLevels(size) : 1;
+            GraphicsDevice = graphicsDevice;
+            this.size = size;
+            _format = format;
+            _levelCount = mipMap ? CalculateMipLevels(size) : 1;
 
             PlatformConstruct(graphicsDevice, size, mipMap, format, renderTarget);
         }
@@ -57,36 +52,34 @@ namespace Microsoft.Xna.Framework.Graphics
             GetData(cubeMapFace, 0, null, data, 0, data.Length);
         }
 
-	    public void GetData<T>(CubeMapFace cubeMapFace, T[] data, int startIndex, int elementCount) where T : struct
-	    {
-	        GetData(cubeMapFace, 0, null, data, startIndex, elementCount);
-	    }
+        public void GetData<T>(CubeMapFace cubeMapFace, T[] data, int startIndex, int elementCount) where T : struct
+        {
+            GetData(cubeMapFace, 0, null, data, startIndex, elementCount);
+        }
 
-	    public void GetData<T>(CubeMapFace cubeMapFace, int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
-	    {
-            Rectangle checkedRect;
-            ValidateParams(level, rect, data, startIndex, elementCount, out checkedRect);
-	        PlatformGetData(cubeMapFace, level, checkedRect, data, startIndex, elementCount);
-	    }
+        public void GetData<T>(CubeMapFace cubeMapFace, int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+        {
+            ValidateParams(level, rect, data, startIndex, elementCount, out Rectangle checkedRect);
+            PlatformGetData(cubeMapFace, level, checkedRect, data, startIndex, elementCount);
+        }
 
-		public void SetData<T> (CubeMapFace face, T[] data) where T : struct
-		{
+        public void SetData<T>(CubeMapFace face, T[] data) where T : struct
+        {
             if (data == null)
                 throw new ArgumentNullException("data");
             SetData(face, 0, null, data, 0, data.Length);
-		}
+        }
 
         public void SetData<T>(CubeMapFace face, T[] data, int startIndex, int elementCount) where T : struct
-		{
+        {
             SetData(face, 0, null, data, startIndex, elementCount);
-		}
-		
+        }
+
         public void SetData<T>(CubeMapFace face, int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
-            Rectangle checkedRect;
-            ValidateParams(level, rect, data, startIndex, elementCount, out checkedRect);
+            ValidateParams(level, rect, data, startIndex, elementCount, out Rectangle checkedRect);
             PlatformSetData(face, level, checkedRect, data, startIndex, elementCount);
-		}
+        }
 
         private void ValidateParams<T>(int level, Rectangle? rect, T[] data, int startIndex,
             int elementCount, out Rectangle checkedRect) where T : struct
@@ -112,8 +105,8 @@ namespace Microsoft.Xna.Framework.Graphics
             if (Format.IsCompressedFormat())
             {
                 // round x and y down to next multiple of four; width and height up to next multiple of four
-                var roundedWidth = (checkedRect.Width + 3) & ~0x3;
-                var roundedHeight = (checkedRect.Height + 3) & ~0x3;
+                var roundedWidth = checkedRect.Width + 3 & ~0x3;
+                var roundedHeight = checkedRect.Height + 3 & ~0x3;
                 checkedRect = new Rectangle(checkedRect.X & ~0x3, checkedRect.Y & ~0x3,
 #if OPENGL
                     // OpenGL only: The last two mip levels require the width and height to be
@@ -132,9 +125,8 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             if (elementCount * tSize != dataByteSize)
                 throw new ArgumentException(string.Format("elementCount is not the right size, " +
-                                            "elementCount * sizeof(T) is {0}, but data size is {1}.",
-                                            elementCount * tSize, dataByteSize), "elementCount");
+                                                          "elementCount * sizeof(T) is {0}, but data size is {1}.",
+                    elementCount * tSize, dataByteSize), "elementCount");
         }
-	}
+    }
 }
-

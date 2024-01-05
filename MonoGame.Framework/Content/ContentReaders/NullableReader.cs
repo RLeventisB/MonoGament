@@ -6,7 +6,7 @@ using System;
 
 namespace Microsoft.Xna.Framework.Content
 {
-	internal class NullableReader<T> : ContentTypeReader<T?> where T : struct
+    internal class NullableReader<T> : ContentTypeReader<T?> where T : struct
     {
         ContentTypeReader elementReader;
 
@@ -14,19 +14,19 @@ namespace Microsoft.Xna.Framework.Content
         {
         }
 
-        protected internal override void Initialize(ContentTypeReaderManager manager)
-        {			
-			Type readerType = typeof(T);
-			elementReader = manager.GetTypeReader(readerType);
-        }
-		
-        protected internal override T? Read(ContentReader input, T? existingInstance)
+        public override void Initialize(ContentTypeReaderManager manager)
         {
-			if(input.ReadBoolean())
-				return input.ReadObject<T>(elementReader);
-			
-			return null;
-		}
+            Type readerType = typeof(T);
+            elementReader = manager.GetTypeReader(readerType);
+        }
+
+        public override T? Read(ContentReader input, T? existingInstance)
+        {
+            if (input.ReadBoolean())
+                return input.ReadObject<T>(elementReader);
+
+            return null;
+        }
     }
 }
 

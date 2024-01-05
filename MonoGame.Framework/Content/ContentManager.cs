@@ -2,37 +2,38 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using Microsoft.Xna.Framework.Graphics;
+
+using MonoGame.Framework.Utilities;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Reflection;
-using MonoGame.Framework.Utilities;
-using Microsoft.Xna.Framework.Graphics;
 using System.Globalization;
+using System.IO;
 
 #if !WINDOWS_UAP
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Media;
 #endif
 
 namespace Microsoft.Xna.Framework.Content
 {
-	public partial class ContentManager : IDisposable
-	{
+    public partial class ContentManager : IDisposable
+    {
         const byte ContentCompressedLzx = 0x80;
         const byte ContentCompressedLz4 = 0x40;
 
-		private string _rootDirectory = string.Empty;
-		private IServiceProvider serviceProvider;
+        private string _rootDirectory = string.Empty;
+        private IServiceProvider serviceProvider;
+#if ANDROID
         private Dictionary<string, object> loadedAssets = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-		private List<IDisposable> disposableAssets = new List<IDisposable>();
+#endif
+        private List<IDisposable> disposableAssets = new List<IDisposable>();
         private bool disposed;
 
-		private static object ContentManagerLock = new object();
+        private static object ContentManagerLock = new object();
         private static List<WeakReference> ContentManagers = new List<WeakReference>();
 
-        internal static readonly ByteBufferPool ScratchBufferPool = new ByteBufferPool(1024 * 1024, Environment.ProcessorCount);
+        public static readonly ByteBufferPool ScratchBufferPool = new ByteBufferPool(1024 * 1024, Environment.ProcessorCount);
 
         private static readonly List<char> targetPlatformIdentifiers = new List<char>()
         {
@@ -57,7 +58,7 @@ namespace Microsoft.Xna.Framework.Content
             // are not defined in this repository.  Be sure to ask the
             // console port maintainers to ensure no collisions occur.
 
-            
+
             // Legacy identifiers... these could be reused in the
             // future if we feel enough time has passed.
 
@@ -111,7 +112,7 @@ namespace Microsoft.Xna.Framework.Content
                 }
             }
         }
-
+#if ANDROID
         internal static void ReloadGraphicsContent()
         {
             lock (ContentManagerLock)
@@ -124,8 +125,7 @@ namespace Microsoft.Xna.Framework.Content
                     if (contentRef.IsAlive)
                     {
                         var contentManager = (ContentManager)contentRef.Target;
-                        if (contentManager != null)
-                            contentManager.ReloadGraphicsAssets();
+                        contentManager?.ReloadGraphicsAssets();
                     }
                     else
                     {
@@ -134,95 +134,98 @@ namespace Microsoft.Xna.Framework.Content
                 }
             }
         }
+#endif
+        // Use C# destructor syntax for finalization code.
+        // This destructor will run only if the Dispose method
+        // does not get called.
+        // It gives your base class the opportunity to finalize.
+        // Do not provide destructors in types derived from this class.
+        ~ContentManager()
+        {
+            // Do not re-create Dispose clean-up code here.
+            // Calling Dispose(false) is optimal in terms of
+            // readability and maintainability.
+            Dispose(false);
+        }
 
-		// Use C# destructor syntax for finalization code.
-		// This destructor will run only if the Dispose method
-		// does not get called.
-		// It gives your base class the opportunity to finalize.
-		// Do not provide destructors in types derived from this class.
-		~ContentManager()
-		{
-			// Do not re-create Dispose clean-up code here.
-			// Calling Dispose(false) is optimal in terms of
-			// readability and maintainability.
-			Dispose(false);
-		}
-
-		public ContentManager(IServiceProvider serviceProvider)
-		{
-			if (serviceProvider == null)
-			{
-				throw new ArgumentNullException("serviceProvider");
-			}
-			this.serviceProvider = serviceProvider;
+        public ContentManager(IServiceProvider serviceProvider)
+        {
+            if (serviceProvider == null)
+            {
+                throw new ArgumentNullException("serviceProvider");
+            }
+            this.serviceProvider = serviceProvider;
             AddContentManager(this);
-		}
+        }
 
-		public ContentManager(IServiceProvider serviceProvider, string rootDirectory)
-		{
-			if (serviceProvider == null)
-			{
-				throw new ArgumentNullException("serviceProvider");
-			}
-			if (rootDirectory == null)
-			{
-				throw new ArgumentNullException("rootDirectory");
-			}
-			this.RootDirectory = rootDirectory;
-			this.serviceProvider = serviceProvider;
+        public ContentManager(IServiceProvider serviceProvider, string rootDirectory)
+        {
+            if (serviceProvider == null)
+            {
+                throw new ArgumentNullException("serviceProvider");
+            }
+            if (rootDirectory == null)
+            {
+                throw new ArgumentNullException("rootDirectory");
+            }
+            RootDirectory = rootDirectory;
+            this.serviceProvider = serviceProvider;
             AddContentManager(this);
-		}
+        }
 
-		public void Dispose()
-		{
-			Dispose(true);
-			// Tell the garbage collector not to call the finalizer
-			// since all the cleanup will already be done.
-			GC.SuppressFinalize(this);
+        public void Dispose()
+        {
+            Dispose(true);
+            // Tell the garbage collector not to call the finalizer
+            // since all the cleanup will already be done.
+            GC.SuppressFinalize(this);
             // Once disposed, content manager wont be used again
             RemoveContentManager(this);
-		}
+        }
 
-		// If disposing is true, it was called explicitly and we should dispose managed objects.
-		// If disposing is false, it was called by the finalizer and managed objects should not be disposed.
-		protected virtual void Dispose(bool disposing)
-		{
-			if (!disposed)
-			{
+        // If disposing is true, it was called explicitly and we should dispose managed objects.
+        // If disposing is false, it was called by the finalizer and managed objects should not be disposed.
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
                 if (disposing)
                 {
                     Unload();
                 }
 
-				disposed = true;
-			}
-		}
+                disposed = true;
+            }
+        }
 
-        public virtual T LoadLocalized<T> (string assetName)
+        public virtual T LoadLocalized<T>(string assetName)
         {
-            string [] cultureNames =
+            string[] cultureNames =
             {
-                CultureInfo.CurrentCulture.Name,                        // eg. "en-US"
-                CultureInfo.CurrentCulture.TwoLetterISOLanguageName     // eg. "en"
+                CultureInfo.CurrentCulture.Name, // eg. "en-US"
+                CultureInfo.CurrentCulture.TwoLetterISOLanguageName // eg. "en"
             };
 
             // Look first for a specialized language-country version of the asset,
             // then if that fails, loop back around to see if we can find one that
             // specifies just the language without the country part.
-            foreach (string cultureName in cultureNames) {
+            foreach (string cultureName in cultureNames)
+            {
                 string localizedAssetName = assetName + '.' + cultureName;
 
-                try {
-                    return Load<T> (localizedAssetName);
-                } catch (ContentLoadException) { }
+                try
+                {
+                    return Load<T>(localizedAssetName);
+                }
+                catch (ContentLoadException) { }
             }
 
             // If we didn't find any localized asset, fall back to the default name.
-            return Load<T> (assetName);
+            return Load<T>(assetName);
         }
 
-		public virtual T Load<T>(string assetName)
-		{
+        public virtual T Load<T>(string assetName)
+        {
             if (string.IsNullOrEmpty(assetName))
             {
                 throw new ArgumentNullException("assetName");
@@ -233,7 +236,7 @@ namespace Microsoft.Xna.Framework.Content
             }
 
             T result = default(T);
-            
+#if ANDROID
             // On some platforms, name and slash direction matter.
             // We store the asset by a /-seperating key rather than how the
             // path to the file was passed to us to avoid
@@ -243,26 +246,27 @@ namespace Microsoft.Xna.Framework.Content
             var key = assetName.Replace('\\', '/');
 
             // Check for a previously loaded asset first
-            object asset = null;
-            if (loadedAssets.TryGetValue(key, out asset))
+            if (loadedAssets.TryGetValue(key, out object asset))
             {
                 if (asset is T)
                 {
                     return (T)asset;
                 }
             }
-
+#endif
             // Load the asset.
             result = ReadAsset<T>(assetName, null);
 
+#if ANDROID
             loadedAssets[key] = result;
+#endif
             return result;
-		}
-		
-		protected virtual Stream OpenStream(string assetName)
-		{
-			Stream stream;
-			try
+        }
+
+        protected virtual Stream OpenStream(string assetName)
+        {
+            Stream stream;
+            try
             {
                 var assetPath = Path.Combine(RootDirectory, assetName) + ".xnb";
 
@@ -270,11 +274,11 @@ namespace Microsoft.Xna.Framework.Content
                 // Setting the RootDirectory to an absolute path is useful in editor
                 // situations, but TitleContainer can ONLY be passed relative paths.                
 #if DESKTOPGL || WINDOWS
-                if (Path.IsPathRooted(assetPath))                
-                    stream = File.OpenRead(assetPath);                
+                if (Path.IsPathRooted(assetPath))
+                    stream = File.OpenRead(assetPath);
                 else
-#endif                
-                stream = TitleContainer.OpenStream(assetPath);
+#endif
+                    stream = TitleContainer.OpenStream(assetPath);
 #if ANDROID
                 // Read the asset into memory in one go. This results in a ~50% reduction
                 // in load times on Android due to slow Android asset streams.
@@ -284,37 +288,37 @@ namespace Microsoft.Xna.Framework.Content
                 stream.Close();
                 stream = memStream;
 #endif
-			}
-			catch (FileNotFoundException fileNotFound)
-			{
-				throw new ContentLoadException("The content file was not found.", fileNotFound);
-			}
+            }
+            catch (FileNotFoundException fileNotFound)
+            {
+                throw new ContentLoadException("The content file was not found.", fileNotFound);
+            }
 #if !WINDOWS_UAP
-			catch (DirectoryNotFoundException directoryNotFound)
-			{
-				throw new ContentLoadException("The directory was not found.", directoryNotFound);
-			}
+            catch (DirectoryNotFoundException directoryNotFound)
+            {
+                throw new ContentLoadException("The directory was not found.", directoryNotFound);
+            }
 #endif
-			catch (Exception exception)
-			{
-				throw new ContentLoadException("Opening stream error.", exception);
-			}
-			return stream;
-		}
+            catch (Exception exception)
+            {
+                throw new ContentLoadException("Opening stream error.", exception);
+            }
+            return stream;
+        }
 
-		protected T ReadAsset<T>(string assetName, Action<IDisposable> recordDisposableObject)
-		{
-			if (string.IsNullOrEmpty(assetName))
-			{
-				throw new ArgumentNullException("assetName");
-			}
-			if (disposed)
-			{
-				throw new ObjectDisposedException("ContentManager");
-			}
-						
-			string originalAssetName = assetName;
-			object result = null;
+        public T ReadAsset<T>(string assetName, Action<IDisposable> recordDisposableObject)
+        {
+            if (string.IsNullOrEmpty(assetName))
+            {
+                throw new ArgumentNullException("assetName");
+            }
+            if (disposed)
+            {
+                throw new ObjectDisposedException("ContentManager");
+            }
+
+            string originalAssetName = assetName;
+            object result = null;
 
             // Try to load as XNB file
             var stream = OpenStream(assetName);
@@ -323,16 +327,16 @@ namespace Microsoft.Xna.Framework.Content
                 using (var reader = GetContentReaderFromXnb(assetName, stream, xnbReader, recordDisposableObject))
                 {
                     result = reader.ReadAsset<T>();
-                    if (result is GraphicsResource)
-                        ((GraphicsResource)result).Name = originalAssetName;
+                    if (result is GraphicsResource graphicsResource)
+                        graphicsResource.Name = originalAssetName;
                 }
             }
-            
-			if (result == null)
-				throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
 
-			return (T)result;
-		}
+            if (result == null)
+                throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
+
+            return (T)result;
+        }
 
         private ContentReader GetContentReaderFromXnb(string originalAssetName, Stream stream, BinaryReader xnbReader, Action<IDisposable> recordDisposableObject)
         {
@@ -343,7 +347,7 @@ namespace Microsoft.Xna.Framework.Content
             byte platform = xnbReader.ReadByte();
 
             if (x != 'X' || n != 'N' || b != 'B' ||
-                !(targetPlatformIdentifiers.Contains((char)platform)))
+                !targetPlatformIdentifiers.Contains((char)platform))
             {
                 throw new ContentLoadException("Asset does not appear to be a valid XNB file. Did you process your content for Windows?");
             }
@@ -383,8 +387,8 @@ namespace Microsoft.Xna.Framework.Content
             }
 
             var reader = new ContentReader(this, decompressedStream,
-                                                        originalAssetName, version, recordDisposableObject);
-            
+                originalAssetName, version, recordDisposableObject);
+
             return reader;
         }
 
@@ -398,15 +402,13 @@ namespace Microsoft.Xna.Framework.Content
                 disposableAssets.Add(disposable);
         }
 
+#if ANDROID
         /// <summary>
         /// Virtual property to allow a derived ContentManager to have it's assets reloaded
         /// </summary>
-        protected virtual Dictionary<string, object> LoadedAssets
-        {
-            get { return loadedAssets; }
-        }
+        protected virtual Dictionary<string, object> LoadedAssets => loadedAssets;
 
-		protected virtual void ReloadGraphicsAssets()
+        protected virtual void ReloadGraphicsAssets()
         {
             foreach (var asset in LoadedAssets)
             {
@@ -417,43 +419,42 @@ namespace Microsoft.Xna.Framework.Content
 
                 var methodInfo = ReflectionHelpers.GetMethodInfo(typeof(ContentManager), "ReloadAsset");
                 var genericMethod = methodInfo.MakeGenericMethod(asset.Value.GetType());
-                genericMethod.Invoke(this, new object[] { asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()) }); 
+                genericMethod.Invoke(this, new object[] { asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()) });
             }
         }
-
-        protected virtual void ReloadAsset<T>(string originalAssetName, T currentAsset)
+#endif
+        public virtual void ReloadAsset<T>(string originalAssetName, T currentAsset)
         {
-			string assetName = originalAssetName;
-			if (string.IsNullOrEmpty(assetName))
-			{
-				throw new ArgumentNullException("assetName");
-			}
-			if (disposed)
-			{
-				throw new ObjectDisposedException("ContentManager");
-			}
+            if (string.IsNullOrEmpty(originalAssetName))
+            {
+                throw new ArgumentNullException("assetName");
+            }
+            if (disposed)
+            {
+                throw new ObjectDisposedException("ContentManager");
+            }
 
-            var stream = OpenStream(assetName);
+            var stream = OpenStream(originalAssetName);
             using (var xnbReader = new BinaryReader(stream))
             {
-                using (var reader = GetContentReaderFromXnb(assetName, stream, xnbReader, null))
+                using (var reader = GetContentReaderFromXnb(originalAssetName, stream, xnbReader, null))
                 {
                     reader.ReadAsset<T>(currentAsset);
                 }
             }
-		}
-
-		public virtual void Unload()
-		{
-		    // Look for disposable assets.
-		    foreach (var disposable in disposableAssets)
-		    {
-		        if (disposable != null)
-		            disposable.Dispose();
-		    }
-			disposableAssets.Clear();
-		    loadedAssets.Clear();
-		}
+        }
+        public virtual void Unload()
+        {
+            // Look for disposable assets.
+            foreach (var disposable in disposableAssets)
+            {
+                disposable?.Dispose();
+            }
+            disposableAssets.Clear();
+#if ANDROID
+            loadedAssets.Clear();
+#endif
+        }
 
         /// <summary>
         /// Unloads a single asset.
@@ -470,9 +471,9 @@ namespace Microsoft.Xna.Framework.Content
                 throw new ObjectDisposedException("ContentManager");
             }
 
+#if ANDROID
             //Check if the asset exists
-            object asset;
-            if (loadedAssets.TryGetValue(assetName, out asset))
+            if (loadedAssets.TryGetValue(assetName, out object asset))
             {
                 //Check if it's disposable and remove it from the disposable list if so
                 var disposable = asset as IDisposable;
@@ -484,8 +485,10 @@ namespace Microsoft.Xna.Framework.Content
 
                 loadedAssets.Remove(assetName);
             }
+#endif
         }
 
+#if ANDROID
         /// <summary>
         /// Unloads a set of assets.
         /// </summary>
@@ -506,33 +509,19 @@ namespace Microsoft.Xna.Framework.Content
                 UnloadAsset(assetNames[i]);
             }
         }
-
-		public string RootDirectory
-		{
-			get
-			{
-				return _rootDirectory;
-			}
-			set
-			{
-				_rootDirectory = value;
-			}
-		}
-
-        internal string RootDirectoryFullPath
+#endif
+        public string RootDirectory
         {
-            get
-            {
-                return Path.Combine(TitleContainer.Location, RootDirectory);
-            }
+            get => _rootDirectory;
+            set => _rootDirectory = value;
         }
-		
-		public IServiceProvider ServiceProvider
-		{
-			get
-			{
-				return this.serviceProvider;
-			}
-		}
+        public static void FreeMemory()
+        {
+            ScratchBufferPool.ClearPool();
+        }
+
+        internal string RootDirectoryFullPath => Path.Combine(TitleContainer.Location, RootDirectory);
+
+        public IServiceProvider ServiceProvider => serviceProvider;
     }
 }

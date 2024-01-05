@@ -8,15 +8,15 @@ namespace Microsoft.Xna.Framework.Media
 {
 	public partial class MediaLibrary : IDisposable
 	{
-        public AlbumCollection Albums { get { return PlatformGetAlbums();  } }
+        public AlbumCollection Albums => PlatformGetAlbums();
         //public ArtistCollection Artists { get; private set; }
         //public GenreCollection Genres { get; private set; }
         public bool IsDisposed { get; private set; }
-        public MediaSource MediaSource { get { return null; } }
-		//public PlaylistCollection Playlists { get; private set; }
-        public SongCollection Songs { get { return PlatformGetSongs(); } }
+        public MediaSource MediaSource => null;
+        //public PlaylistCollection Playlists { get; private set; }
+        public SongCollection Songs => PlatformGetSongs();
 
-		public MediaLibrary()
+        public MediaLibrary()
 		{
 		}
 
@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.Media
 		public void Dispose()
 		{
 		    PlatformDispose();
-		    this.IsDisposed = true;
+		    IsDisposed = true;
 		}
 	}
 }

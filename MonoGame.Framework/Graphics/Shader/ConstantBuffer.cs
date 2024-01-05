@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -19,10 +20,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private ulong _stateKey;
 
         private bool _dirty;
-        private bool Dirty
-        {
-            get { return _dirty; }
-        }
+        private bool Dirty => _dirty;
 
         public ConstantBuffer(ConstantBuffer cloneSource)
         {
@@ -39,10 +37,10 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         public ConstantBuffer(GraphicsDevice device,
-                              int sizeInBytes,
-                              int[] parameterIndexes,
-                              int[] parameterOffsets,
-                              string name)
+            int sizeInBytes,
+            int[] parameterIndexes,
+            int[] parameterOffsets,
+            string name)
         {
             GraphicsDevice = device;
 
@@ -61,7 +59,7 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformClear();
         }
 
-        private void SetData(int offset, int rows, int columns, object data)
+        private unsafe void SetData(int offset, int rows, int columns, nint data)
         {
             // Shader registers are always 4 bytes and all the
             // incoming data objects should be 4 bytes per element.
@@ -71,32 +69,28 @@ namespace Microsoft.Xna.Framework.Graphics
             // Take care of a single element.
             if (rows == 1 && columns == 1)
             {
-                // EffectParameter stores all values in arrays by default.             
-                if (data is Array)
-                    Buffer.BlockCopy(data as Array, 0, _buffer, offset, elementSize);
-                else
-                {
-                    // TODO: When we eventually expose the internal Shader 
-                    // API then we will need to deal with non-array elements.
-                    throw new NotImplementedException();
-                }
+                // EffectParameter stores all values in arrays by default.
+                Marshal.Copy(data, _buffer, offset, elementSize);
+                //  Buffer.BlockCopy(data as Array, 0, _buffer, offset, elementSize);
             }
 
-
             // Take care of the single copy case!
-            else if (rows == 1 || (rows == 4 && columns == 4)) {
-                // take care of shader compiler optimization
-                int len = rows * columns * elementSize;
-                if (_buffer.Length - offset > len)
-                len = _buffer.Length - offset;
-                Buffer.BlockCopy(data as Array, 0, _buffer, offset, rows*columns*elementSize);
-            } else
+            else if (rows == 1 || rows == 4 && columns == 4)
             {
-                var source = data as Array;
+                // take care of shader compiler optimization
+                // Buffer.BlockCopy(data as Array, 0, _buffer, offset, rows * columns * elementSize);
+                Marshal.Copy(data, _buffer, offset, rows * columns * elementSize);
+            }
+            else
+            {
 
-                var stride = (columns*elementSize);
+                var stride = columns * elementSize;
                 for (var y = 0; y < rows; y++)
-                    Buffer.BlockCopy(source, stride*y, _buffer, offset + (rowSize*y), columns*elementSize);
+                {
+                    nint offsetData = data + stride * y;
+                    //Buffer.BlockCopy(data as Array, stride*y, _buffer, offset + (rowSize*y), columns*elementSize);
+                    Marshal.Copy(offsetData, _buffer, offset + rowSize * y, columns * elementSize);
+                }
             }
         }
 
@@ -110,14 +104,14 @@ namespace Microsoft.Xna.Framework.Graphics
             var elements = param.Elements;
             if (elements.Count > 0)
             {
-                for (var i=0; i < elements.Count; i++)
+                for (var i = 0; i < elements.Count; i++)
                 {
                     var rowsUsedSubParam = SetParameter(offset, elements[i]);
                     offset += rowsUsedSubParam * rowSize;
                     rowsUsed += rowsUsedSubParam;
                 }
             }
-            else if (param.Data != null)
+            else
             {
                 switch (param.ParameterType)
                 {
@@ -147,7 +141,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Update(EffectParameterCollection parameters)
         {
-            // TODO:  We should be doing some sort of dirty state 
+            // TODO:  We should be doing some sort of dirty state
             // testing here.
             //
             // It should let us skip all parameter updates if
@@ -155,12 +149,12 @@ namespace Microsoft.Xna.Framework.Graphics
             // as that is why you should use multiple constant
             // buffers.
 
-            // If our state key becomes larger than the 
-            // next state key then the keys have rolled 
+            // If our state key becomes larger than the
+            // next state key then the keys have rolled
             // over and we need to reset.
             if (_stateKey > EffectParameter.NextStateKey)
                 _stateKey = 0;
-            
+
             for (var p = 0; p < _parameters.Length; p++)
             {
                 var index = _parameters[p];

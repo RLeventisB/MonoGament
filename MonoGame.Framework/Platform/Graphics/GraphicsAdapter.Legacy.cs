@@ -64,11 +64,16 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #if DESKTOPGL
-        public string Description {
-            get {
-                try {
+        public string Description
+        {
+            get
+            {
+                try
+                {
                     return MonoGame.OpenGL.GL.GetString(MonoGame.OpenGL.StringName.Renderer);
-                } catch {
+                }
+                catch
+                {
                     return string.Empty;
                 }
             }
@@ -76,7 +81,9 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 #else
         string _description = string.Empty;
-        public string Description { get { return _description; } private set { _description = value; } }
+        public string Description { get => _description;
+            private set => _description = value;
+        }
 #endif
 
         public DisplayMode CurrentDisplayMode
@@ -93,8 +100,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif DESKTOPGL
                 var displayIndex = Sdl.Display.GetWindowDisplayIndex(SdlGameWindow.Instance.Handle);
 
-                Sdl.Display.Mode mode;
-                Sdl.Display.GetCurrentDisplayMode(displayIndex, out mode);
+                Sdl.Display.GetCurrentDisplayMode(displayIndex, out Sdl.Display.Mode mode);
 
                 return new DisplayMode(mode.Width, mode.Height, SurfaceFormat.Color);
 #elif WINDOWS
@@ -112,10 +118,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        public static GraphicsAdapter DefaultAdapter
-        {
-            get { return Adapters[0]; }
-        }
+        public static GraphicsAdapter DefaultAdapter => Adapters[0];
 
         public static ReadOnlyCollection<GraphicsAdapter> Adapters
         {
@@ -146,8 +149,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </remarks>
         public static bool UseReferenceDevice
         {
-            get { return UseDriverType == DriverType.Reference; }
-            set { UseDriverType = value ? DriverType.Reference : DriverType.Hardware; }
+            get => UseDriverType == DriverType.Reference;
+            set => UseDriverType = value ? DriverType.Reference : DriverType.Hardware;
         }
 
         /// <summary>
@@ -170,16 +173,16 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="selectedDepthFormat">Set to the best format supported by the adaptor for the requested depth stencil format.</param>
         /// <param name="selectedMultiSampleCount">Set to the best count supported by the adaptor for the requested multisample count.</param>
         /// <returns>True if the requested format is supported by the adaptor. False if one or more of the values was changed.</returns>
-		public bool QueryRenderTargetFormat(
-			GraphicsProfile graphicsProfile,
-			SurfaceFormat format,
-			DepthFormat depthFormat,
-			int multiSampleCount,
-			out SurfaceFormat selectedFormat,
-			out DepthFormat selectedDepthFormat,
-			out int selectedMultiSampleCount)
-		{
-			selectedFormat = format;
+        public bool QueryRenderTargetFormat(
+            GraphicsProfile graphicsProfile,
+            SurfaceFormat format,
+            DepthFormat depthFormat,
+            int multiSampleCount,
+            out SurfaceFormat selectedFormat,
+            out DepthFormat selectedDepthFormat,
+            out int selectedMultiSampleCount)
+        {
+            selectedFormat = format;
             selectedDepthFormat = depthFormat;
             selectedMultiSampleCount = multiSampleCount;
 
@@ -197,8 +200,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 selectedFormat = SurfaceFormat.Color;
 
 
-            return (format == selectedFormat) && (depthFormat == selectedDepthFormat) && (multiSampleCount == selectedMultiSampleCount);
-		}
+            return format == selectedFormat && depthFormat == selectedDepthFormat && multiSampleCount == selectedMultiSampleCount;
+        }
 
         /*
         public string Description
@@ -305,7 +308,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 bool displayChanged = false;
 #if DESKTOPGL
-                var displayIndex = Sdl.Display.GetWindowDisplayIndex (SdlGameWindow.Instance.Handle);
+                var displayIndex = Sdl.Display.GetWindowDisplayIndex(SdlGameWindow.Instance.Handle);
                 displayChanged = displayIndex != _displayIndex;
 #endif
                 if (_supportedDisplayModes == null || displayChanged)
@@ -315,13 +318,12 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DESKTOPGL
                     _displayIndex = displayIndex;
                     modes.Clear();
-                    
+
                     var modeCount = Sdl.Display.GetNumDisplayModes(displayIndex);
 
-                    for (int i = 0;i < modeCount;i++)
+                    for (int i = 0; i < modeCount; i++)
                     {
-                        Sdl.Display.Mode mode;
-                        Sdl.Display.GetDisplayMode(displayIndex, i, out mode);
+                        Sdl.Display.GetDisplayMode(displayIndex, i, out Sdl.Display.Mode mode);
 
                         // We are only using one format, Color
                         // mode.Format gets the Color format from SDL
@@ -354,7 +356,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     {
                         if (a == b) return 0;
                         if (a.Format <= b.Format && a.Width <= b.Width && a.Height <= b.Height) return -1;
-                        else return 1;
+                        return 1;
                     });
                     _supportedDisplayModes = new DisplayModeCollection(modes);
                 }
@@ -394,10 +396,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public bool IsProfileSupported(GraphicsProfile graphicsProfile)
         {
-            if(UseReferenceDevice)
+            if (UseReferenceDevice)
                 return true;
 
-            switch(graphicsProfile)
+            switch (graphicsProfile)
             {
                 case GraphicsProfile.Reach:
                     return true;

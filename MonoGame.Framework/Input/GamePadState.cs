@@ -110,7 +110,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <summary>
         /// Gets the button mask along with 'virtual buttons' like LeftThumbstickLeft.
         /// </summary>
-        private Buttons GetVirtualButtons ()
+        private Buttons GetVirtualButtons()
         {
             var result = Buttons._buttons;
 
@@ -158,12 +158,12 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns><c>true</c> if <c>left</c> and <c>right</c> are equal; otherwise, <c>false</c>.</returns>
         public static bool operator ==(GamePadState left, GamePadState right)
         {
-            return (left.IsConnected == right.IsConnected) &&
-                (left.PacketNumber == right.PacketNumber) &&
-                (left.Buttons == right.Buttons) &&
-                (left.DPad == right.DPad) &&
-                (left.ThumbSticks == right.ThumbSticks) &&
-                (left.Triggers == right.Triggers);
+            return left.IsConnected == right.IsConnected &&
+                   left.PacketNumber == right.PacketNumber &&
+                   left.Buttons == right.Buttons &&
+                   left.DPad == right.DPad &&
+                   left.ThumbSticks == right.ThumbSticks &&
+                   left.Triggers == right.Triggers;
         }
 
         /// <summary>
@@ -186,7 +186,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <see cref="T:Microsoft.Xna.Framework.Input.GamePadState"/>; otherwise, <c>false</c>.</returns>
         public override bool Equals(object obj)
         {
-            return (obj is GamePadState) && (this == (GamePadState)obj);
+            return obj is GamePadState state && this == state;
         }
 
         /// <summary>
@@ -199,10 +199,10 @@ namespace Microsoft.Xna.Framework.Input
             unchecked
             {
                 var hash = PacketNumber;
-                hash = (hash * 397) ^ Buttons.GetHashCode();
-                hash = (hash * 397) ^ DPad.GetHashCode();
-                hash = (hash * 397) ^ ThumbSticks.GetHashCode();
-                hash = (hash * 397) ^ Triggers.GetHashCode();
+                hash = hash * 397 ^ Buttons.GetHashCode();
+                hash = hash * 397 ^ DPad.GetHashCode();
+                hash = hash * 397 ^ ThumbSticks.GetHashCode();
+                hash = hash * 397 ^ Triggers.GetHashCode();
                 return hash;
             }
         }

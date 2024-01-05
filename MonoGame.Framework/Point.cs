@@ -17,13 +17,13 @@ namespace Microsoft.Xna.Framework
     public struct Point : IEquatable<Point>
     {
         #region Private Fields
-
         private static readonly Point zeroPoint = new Point();
-
+        private static readonly Point onePoint = new Point(1, 1);
+        private static readonly Point unitXPoint = new Point(1, 0);
+        private static readonly Point unitYPoint = new Point(0, 1);
         #endregion
 
         #region Public Fields
-
         /// <summary>
         /// The x coordinate of this <see cref="Point"/>.
         /// </summary>
@@ -35,38 +35,26 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         [DataMember]
         public int Y;
-
         #endregion
 
         #region Properties
-
         /// <summary>
         /// Returns a <see cref="Point"/> with coordinates 0, 0.
         /// </summary>
-        public static Point Zero
-        {
-            get { return zeroPoint; }
-        }
-
+        public static Point Zero => zeroPoint;
+        public static Point One => onePoint;
+        public static Point UnitX => unitXPoint;
+        public static Point UnitY => unitYPoint;
         #endregion
 
         #region Internal Properties
-
-        internal string DebugDisplayString
-        {
-            get
-            {
-                return string.Concat(
-                    this.X.ToString(), "  ",
-                    this.Y.ToString()
-                );
-            }
-        }
-
+        internal string DebugDisplayString => string.Concat(
+            X.ToString(), "  ",
+            Y.ToString()
+        );
         #endregion
 
         #region Constructors
-
         /// <summary>
         /// Constructs a point with X and Y from two values.
         /// </summary>
@@ -74,8 +62,8 @@ namespace Microsoft.Xna.Framework
         /// <param name="y">The y coordinate in 2d-space.</param>
         public Point(int x, int y)
         {
-            this.X = x;
-            this.Y = y;
+            X = x;
+            Y = y;
         }
 
         /// <summary>
@@ -84,14 +72,12 @@ namespace Microsoft.Xna.Framework
         /// <param name="value">The x and y coordinates in 2d-space.</param>
         public Point(int value)
         {
-            this.X = value;
-            this.Y = value;
+            X = value;
+            Y = value;
         }
-
         #endregion
 
         #region Operators
-
         /// <summary>
         /// Adds two points.
         /// </summary>
@@ -157,11 +143,9 @@ namespace Microsoft.Xna.Framework
         {
             return !a.Equals(b);
         }
-
         #endregion
 
         #region Public methods
-
         /// <summary>
         /// Compares whether current instance is equal to specified <see cref="Object"/>.
         /// </summary>
@@ -169,7 +153,7 @@ namespace Microsoft.Xna.Framework
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public override bool Equals(object obj)
         {
-            return (obj is Point) && Equals((Point)obj);
+            return obj is Point point && Equals(point);
         }
 
         /// <summary>
@@ -179,7 +163,7 @@ namespace Microsoft.Xna.Framework
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public bool Equals(Point other)
         {
-            return ((X == other.X) && (Y == other.Y));
+            return X == other.X && Y == other.Y;
         }
 
         /// <summary>
@@ -228,9 +212,6 @@ namespace Microsoft.Xna.Framework
             x = X;
             y = Y;
         }
-
         #endregion
     }
 }
-
-

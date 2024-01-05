@@ -13,17 +13,13 @@ namespace Microsoft.Xna.Framework.Audio
     public sealed partial class DynamicSoundEffectInstance : SoundEffectInstance
     {
         #region Public Properties
-
         /// <summary>
         /// This value has no effect on DynamicSoundEffectInstance.
         /// It may not be set.
         /// </summary>
         public override bool IsLooped
         {
-            get
-            {
-                return false;
-            }
+            get => false;
 
             set
             {
@@ -61,7 +57,6 @@ namespace Microsoft.Xna.Framework.Audio
         /// This event may occur when <see cref="Play()"/> is called or during playback when a buffer is completed.
         /// </remarks>
         public event EventHandler<EventArgs> BufferNeeded;
-
         #endregion
 
         private const int TargetPendingBufferCount = 3;
@@ -71,7 +66,6 @@ namespace Microsoft.Xna.Framework.Audio
         private SoundState _state;
 
         #region Public Constructor
-
         /// <param name="sampleRate">Sample rate, in Hertz (Hz).</param>
         /// <param name="channels">Number of channels (mono or stereo).</param>
         public DynamicSoundEffectInstance(int sampleRate, AudioChannels channels)
@@ -80,26 +74,24 @@ namespace Microsoft.Xna.Framework.Audio
             if (SoundEffect._systemState != SoundEffect.SoundSystemState.Initialized)
                 throw new NoAudioHardwareException("Audio has failed to initialize. Call SoundEffect.Initialize() before sound operation to get more specific errors.");
 
-            if ((sampleRate < 8000) || (sampleRate > 48000))
+            if (sampleRate < 8000 || sampleRate > 48000)
                 throw new ArgumentOutOfRangeException("sampleRate");
-            if ((channels != AudioChannels.Mono) && (channels != AudioChannels.Stereo))
+            if (channels != AudioChannels.Mono && channels != AudioChannels.Stereo)
                 throw new ArgumentOutOfRangeException("channels");
 
             _sampleRate = sampleRate;
             _channels = channels;
             _state = SoundState.Stopped;
             PlatformCreate();
-            
+
             // This instance is added to the pool so that its volume reflects master volume changes
             // and it contributes to the playing instances limit, but the source/voice is not owned by the pool.
             _isPooled = false;
             _isDynamic = true;
         }
-
         #endregion
 
         #region Public Functions
-
         /// <summary>
         /// Returns the duration of an audio buffer of the specified size, based on the settings of this instance.
         /// </summary>
@@ -200,7 +192,7 @@ namespace Microsoft.Xna.Framework.Audio
         public override void Stop(bool immediate)
         {
             AssertNotDisposed();
-            
+
             if (immediate)
             {
                 DynamicSoundEffectInstanceManager.RemoveInstance(this);
@@ -222,7 +214,7 @@ namespace Microsoft.Xna.Framework.Audio
         public void SubmitBuffer(byte[] buffer)
         {
             AssertNotDisposed();
-            
+
             if (buffer.Length == 0)
                 throw new ArgumentException("Buffer may not be empty.");
 
@@ -247,12 +239,12 @@ namespace Microsoft.Xna.Framework.Audio
         public void SubmitBuffer(byte[] buffer, int offset, int count)
         {
             AssertNotDisposed();
-            
-            if ((buffer == null) || (buffer.Length == 0))
+
+            if (buffer == null || buffer.Length == 0)
                 throw new ArgumentException("Buffer may not be null or empty.");
             if (count <= 0)
                 throw new ArgumentException("Number of bytes must be greater than zero.");
-            if ((offset + count) > buffer.Length)
+            if (offset + count > buffer.Length)
                 throw new ArgumentException("Buffer is shorter than the specified number of bytes from the offset.");
 
             // Ensure that the buffer length and start position match alignment.
@@ -264,11 +256,9 @@ namespace Microsoft.Xna.Framework.Audio
 
             PlatformSubmitBuffer(buffer, offset, count);
         }
-
         #endregion
 
         #region Nonpublic Functions
-
         private void AssertNotDisposed()
         {
             if (IsDisposed)
@@ -283,7 +273,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void CheckBufferCount()
         {
-            if ((PendingBufferCount < TargetPendingBufferCount) && (_state == SoundState.Playing))
+            if (PendingBufferCount < TargetPendingBufferCount && _state == SoundState.Playing)
                 _buffersNeeded++;
         }
 
@@ -297,7 +287,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             if (bufferNeededHandler != null)
             {
-                var eventCount = (_buffersNeeded < 3) ? _buffersNeeded : 3;
+                var eventCount = _buffersNeeded < 3 ? _buffersNeeded : 3;
                 for (var i = 0; i < eventCount; i++)
                 {
                     bufferNeededHandler(this, EventArgs.Empty);
@@ -306,7 +296,6 @@ namespace Microsoft.Xna.Framework.Audio
 
             _buffersNeeded = 0;
         }
-
         #endregion
     }
 }

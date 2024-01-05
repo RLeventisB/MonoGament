@@ -40,7 +40,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>true if <paramref name="left"/> and <paramref name="right"/> are equal; otherwise, false.</returns>
         public static bool operator ==(GamePadTriggers left, GamePadTriggers right)
         {
-            return (left.Left == right.Left) && (left.Right == right.Right);
+            return left.Left == right.Left && left.Right == right.Right;
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>true if <paramref name="obj"/> is a <see cref="GamePadTriggers"/> and has the same value as this instance; otherwise, false.</returns>
         public override bool Equals(object obj)
         {
-            return (obj is GamePadTriggers) && (this == (GamePadTriggers)obj);
+            return obj is GamePadTriggers triggers && this == triggers;
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             unchecked
             {
-                return (Left.GetHashCode() * 397) ^ Right.GetHashCode();
+                return Left.GetHashCode() * 397 ^ Right.GetHashCode();
             }
         }
 

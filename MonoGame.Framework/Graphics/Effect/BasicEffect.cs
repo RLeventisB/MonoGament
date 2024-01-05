@@ -10,6 +10,7 @@
 #region Using Statements
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using System;
 #endregion
 
@@ -21,7 +22,6 @@ namespace Microsoft.Xna.Framework.Graphics
     public class BasicEffect : Effect, IEffectMatrices, IEffectLights, IEffectFog
     {
         #region Effect Parameters
-
         EffectParameter textureParam;
         EffectParameter diffuseColorParam;
         EffectParameter emissiveColorParam;
@@ -33,11 +33,9 @@ namespace Microsoft.Xna.Framework.Graphics
         EffectParameter worldParam;
         EffectParameter worldInverseTransposeParam;
         EffectParameter worldViewProjParam;
-
         #endregion
 
         #region Fields
-
         bool lightingEnabled;
         bool preferPerPixelLighting;
         bool oneLight;
@@ -61,23 +59,20 @@ namespace Microsoft.Xna.Framework.Graphics
         DirectionalLight light1;
         DirectionalLight light2;
 
-        float fogStart = 0;
+        float fogStart;
         float fogEnd = 1;
 
         EffectDirtyFlags dirtyFlags = EffectDirtyFlags.All;
-
         #endregion
-        
+
         #region Public Properties
-
-
         /// <summary>
         /// Gets or sets the world matrix.
         /// </summary>
         public Matrix World
         {
-            get { return world; }
-            
+            get => world;
+
             set
             {
                 world = value;
@@ -91,8 +86,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         public Matrix View
         {
-            get { return view; }
-            
+            get => view;
+
             set
             {
                 view = value;
@@ -106,8 +101,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         public Matrix Projection
         {
-            get { return projection; }
-            
+            get => projection;
+
             set
             {
                 projection = value;
@@ -121,8 +116,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         public Vector3 DiffuseColor
         {
-            get { return diffuseColor; }
-            
+            get => diffuseColor;
+
             set
             {
                 diffuseColor = value;
@@ -136,8 +131,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         public Vector3 EmissiveColor
         {
-            get { return emissiveColor; }
-            
+            get => emissiveColor;
+
             set
             {
                 emissiveColor = value;
@@ -151,8 +146,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         public Vector3 SpecularColor
         {
-            get { return specularColorParam.GetValueVector3(); }
-            set { specularColorParam.SetValue(value); }
+            get => specularColorParam.GetValueVector3();
+            set => specularColorParam.SetValue(value);
         }
 
 
@@ -161,8 +156,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         public float SpecularPower
         {
-            get { return specularPowerParam.GetValueSingle(); }
-            set { specularPowerParam.SetValue(value); }
+            get => specularPowerParam.GetValueSingle();
+            set => specularPowerParam.SetValue(value);
         }
 
 
@@ -171,8 +166,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         public float Alpha
         {
-            get { return alpha; }
-            
+            get => alpha;
+
             set
             {
                 alpha = value;
@@ -183,8 +178,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <inheritdoc/>
         public bool LightingEnabled
         {
-            get { return lightingEnabled; }
-            
+            get => lightingEnabled;
+
             set
             {
                 if (lightingEnabled != value)
@@ -201,8 +196,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         public bool PreferPerPixelLighting
         {
-            get { return preferPerPixelLighting; }
-            
+            get => preferPerPixelLighting;
+
             set
             {
                 if (preferPerPixelLighting != value)
@@ -217,8 +212,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <inheritdoc/>
         public Vector3 AmbientLightColor
         {
-            get { return ambientLightColor; }
-            
+            get => ambientLightColor;
+
             set
             {
                 ambientLightColor = value;
@@ -228,22 +223,22 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
         /// <inheritdoc/>
-        public DirectionalLight DirectionalLight0 { get { return light0; } }
+        public DirectionalLight DirectionalLight0 => light0;
 
 
         /// <inheritdoc/>
-        public DirectionalLight DirectionalLight1 { get { return light1; } }
+        public DirectionalLight DirectionalLight1 => light1;
 
 
         /// <inheritdoc/>
-        public DirectionalLight DirectionalLight2 { get { return light2; } }
+        public DirectionalLight DirectionalLight2 => light2;
 
 
         /// <inheritdoc/>
         public bool FogEnabled
         {
-            get { return fogEnabled; }
-            
+            get => fogEnabled;
+
             set
             {
                 if (fogEnabled != value)
@@ -258,8 +253,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <inheritdoc/>
         public float FogStart
         {
-            get { return fogStart; }
-            
+            get => fogStart;
+
             set
             {
                 fogStart = value;
@@ -271,8 +266,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <inheritdoc/>
         public float FogEnd
         {
-            get { return fogEnd; }
-            
+            get => fogEnd;
+
             set
             {
                 fogEnd = value;
@@ -284,8 +279,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <inheritdoc/>
         public Vector3 FogColor
         {
-            get { return fogColorParam.GetValueVector3(); }
-            set { fogColorParam.SetValue(value); }
+            get => fogColorParam.GetValueVector3();
+            set => fogColorParam.SetValue(value);
         }
 
 
@@ -294,8 +289,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         public bool TextureEnabled
         {
-            get { return textureEnabled; }
-            
+            get => textureEnabled;
+
             set
             {
                 if (textureEnabled != value)
@@ -312,8 +307,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         public Texture2D Texture
         {
-            get { return textureParam.GetValueTexture2D(); }
-            set { textureParam.SetValue(value); }
+            get => textureParam.GetValueTexture2D();
+            set => textureParam.SetValue(value);
         }
 
 
@@ -322,8 +317,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         public bool VertexColorEnabled
         {
-            get { return vertexColorEnabled; }
-            
+            get => vertexColorEnabled;
+
             set
             {
                 if (vertexColorEnabled != value)
@@ -333,12 +328,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
         }
-
-
         #endregion
 
         #region Methods
-
         /// <summary>
         /// Creates a new BasicEffect with default parameter settings.
         /// </summary>
@@ -362,7 +354,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             lightingEnabled = cloneSource.lightingEnabled;
             preferPerPixelLighting = cloneSource.preferPerPixelLighting;
-            fogEnabled = cloneSource.fogEnabled;            
+            fogEnabled = cloneSource.fogEnabled;
             textureEnabled = cloneSource.textureEnabled;
             vertexColorEnabled = cloneSource.vertexColorEnabled;
 
@@ -404,32 +396,32 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         void CacheEffectParameters(BasicEffect cloneSource)
         {
-            textureParam                = Parameters["Texture"];
-            diffuseColorParam           = Parameters["DiffuseColor"];
-            emissiveColorParam          = Parameters["EmissiveColor"];
-            specularColorParam          = Parameters["SpecularColor"];
-            specularPowerParam          = Parameters["SpecularPower"];
-            eyePositionParam            = Parameters["EyePosition"];
-            fogColorParam               = Parameters["FogColor"];
-            fogVectorParam              = Parameters["FogVector"];
-            worldParam                  = Parameters["World"];
-            worldInverseTransposeParam  = Parameters["WorldInverseTranspose"];
-            worldViewProjParam          = Parameters["WorldViewProj"];
+            textureParam = Parameters["Texture"];
+            diffuseColorParam = Parameters["DiffuseColor"];
+            emissiveColorParam = Parameters["EmissiveColor"];
+            specularColorParam = Parameters["SpecularColor"];
+            specularPowerParam = Parameters["SpecularPower"];
+            eyePositionParam = Parameters["EyePosition"];
+            fogColorParam = Parameters["FogColor"];
+            fogVectorParam = Parameters["FogVector"];
+            worldParam = Parameters["World"];
+            worldInverseTransposeParam = Parameters["WorldInverseTranspose"];
+            worldViewProjParam = Parameters["WorldViewProj"];
 
             light0 = new DirectionalLight(Parameters["DirLight0Direction"],
-                                          Parameters["DirLight0DiffuseColor"],
-                                          Parameters["DirLight0SpecularColor"],
-                                          (cloneSource != null) ? cloneSource.light0 : null);
+                Parameters["DirLight0DiffuseColor"],
+                Parameters["DirLight0SpecularColor"],
+                cloneSource != null ? cloneSource.light0 : null);
 
             light1 = new DirectionalLight(Parameters["DirLight1Direction"],
-                                          Parameters["DirLight1DiffuseColor"],
-                                          Parameters["DirLight1SpecularColor"],
-                                          (cloneSource != null) ? cloneSource.light1 : null);
+                Parameters["DirLight1DiffuseColor"],
+                Parameters["DirLight1SpecularColor"],
+                cloneSource != null ? cloneSource.light1 : null);
 
             light2 = new DirectionalLight(Parameters["DirLight2Direction"],
-                                          Parameters["DirLight2DiffuseColor"],
-                                          Parameters["DirLight2SpecularColor"],
-                                          (cloneSource != null) ? cloneSource.light2 : null);
+                Parameters["DirLight2DiffuseColor"],
+                Parameters["DirLight2SpecularColor"],
+                cloneSource != null ? cloneSource.light2 : null);
         }
 
 
@@ -440,7 +432,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             // Recompute the world+view+projection matrix or fog vector?
             dirtyFlags = EffectHelpers.SetWorldViewProjAndFog(dirtyFlags, ref world, ref view, ref projection, ref worldView, fogEnabled, fogStart, fogEnd, worldViewProjParam, fogVectorParam);
-            
+
             // Recompute the diffuse/emissive/alpha material color parameters?
             if ((dirtyFlags & EffectDirtyFlags.MaterialColor) != 0)
             {
@@ -454,10 +446,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Recompute the world inverse transpose and eye position?
                 dirtyFlags = EffectHelpers.SetLightingMatrices(dirtyFlags, ref world, ref view, worldParam, worldInverseTransposeParam, eyePositionParam);
 
-                
+
                 // Check if we can use the only-bother-with-the-first-light shader optimization.
                 bool newOneLight = !light1.Enabled && !light2.Enabled;
-                
+
                 if (oneLight != newOneLight)
                 {
                     oneLight = newOneLight;
@@ -469,13 +461,13 @@ namespace Microsoft.Xna.Framework.Graphics
             if ((dirtyFlags & EffectDirtyFlags.ShaderIndex) != 0)
             {
                 int shaderIndex = 0;
-                
+
                 if (!fogEnabled)
                     shaderIndex += 1;
-                
+
                 if (vertexColorEnabled)
                     shaderIndex += 2;
-                
+
                 if (textureEnabled)
                     shaderIndex += 4;
 
@@ -494,8 +486,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 CurrentTechnique = Techniques[shaderIndex];
             }
         }
-
-
         #endregion
     }
 }

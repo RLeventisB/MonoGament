@@ -6,7 +6,7 @@ namespace Microsoft.Xna.Framework.Graphics
     {
 		private readonly EffectTechnique[] _techniques;
 
-        public int Count { get { return _techniques.Length; } }
+        public int Count => _techniques.Length;
 
         internal EffectTechniqueCollection(EffectTechnique[] techniques)
         {
@@ -22,10 +22,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return new EffectTechniqueCollection(techniques);
         }
         
-        public EffectTechnique this[int index]
-        {
-            get { return _techniques [index]; }
-        }
+        public EffectTechnique this[int index] => _techniques [index];
 
         public EffectTechnique this[string name]
         {

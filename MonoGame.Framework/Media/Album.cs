@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+
 #if WINDOWS_UAP
 using Windows.Storage.FileProperties;
 #elif IOS
@@ -32,35 +33,17 @@ namespace Microsoft.Xna.Framework.Media
         private Android.Net.Uri thumbnail;
 #endif
 
-        public Artist Artist
-        {
-            get
-            {
-                return this.artist;
-            }
-        }
+        public Artist Artist => artist;
 
         /// <summary>
         /// Gets the duration of the Album.
         /// </summary>
-        public TimeSpan Duration
-        {
-            get
-            {
-                return TimeSpan.Zero; // Not implemented
-            }
-        }
+        public TimeSpan Duration => TimeSpan.Zero; // Not implemented
 
         /// <summary>
         /// Gets the Genre of the Album.
         /// </summary>
-        public Genre Genre
-        {
-            get
-            {
-                return this.genre;
-            }
-        }
+        public Genre Genre => genre;
 
         /// <summary>
         /// Gets a value indicating whether the Album has associated album art.
@@ -69,6 +52,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
+
 #if WINDOWS_UAP
                 return this.thumbnail != null;
 #elif IOS && !TVOS
@@ -85,40 +69,22 @@ namespace Microsoft.Xna.Framework.Media
         /// <summary>
         /// Gets a value indicating whether the object is disposed.
         /// </summary>
-        public bool IsDisposed
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool IsDisposed => false;
 
         /// <summary>
         /// Gets the name of the Album.
         /// </summary>
-        public string Name
-        {
-            get
-            {
-                return this.album;
-            }
-        }
+        public string Name => album;
 
         /// <summary>
         /// Gets a SongCollection that contains the songs on the album.
         /// </summary>
-        public SongCollection Songs
-        {
-            get
-            {
-                return this.songCollection;
-            }
-        }
+        public SongCollection Songs => songCollection;
 
-       private Album(SongCollection songCollection, string name, Artist artist, Genre genre)
+        private Album(SongCollection songCollection, string name, Artist artist, Genre genre)
         {
             this.songCollection = songCollection;
-            this.album = name;
+            album = name;
             this.artist = artist;
             this.genre = genre;
         }
@@ -152,7 +118,7 @@ namespace Microsoft.Xna.Framework.Media
                 this.thumbnail.Dispose();
 #endif
         }
-        
+
 #if IOS && !TVOS
         [CLSCompliant(false)]
         public UIImage GetAlbumArt(int width = 0, int height = 0)
@@ -221,12 +187,12 @@ namespace Microsoft.Xna.Framework.Media
         }
 #endif
 
-		/// <summary>
+        /// <summary>
         /// Returns a String representation of this Album.
         /// </summary>
         public override string ToString()
         {
-            return this.album.ToString();
+            return album.ToString();
         }
 
         /// <summary>
@@ -234,7 +200,7 @@ namespace Microsoft.Xna.Framework.Media
         /// </summary>
         public override int GetHashCode()
         {
-            return this.album.GetHashCode();
+            return album.GetHashCode();
         }
     }
 }

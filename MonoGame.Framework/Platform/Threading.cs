@@ -4,20 +4,17 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
-using Microsoft.Xna.Framework.Graphics;
 #if IOS
 using Foundation;
 using OpenGLES;
 #endif
 #if DESKTOPGL || ANGLE || GLES
-using MonoGame.OpenGL;
 #endif
 
 namespace Microsoft.Xna.Framework
 {
-    internal class Threading
+    public class Threading
     {
         static int _mainThreadId;
 
@@ -34,7 +31,7 @@ namespace Microsoft.Xna.Framework
         /// but a non-generic dequeue-and-invoke <see cref="Action"/>.
         /// </summary>
         /// <typeparam name="TState"></typeparam>
-        static class StateActionHelper<TState>
+        public static class StateActionHelper<TState>
         {
             public static readonly Queue<QueuedAction> Queue = new Queue<QueuedAction>();
             public static readonly Action DequeueAction = Dequeue;
@@ -64,7 +61,7 @@ namespace Microsoft.Xna.Framework
         }
 
 #if ANDROID
-        internal static void ResetThread (int id)
+        public static void ResetThread(int id)
         {
             _mainThreadId = id;
         }
@@ -94,7 +91,7 @@ namespace Microsoft.Xna.Framework
         /// If the current thread is the UI thread, the action will run immediately.
         /// </summary>
         /// <param name="action">The action to be run on the UI thread</param>
-        internal static void BlockOnUIThread(Action action)
+        public static void BlockOnUIThread(Action action)
         {
             if (action == null)
                 throw new ArgumentNullException("action");
@@ -108,7 +105,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="action">The action to be run on the UI thread</param>
         /// <param name="state">The data to pass to <paramref name="action"/></param>.
-        internal static void BlockOnUIThread<TState>(Action<TState> action, TState state)
+        public static void BlockOnUIThread<TState>(Action<TState> action, TState state)
         {
             if (action == null)
                 throw new ArgumentNullException("action");
@@ -148,7 +145,7 @@ namespace Microsoft.Xna.Framework
 #endif
         }
 
-        static ManualResetEventSlim RentResetEvent()
+        public static ManualResetEventSlim RentResetEvent()
         {
             lock (_resetEventPool)
             {
@@ -158,7 +155,7 @@ namespace Microsoft.Xna.Framework
             return new ManualResetEventSlim();
         }
 
-        static void ReturnResetEvent(ManualResetEventSlim resetEvent)
+        public static void ReturnResetEvent(ManualResetEventSlim resetEvent)
         {
             resetEvent.Reset();
 
@@ -188,7 +185,7 @@ namespace Microsoft.Xna.Framework
 
 #if ANDROID
             //if (!Game.Instance.Window.GraphicsContext.IsCurrent)
-                ((AndroidGameWindow)Game.Instance.Window).GameView.MakeCurrent();
+            ((AndroidGameWindow)Game.Instance.Window).GameView.MakeCurrent();
 #endif
 
             lock (_queuedActions)

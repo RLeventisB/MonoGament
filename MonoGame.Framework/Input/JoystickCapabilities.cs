@@ -61,11 +61,11 @@ namespace Microsoft.Xna.Framework.Input
         public static bool operator ==(JoystickCapabilities left, JoystickCapabilities right)
         {
             return left.IsConnected == right.IsConnected &&
-               left.Identifier == right.Identifier &&
-               left.IsGamepad == right.IsGamepad &&
-               left.AxisCount == right.AxisCount &&
-               left.ButtonCount == right.ButtonCount &&
-               left.HatCount == right.HatCount;
+                   left.Identifier == right.Identifier &&
+                   left.IsGamepad == right.IsGamepad &&
+                   left.AxisCount == right.AxisCount &&
+                   left.ButtonCount == right.ButtonCount &&
+                   left.HatCount == right.HatCount;
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <see cref="T:Microsoft.Xna.Framework.Input.JoystickCapabilities"/>; otherwise, <c>false</c>.</returns>
         public override bool Equals(object obj)
         {
-            return (obj is JoystickCapabilities) && (this == (JoystickCapabilities)obj);
+            return obj is JoystickCapabilities capabilities && this == capabilities;
         }
 
         /// <summary>
@@ -111,4 +111,3 @@ namespace Microsoft.Xna.Framework.Input
         }
     }
 }
-

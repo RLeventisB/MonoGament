@@ -19,34 +19,28 @@ namespace Microsoft.Xna.Framework.Graphics
             TextureCoordinate = textureCoordinate;
         }
 
-        VertexDeclaration IVertexType.VertexDeclaration
-        {
-            get
-            {
-                return VertexDeclaration;
-            }
-        }
+        VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
 
         public override int GetHashCode()
         {
             unchecked
             {
                 var hashCode = Position.GetHashCode();
-                hashCode = (hashCode * 397) ^ Color.GetHashCode();
-                hashCode = (hashCode * 397) ^ Normal.GetHashCode();
-                hashCode = (hashCode * 397) ^ TextureCoordinate.GetHashCode();
+                hashCode = hashCode * 397 ^ Color.GetHashCode();
+                hashCode = hashCode * 397 ^ Normal.GetHashCode();
+                hashCode = hashCode * 397 ^ TextureCoordinate.GetHashCode();
                 return hashCode;
             }
         }
 
         public override string ToString()
         {
-            return "{{Position:" + this.Position + " Color:" + this.Color + " Normal:" + this.Normal + " TextureCoordinate:" + this.TextureCoordinate + "}}";
+            return "{{Position:" + Position + " Color:" + Color + " Normal:" + Normal + " TextureCoordinate:" + TextureCoordinate + "}}";
         }
 
         public static bool operator ==(VertexPositionColorNormalTexture left, VertexPositionColorNormalTexture right)
         {
-            return (((left.Position == right.Position) && (left.Color == right.Color)) && (left.Normal == right.Normal) && (left.TextureCoordinate == right.TextureCoordinate));
+            return left.Position == right.Position && left.Color == right.Color && left.Normal == right.Normal && left.TextureCoordinate == right.TextureCoordinate;
         }
 
         public static bool operator !=(VertexPositionColorNormalTexture left, VertexPositionColorNormalTexture right)
@@ -59,10 +53,10 @@ namespace Microsoft.Xna.Framework.Graphics
             if (obj == null)
                 return false;
 
-            if (obj.GetType() != base.GetType())
+            if (obj.GetType() != GetType())
                 return false;
 
-            return (this == ((VertexPositionColorNormalTexture)obj));
+            return this == (VertexPositionColorNormalTexture)obj;
         }
 
         static VertexPositionColorNormalTexture()

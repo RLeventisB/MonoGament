@@ -2,26 +2,24 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Diagnostics;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Content;
+
 using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Content
 {
     internal class ModelReader : ContentTypeReader<Model>
-	{
-//      List<VertexBuffer> vertexBuffers = new List<VertexBuffer>();
-//      List<IndexBuffer> indexBuffers = new List<IndexBuffer>();
-//      List<Effect> effects = new List<Effect>();
-//      List<GraphicsResource> sharedResources = new List<GraphicsResource>();
+    {
+        //      List<VertexBuffer> vertexBuffers = new List<VertexBuffer>();
+        //      List<IndexBuffer> indexBuffers = new List<IndexBuffer>();
+        //      List<Effect> effects = new List<Effect>();
+        //      List<GraphicsResource> sharedResources = new List<GraphicsResource>();
 
-		public ModelReader ()
-		{
-		}
-		
-		static int ReadBoneReference(ContentReader reader, uint boneCount)
+        public ModelReader()
+        {
+        }
+
+        static int ReadBoneReference(ContentReader reader, uint boneCount)
         {
             uint boneId;
 
@@ -41,16 +39,13 @@ namespace Microsoft.Xna.Framework.Content
                 //Debug.WriteLine("bone #{0}", boneId - 1);
                 return (int)(boneId - 1);
             }
-            else
-            {
-                //Debug.WriteLine("null");
-            }
 
+            //Debug.WriteLine("null");
             return -1;
         }
-		
-		protected internal override Model Read(ContentReader reader, Model existingInstance)
-		{
+
+        public override Model Read(ContentReader reader, Model existingInstance)
+        {
             // Read the bone names and transforms.
             uint boneCount = reader.ReadUInt32();
             //Debug.WriteLine("Bone count: {0}", boneCount);
@@ -60,11 +55,11 @@ namespace Microsoft.Xna.Framework.Content
             for (uint i = 0; i < boneCount; i++)
             {
                 string name = reader.ReadObject<string>();
-				var matrix = reader.ReadMatrix();
+                var matrix = reader.ReadMatrix();
                 var bone = new ModelBone { Transform = matrix, Index = (int)i, Name = name };
                 bones.Add(bone);
             }
-			
+
             // Read the bone hierarchy.
             for (int i = 0; i < boneCount; i++)
             {
@@ -111,7 +106,7 @@ namespace Microsoft.Xna.Framework.Content
                 //Debug.WriteLine("Mesh {0}", i);
                 string name = reader.ReadObject<string>();
                 var parentBoneIndex = ReadBoneReference(reader, boneCount);
-				var boundingSphere = reader.ReadBoundingSphere();
+                var boundingSphere = reader.ReadBoundingSphere();
 
                 // Tag
                 var meshTag = reader.ReadObject<object>();
@@ -130,46 +125,46 @@ namespace Microsoft.Xna.Framework.Content
                     else
                         part = new ModelMeshPart();
 
-					part.VertexOffset = reader.ReadInt32();
+                    part.VertexOffset = reader.ReadInt32();
                     part.NumVertices = reader.ReadInt32();
                     part.StartIndex = reader.ReadInt32();
                     part.PrimitiveCount = reader.ReadInt32();
 
                     // tag
                     part.Tag = reader.ReadObject<object>();
-					
-					parts.Add(part);
-					
-					int jj = (int)j;
-					reader.ReadSharedResource<VertexBuffer>(delegate (VertexBuffer v)
-					{
-						parts[jj].VertexBuffer = v;
-					});
-					reader.ReadSharedResource<IndexBuffer>(delegate (IndexBuffer v)
-					{
-						parts[jj].IndexBuffer = v;
-					});
-					reader.ReadSharedResource<Effect>(delegate (Effect v)
-					{
-						parts[jj].Effect = v;
-					});
 
-					
+                    parts.Add(part);
+
+                    int jj = (int)j;
+                    reader.ReadSharedResource<VertexBuffer>(delegate (VertexBuffer v)
+                    {
+                        parts[jj].VertexBuffer = v;
+                    });
+                    reader.ReadSharedResource<IndexBuffer>(delegate (IndexBuffer v)
+                    {
+                        parts[jj].IndexBuffer = v;
+                    });
+                    reader.ReadSharedResource<Effect>(delegate (Effect v)
+                    {
+                        parts[jj].Effect = v;
+                    });
+
+
                 }
 
                 if (existingInstance != null)
                     continue;
 
-				ModelMesh mesh = new ModelMesh(reader.GetGraphicsDevice(), parts);
+                ModelMesh mesh = new ModelMesh(reader.GetGraphicsDevice(), parts);
 
                 // Tag reassignment
                 mesh.Tag = meshTag;
 
-				mesh.Name = name;
-				mesh.ParentBone = bones[parentBoneIndex];
-				mesh.ParentBone.AddMesh(mesh);
-				mesh.BoundingSphere = boundingSphere;
-				meshes.Add(mesh);
+                mesh.Name = name;
+                mesh.ParentBone = bones[parentBoneIndex];
+                mesh.ParentBone.AddMesh(mesh);
+                mesh.BoundingSphere = boundingSphere;
+                meshes.Add(mesh);
             }
 
             if (existingInstance != null)
@@ -186,14 +181,14 @@ namespace Microsoft.Xna.Framework.Content
             Model model = new Model(reader.GetGraphicsDevice(), bones, meshes);
 
             model.Root = bones[rootBoneIndex];
-		
-			model.BuildHierarchy();
-			
-			// Tag?
+
+            model.BuildHierarchy();
+
+            // Tag?
             model.Tag = reader.ReadObject<object>();
-			
-			return model;
-		}
-	}
+
+            return model;
+        }
+    }
 }
 

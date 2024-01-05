@@ -311,7 +311,6 @@ namespace MonoGame.Framework.Utilities.Deflate
         }
 
         #region Zlib properties
-
         /// <summary>
         /// This property sets the flush behavior on the stream.
         /// </summary>
@@ -319,11 +318,11 @@ namespace MonoGame.Framework.Utilities.Deflate
         /// </remarks>
         virtual public FlushType FlushMode
         {
-            get { return (this._baseStream._flushMode); }
+            get => _baseStream._flushMode;
             set
             {
                 if (_disposed) throw new ObjectDisposedException("DeflateStream");
-                this._baseStream._flushMode = value;
+                _baseStream._flushMode = value;
             }
         }
 
@@ -346,18 +345,15 @@ namespace MonoGame.Framework.Utilities.Deflate
         /// </remarks>
         public int BufferSize
         {
-            get
-            {
-                return this._baseStream._bufferSize;
-            }
+            get => _baseStream._bufferSize;
             set
             {
                 if (_disposed) throw new ObjectDisposedException("DeflateStream");
-                if (this._baseStream._workingBuffer != null)
+                if (_baseStream._workingBuffer != null)
                     throw new ZlibException("The working buffer is already set.");
                 if (value < ZlibConstants.WorkingBufferSizeMin)
-                    throw new ZlibException(String.Format("Don't be silly. {0} bytes?? Use a bigger buffer, at least {1}.", value, ZlibConstants.WorkingBufferSizeMin));
-                this._baseStream._bufferSize = value;
+                    throw new ZlibException(string.Format("Don't be silly. {0} bytes?? Use a bigger buffer, at least {1}.", value, ZlibConstants.WorkingBufferSizeMin));
+                _baseStream._bufferSize = value;
             }
         }
 
@@ -371,35 +367,19 @@ namespace MonoGame.Framework.Utilities.Deflate
         /// </remarks>
         public CompressionStrategy Strategy
         {
-            get
-            {
-                return this._baseStream.Strategy;
-            }
+            get => _baseStream.Strategy;
             set
             {
-            if (_disposed) throw new ObjectDisposedException("DeflateStream");
-                this._baseStream.Strategy = value;
+                if (_disposed) throw new ObjectDisposedException("DeflateStream");
+                _baseStream.Strategy = value;
             }
         }
 
         /// <summary> Returns the total number of bytes input so far.</summary>
-        virtual public long TotalIn
-        {
-            get
-            {
-                return this._baseStream._z.TotalBytesIn;
-            }
-        }
+        virtual public long TotalIn => _baseStream._z.TotalBytesIn;
 
         /// <summary> Returns the total number of bytes output so far.</summary>
-        virtual public long TotalOut
-        {
-            get
-            {
-                return this._baseStream._z.TotalBytesOut;
-            }
-        }
-
+        virtual public long TotalOut => _baseStream._z.TotalBytesOut;
         #endregion
 
         #region System.IO.Stream methods
@@ -433,8 +413,8 @@ namespace MonoGame.Framework.Utilities.Deflate
             {
                 if (!_disposed)
                 {
-                    if (disposing && (this._baseStream != null))
-                        this._baseStream.Dispose();
+                    if (disposing && _baseStream != null)
+                        _baseStream.Dispose();
                     _disposed = true;
                 }
             }
@@ -443,7 +423,6 @@ namespace MonoGame.Framework.Utilities.Deflate
                 base.Dispose(disposing);
             }
         }
-
 
 
         /// <summary>
@@ -467,10 +446,7 @@ namespace MonoGame.Framework.Utilities.Deflate
         /// <remarks>
         /// Always returns false.
         /// </remarks>
-        public override bool CanSeek
-        {
-            get { return false; }
-        }
+        public override bool CanSeek => false;
 
 
         /// <summary>
@@ -500,10 +476,7 @@ namespace MonoGame.Framework.Utilities.Deflate
         /// <summary>
         /// Reading this property always throws a <see cref="NotImplementedException"/>.
         /// </summary>
-        public override long Length
-        {
-            get { throw new NotImplementedException(); }
-        }
+        public override long Length => throw new NotImplementedException();
 
         /// <summary>
         /// The position of the stream pointer.
@@ -520,13 +493,13 @@ namespace MonoGame.Framework.Utilities.Deflate
         {
             get
             {
-                if (this._baseStream._streamMode == MonoGame.Framework.Utilities.Deflate.ZlibBaseStream.StreamMode.Writer)
-                    return this._baseStream._z.TotalBytesOut;
-                if (this._baseStream._streamMode == MonoGame.Framework.Utilities.Deflate.ZlibBaseStream.StreamMode.Reader)
-                    return this._baseStream._z.TotalBytesIn;
+                if (_baseStream._streamMode == ZlibBaseStream.StreamMode.Writer)
+                    return _baseStream._z.TotalBytesOut;
+                if (_baseStream._streamMode == ZlibBaseStream.StreamMode.Reader)
+                    return _baseStream._z.TotalBytesIn;
                 return 0;
             }
-            set { throw new NotImplementedException(); }
+            set => throw new NotImplementedException();
         }
 
         /// <summary>
@@ -619,8 +592,6 @@ namespace MonoGame.Framework.Utilities.Deflate
         #endregion
 
 
-
-
         /// <summary>
         ///   Compress a string into a byte array using DEFLATE (RFC 1951).
         /// </summary>
@@ -640,7 +611,7 @@ namespace MonoGame.Framework.Utilities.Deflate
         /// </param>
         ///
         /// <returns>The string in compressed form</returns>
-        public static byte[] CompressString(String s)
+        public static byte[] CompressString(string s)
         {
             using (var ms = new System.IO.MemoryStream())
             {
@@ -675,7 +646,7 @@ namespace MonoGame.Framework.Utilities.Deflate
             using (var ms = new System.IO.MemoryStream())
             {
                 System.IO.Stream compressor =
-                    new DeflateStream( ms, CompressionMode.Compress, CompressionLevel.BestCompression );
+                    new DeflateStream(ms, CompressionMode.Compress, CompressionLevel.BestCompression);
 
                 ZlibBaseStream.CompressBuffer(b, compressor);
                 return ms.ToArray();
@@ -697,7 +668,7 @@ namespace MonoGame.Framework.Utilities.Deflate
         /// </param>
         ///
         /// <returns>The uncompressed string</returns>
-        public static String UncompressString(byte[] compressed)
+        public static string UncompressString(byte[] compressed)
         {
             using (var input = new System.IO.MemoryStream(compressed))
             {
@@ -728,7 +699,7 @@ namespace MonoGame.Framework.Utilities.Deflate
             using (var input = new System.IO.MemoryStream(compressed))
             {
                 System.IO.Stream decompressor =
-                    new DeflateStream( input, CompressionMode.Decompress );
+                    new DeflateStream(input, CompressionMode.Decompress);
 
                 return ZlibBaseStream.UncompressBuffer(compressed, decompressor);
             }
@@ -737,4 +708,3 @@ namespace MonoGame.Framework.Utilities.Deflate
     }
 
 }
-

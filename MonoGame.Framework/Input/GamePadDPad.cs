@@ -66,10 +66,10 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>true if <paramref name="left"/> and <paramref name="right"/> are equal; otherwise, false.</returns>
         public static bool operator ==(GamePadDPad left, GamePadDPad right)
         {
-            return (left.Down == right.Down)
-                && (left.Left == right.Left)
-                && (left.Right == right.Right)
-                && (left.Up == right.Up);
+            return left.Down == right.Down
+                && left.Left == right.Left
+                && left.Right == right.Right
+                && left.Up == right.Up;
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>true if <paramref name="obj"/> is a <see cref="GamePadDPad"/> and has the same value as this instance; otherwise, false.</returns>
         public override bool Equals(object obj)
         {
-            return (obj is GamePadDPad) && (this == (GamePadDPad)obj);
+            return obj is GamePadDPad pad && this == pad;
         }
 
         /// <summary>

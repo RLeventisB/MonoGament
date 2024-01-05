@@ -19,14 +19,11 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Get the <see cref="GraphicsDevice"/> that this <see cref="DrawableGameComponent"/> uses for drawing.
         /// </summary>
-        public Graphics.GraphicsDevice GraphicsDevice
-        {
-            get { return this.Game.GraphicsDevice; } 
-        }
+        public Graphics.GraphicsDevice GraphicsDevice => Game.GraphicsDevice;
 
         public int DrawOrder
         {
-            get { return _drawOrder; }
+            get => _drawOrder;
             set
             {
                 if (_drawOrder != value)
@@ -39,7 +36,7 @@ namespace Microsoft.Xna.Framework
 
         public bool Visible
         {
-            get { return _visible; }
+            get => _visible;
             set
             {
                 if (_visible != value)

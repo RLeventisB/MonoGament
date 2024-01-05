@@ -12,12 +12,12 @@ namespace Microsoft.Xna.Framework.Content
         {
         }
 
-        protected internal override DateTime Read(ContentReader input, DateTime existingInstance)
+        public override DateTime Read(ContentReader input, DateTime existingInstance)
         {
-            UInt64 value = input.ReadUInt64();
-            UInt64 mask = (UInt64)3 << 62;
+            ulong value = input.ReadUInt64();
+            const ulong mask = (ulong)3 << 62;
             long ticks = (long)(value & ~mask);
-            DateTimeKind kind = (DateTimeKind)((value >> 62) & 3);
+            DateTimeKind kind = (DateTimeKind)(value >> 62 & 3);
             return new DateTime(ticks, kind);
         }
     }

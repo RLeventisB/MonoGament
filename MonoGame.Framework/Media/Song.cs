@@ -10,40 +10,25 @@ namespace Microsoft.Xna.Framework.Media
     public sealed partial class Song : IEquatable<Song>, IDisposable
     {
         private string _name;
-		private int _playCount = 0;
+        private int _playCount;
         private TimeSpan _duration = TimeSpan.Zero;
         bool disposed;
         /// <summary>
         /// Gets the Album on which the Song appears.
         /// </summary>
-        public Album Album
-        {
-            get { return PlatformGetAlbum(); }
-#if WINDOWS_UAP
-            internal set { PlatformSetAlbum(value); }
-#endif
-        }
+        public Album Album => PlatformGetAlbum();
 
         /// <summary>
         /// Gets the Artist of the Song.
         /// </summary>
-        public Artist Artist
-        {
-            get { return PlatformGetArtist(); }
-        }
+        public Artist Artist => PlatformGetArtist();
 
         /// <summary>
         /// Gets the Genre of the Song.
         /// </summary>
-        public Genre Genre
-        {
-            get { return PlatformGetGenre(); }
-        }
-        
-        public bool IsDisposed
-        {
-            get { return disposed; }
-        }
+        public Genre Genre => PlatformGetGenre();
+
+        public bool IsDisposed => disposed;
 
 #if ANDROID || OPENAL || WEB || IOS
         internal delegate void FinishedPlayingHandler(object sender, EventArgs args);
@@ -57,9 +42,9 @@ namespace Microsoft.Xna.Framework.Media
             _duration = TimeSpan.FromMilliseconds(durationMS);
         }
 
-		internal Song(string fileName)
-		{			
-			_name = fileName;
+        internal Song(string fileName)
+        {
+            _name = fileName;
 
             PlatformInitialize(fileName);
         }
@@ -69,10 +54,7 @@ namespace Microsoft.Xna.Framework.Media
             Dispose(false);
         }
 
-        internal string FilePath
-		{
-			get { return _name; }
-		}
+        internal string FilePath => _name;
 
         /// <summary>
         /// Returns a song that can be played via <see cref="MediaPlayer"/>.
@@ -86,13 +68,13 @@ namespace Microsoft.Xna.Framework.Media
             song._name = name;
             return song;
         }
-		
-		public void Dispose()
+
+        public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        
+
         void Dispose(bool disposing)
         {
             if (!disposed)
@@ -106,80 +88,58 @@ namespace Microsoft.Xna.Framework.Media
             }
         }
 
-        public override int GetHashCode ()
-		{
-			return base.GetHashCode ();
-		}
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
 
         public bool Equals(Song song)
         {
 #if DIRECTX
             return song != null && song.FilePath == FilePath;
 #else
-			return ((object)song != null) && (Name == song.Name);
+            return (object)song != null && Name == song.Name;
 #endif
-		}
-		
-		
-		public override bool Equals(Object obj)
-		{
-			if(obj == null)
-			{
-				return false;
-			}
-			
-			return Equals(obj as Song);  
-		}
-		
-		public static bool operator ==(Song song1, Song song2)
-		{
-			if((object)song1 == null)
-			{
-				return (object)song2 == null;
-			}
-
-			return song1.Equals(song2);
-		}
-		
-		public static bool operator !=(Song song1, Song song2)
-		{
-		  return ! (song1 == song2);
-		}
-
-        public TimeSpan Duration
-        {
-            get { return PlatformGetDuration(); }
-        }	
-
-        public bool IsProtected
-        {
-            get { return PlatformIsProtected(); }
         }
 
-        public bool IsRated
+
+        public override bool Equals(object obj)
         {
-            get { return PlatformIsRated(); }
+            if (obj == null)
+            {
+                return false;
+            }
+
+            return Equals(obj as Song);
         }
 
-        public string Name
+        public static bool operator ==(Song song1, Song song2)
         {
-            get { return PlatformGetName(); }
+            if ((object)song1 == null)
+            {
+                return (object)song2 == null;
+            }
+
+            return song1.Equals(song2);
         }
 
-        public int PlayCount
+        public static bool operator !=(Song song1, Song song2)
         {
-            get { return PlatformGetPlayCount(); }
+            return !(song1 == song2);
         }
 
-        public int Rating
-        {
-            get { return PlatformGetRating(); }
-        }
+        public TimeSpan Duration => PlatformGetDuration();
 
-        public int TrackNumber
-        {
-            get { return PlatformGetTrackNumber(); }
-        }
+        public bool IsProtected => PlatformIsProtected();
+
+        public bool IsRated => PlatformIsRated();
+
+        public string Name => PlatformGetName();
+
+        public int PlayCount => PlatformGetPlayCount();
+
+        public int Rating => PlatformGetRating();
+
+        public int TrackNumber => PlatformGetTrackNumber();
     }
 }
-

@@ -13,9 +13,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         internal int UserOffset;
 
-        public bool IsContentLost { get { return false; } }
-		
-		public DynamicIndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage usage) :
+        public bool IsContentLost => false;
+
+        public DynamicIndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage usage) :
 			base(graphicsDevice, indexElementSize, indexCount, usage, true)
 		{
 		}
@@ -27,12 +27,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
         {
-            base.SetDataInternal<T>(offsetInBytes, data, startIndex, elementCount, options);
+            SetDataInternal<T>(offsetInBytes, data, startIndex, elementCount, options);
         }
 
         public void SetData<T>(T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
         {
-            base.SetDataInternal<T>(0, data, startIndex, elementCount, options);
+            SetDataInternal<T>(0, data, startIndex, elementCount, options);
         }
     }
 }

@@ -2,8 +2,9 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using MonoGame.Framework.Utilities;
+
+using System;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -13,13 +14,13 @@ namespace Microsoft.Xna.Framework.Content
 
         public MultiArrayReader() { }
 
-        protected internal override void Initialize(ContentTypeReaderManager manager)
+        public override void Initialize(ContentTypeReaderManager manager)
         {
             Type readerType = typeof(T);
             elementReader = manager.GetTypeReader(readerType);
         }
 
-        protected internal override Array Read(ContentReader input, Array existingInstance)
+        public override Array Read(ContentReader input, Array existingInstance)
         {
             var rank = input.ReadInt32();
             if (rank < 1)

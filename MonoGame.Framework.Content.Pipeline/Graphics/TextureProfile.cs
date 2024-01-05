@@ -2,10 +2,10 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
+
+using System;
+using System.Linq;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -87,7 +87,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             catch (Exception ex)
             {
                 context.Logger.LogImportantMessage("Could not convert texture. " + ex.ToString());
-                throw ex;
+                throw;
             }
         }
 

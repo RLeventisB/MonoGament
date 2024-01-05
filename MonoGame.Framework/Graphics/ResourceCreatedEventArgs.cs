@@ -7,6 +7,6 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// The newly created resource object.
         /// </summary>
-        public Object Resource { get; internal set; }
+        public object Resource { get; internal set; }
     }
 }

@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Content
         {
         }
 
-        protected internal override Effect Read(ContentReader input, Effect existingInstance)
+        public override Effect Read(ContentReader input, Effect existingInstance)
         {
             int dataSize = input.ReadInt32();
             byte[] data = ContentManager.ScratchBufferPool.Get(dataSize);

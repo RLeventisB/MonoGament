@@ -15,25 +15,13 @@ namespace MonoGame.OpenGL
 
         public int SwapInterval
         {
-            get
-            {
-                return Sdl.GL.GetSwapInterval();
-            }
-            set
-            {
-                Sdl.GL.SetSwapInterval(value);
-            }
+            get => Sdl.GL.GetSwapInterval();
+            set => Sdl.GL.SetSwapInterval(value);
         }
 
-        public bool IsDisposed
-        {
-            get { return _disposed; }
-        }
+        public bool IsDisposed => _disposed;
 
-		public bool IsCurrent
-		{
-			get { return true; }
-		}
+        public bool IsCurrent => true;
 
         public GraphicsContext(IWindowInfo info)
         {
@@ -50,7 +38,7 @@ namespace MonoGame.OpenGL
             // GL entry points must be loaded after the GL context creation, otherwise some Windows drivers will return only GL 1.3 compatible functions
             try
             {
-                OpenGL.GL.LoadEntryPoints();
+                GL.LoadEntryPoints();
             }
             catch (EntryPointNotFoundException)
             {

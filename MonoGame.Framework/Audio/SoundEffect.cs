@@ -1,7 +1,7 @@
 // MonoGame - Copyright (C) The MonoGame Team
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
-﻿
+
 using System;
 using System.IO;
 
@@ -16,16 +16,17 @@ namespace Microsoft.Xna.Framework.Audio
     public sealed partial class SoundEffect : IDisposable
     {
         #region Internal Audio Data
-
         private string _name = string.Empty;
-        
-        private bool _isDisposed = false;
-        private readonly TimeSpan _duration;
 
+        private bool _isDisposed;
+        private readonly TimeSpan _duration;
+        internal ushort channels;
+        internal uint sampleRate;
+        internal uint loopStart;
+        internal uint loopLength;
         #endregion
 
         #region Internal Constructors
-
         // Only used from SoundEffect.FromStream.
         private SoundEffect(Stream stream)
         {
@@ -58,10 +59,10 @@ namespace Microsoft.Xna.Framework.Audio
             var format = BitConverter.ToInt16(header, 0);
             if (format == 1)
             {
-                var channels = BitConverter.ToInt16(header, 2);
-                var sampleRate = BitConverter.ToInt32(header, 4);
+                SetCommonData(BitConverter.ToInt16(header, 2), BitConverter.ToInt32(header, 4), loopStart, loopLength);
+
                 var bitsPerSample = BitConverter.ToInt16(header, 14);
-                PlatformInitializePcm(buffer, 0, bufferSize, bitsPerSample, sampleRate, (AudioChannels)channels, loopStart, loopLength);
+                PlatformInitializePcm(buffer, 0, bufferSize, bitsPerSample, (int)sampleRate, (AudioChannels)channels, loopStart, loopLength);
                 return;
             }
 
@@ -72,6 +73,7 @@ namespace Microsoft.Xna.Framework.Audio
         // Only used from XACT WaveBank.
         internal SoundEffect(MiniFormatTag codec, byte[] buffer, int channels, int sampleRate, int blockAlignment, int loopStart, int loopLength)
         {
+            SetCommonData(channels, sampleRate, loopStart, loopLength);
             Initialize();
             if (_systemState != SoundSystemState.Initialized)
                 throw new NoAudioHardwareException("Audio has failed to initialize. Call SoundEffect.Initialize() before sound operation to get more specific errors.");
@@ -86,11 +88,20 @@ namespace Microsoft.Xna.Framework.Audio
 
             PlatformInitializeXact(codec, buffer, channels, sampleRate, blockAlignment, loopStart, loopLength, out _duration);
         }
-
+        public void SetCommonData(int? channels, int? sampleRate, int? loopStart, int? loopLength)
+        {
+            if (sampleRate.HasValue)
+                this.sampleRate = (uint)sampleRate;
+            if (loopStart.HasValue)
+                this.loopStart = (uint)loopStart;
+            if (loopLength.HasValue)
+                this.loopLength = (uint)loopLength;
+            if (channels.HasValue)
+                this.channels = (ushort)channels;
+        }
         #endregion
 
         #region Audio System Initialization
-
         internal enum SoundSystemState
         {
             NotInitialized,
@@ -121,11 +132,9 @@ namespace Microsoft.Xna.Framework.Audio
                 throw;
             }
         }
-
         #endregion
 
         #region Public Constructors
-
         /// <summary>
         /// Create a sound effect.
         /// </summary>
@@ -134,7 +143,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="channels">The number of channels in the sound data.</param>
         /// <remarks>This only supports uncompressed 16bit PCM wav data.</remarks>
         public SoundEffect(byte[] buffer, int sampleRate, AudioChannels channels)
-             : this(buffer, 0, buffer != null ? buffer.Length : 0, sampleRate, channels, 0, 0)
+            : this(buffer, 0, buffer != null ? buffer.Length : 0, sampleRate, channels, 0, 0)
         {
         }
 
@@ -166,12 +175,12 @@ namespace Microsoft.Xna.Framework.Audio
             var blockAlign = (int)channels * 2;
             if (count <= 0)
                 throw new ArgumentException("Ensure that the count is greater than zero.", "count");
-            if ((count % blockAlign) != 0)
+            if (count % blockAlign != 0)
                 throw new ArgumentException("Ensure that the count meets the block alignment requirements for the number of channels.", "count");
 
             if (offset < 0)
                 throw new ArgumentException("The offset cannot be negative.", "offset");
-            if (((ulong)count + (ulong)offset) > (ulong)buffer.Length)
+            if ((ulong)count + (ulong)offset > (ulong)buffer.Length)
                 throw new ArgumentException("Ensure that the offset+count region lines within the buffer.", "offset");
 
             var totalSamples = count / blockAlign;
@@ -186,18 +195,16 @@ namespace Microsoft.Xna.Framework.Audio
 
             if (loopLength < 0)
                 throw new ArgumentException("The loopLength cannot be negative.", "loopLength");
-            if (((ulong)loopStart + (ulong)loopLength) > (ulong)totalSamples)
+            if ((ulong)loopStart + (ulong)loopLength > (ulong)totalSamples)
                 throw new ArgumentException("Ensure that the loopStart+loopLength region lies within the sample range.", "loopLength");
 
             _duration = GetSampleDuration(count, sampleRate, channels);
 
             PlatformInitializePcm(buffer, offset, count, 16, sampleRate, channels, loopStart, loopLength);
         }
-
         #endregion
 
         #region Finalizer
-
         /// <summary>
         /// Releases unmanaged resources and performs other cleanup operations before the
         /// <see cref="Microsoft.Xna.Framework.Audio.SoundEffect"/> is reclaimed by garbage collection.
@@ -206,11 +213,9 @@ namespace Microsoft.Xna.Framework.Audio
         {
             Dispose(false);
         }
-
         #endregion
 
         #region Additional SoundEffect/SoundEffectInstance Creation Methods
-
         /// <summary>
         /// Creates a new SoundEffectInstance for this SoundEffect.
         /// </summary>
@@ -335,11 +340,9 @@ namespace Microsoft.Xna.Framework.Audio
 
             return (int)sizeInBytes;
         }
-
         #endregion
 
         #region Play
-
         /// <summary>Gets an internal SoundEffectInstance and plays it.</summary>
         /// <returns>True if a SoundEffectInstance was successfully played, false if not.</returns>
         /// <remarks>
@@ -397,25 +400,25 @@ namespace Microsoft.Xna.Framework.Audio
 
             return inst;
         }
-
         #endregion
 
         #region Public Properties
-
+        public ushort Channels => channels;
+        public uint SampleRate => sampleRate;
+        public uint LoopStart => loopStart;
+        public uint LoopLength => loopLength;
         /// <summary>Gets the duration of the SoundEffect.</summary>
-        public TimeSpan Duration { get { return _duration; } }
+        public TimeSpan Duration => _duration;
 
         /// <summary>Gets or sets the asset name of the SoundEffect.</summary>
         public string Name
         {
-            get { return _name; }
-            set { _name = value; }
+            get => _name;
+            set => _name = value;
         }
-
         #endregion
 
         #region Static Members
-
         static float _masterVolume = 1.0f;
         /// <summary>
         /// Gets or sets the master volume scale applied to all SoundEffectInstances.
@@ -424,9 +427,9 @@ namespace Microsoft.Xna.Framework.Audio
         /// <para>Each SoundEffectInstance has its own Volume property that is independent to SoundEffect.MasterVolume. During playback SoundEffectInstance.Volume is multiplied by SoundEffect.MasterVolume.</para>
         /// <para>This property is used to adjust the volume on all current and newly created SoundEffectInstances. The volume of an individual SoundEffectInstance can be adjusted on its own.</para>
         /// </remarks>
-        public static float MasterVolume 
-        { 
-            get { return _masterVolume; }
+        public static float MasterVolume
+        {
+            get => _masterVolume;
             set
             {
                 if (value < 0.0f || value > 1.0f)
@@ -434,7 +437,7 @@ namespace Microsoft.Xna.Framework.Audio
 
                 if (_masterVolume == value)
                     return;
-                
+
                 _masterVolume = value;
                 SoundEffectInstancePool.UpdateMasterVolume();
             }
@@ -444,17 +447,17 @@ namespace Microsoft.Xna.Framework.Audio
         /// <summary>
         /// Gets or sets the scale of distance calculations.
         /// </summary>
-        /// <remarks> 
+        /// <remarks>
         /// <para>DistanceScale defaults to 1.0 and must be greater than 0.0.</para>
         /// <para>Higher values reduce the rate of falloff between the sound and listener.</para>
         /// </remarks>
         public static float DistanceScale
         {
-            get { return _distanceScale; }
+            get => _distanceScale;
             set
             {
                 if (value <= 0f)
-                    throw new ArgumentOutOfRangeException ("value", "value of DistanceScale");
+                    throw new ArgumentOutOfRangeException("value", "value of DistanceScale");
 
                 _distanceScale = value;
             }
@@ -471,14 +474,14 @@ namespace Microsoft.Xna.Framework.Audio
         /// </remarks>
         public static float DopplerScale
         {
-            get { return _dopplerScale; }
+            get => _dopplerScale;
             set
             {
                 // As per documenation it does not look like the value can be less than 0
                 //   although the documentation does not say it throws an error we will anyway
                 //   just so it is like the DistanceScale
                 if (value < 0.0f)
-                    throw new ArgumentOutOfRangeException ("value", "value of DopplerScale");
+                    throw new ArgumentOutOfRangeException("value", "value of DopplerScale");
 
                 _dopplerScale = value;
             }
@@ -492,7 +495,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// </remarks>
         public static float SpeedOfSound
         {
-            get { return speedOfSound; }
+            get => speedOfSound;
             set
             {
                 if (value <= 0.0f)
@@ -501,13 +504,11 @@ namespace Microsoft.Xna.Framework.Audio
                 speedOfSound = value;
             }
         }
-
         #endregion
 
         #region IDisposable Members
-
         /// <summary>Indicates whether the object is disposed.</summary>
-        public bool IsDisposed { get { return _isDisposed; } }
+        public bool IsDisposed => _isDisposed;
 
         /// <summary>Releases the resources held by this <see cref="Microsoft.Xna.Framework.Audio.SoundEffect"/>.</summary>
         public void Dispose()
@@ -534,8 +535,6 @@ namespace Microsoft.Xna.Framework.Audio
                 _isDisposed = true;
             }
         }
-
         #endregion
-
     }
 }

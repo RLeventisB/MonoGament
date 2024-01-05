@@ -39,26 +39,25 @@
 // #endregion License
 // 
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Android.Views;
+
+using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Input
 {
-	public static class Keyboard
-	{
-        private static List<Keys> keys = new List<Keys>();
-
+    public static partial class Keyboard
+    {
         private static readonly IDictionary<Keycode, Keys> KeyMap = LoadKeyMap();
-
         internal static bool KeyDown(Keycode keyCode)
         {
-            Keys key;
-            if (KeyMap.TryGetValue(keyCode, out key) && key != Keys.None)
+            if (KeyMap.TryGetValue(keyCode, out Keys key))
             {
-                if (!keys.Contains(key))
-                    keys.Add(key);
+                ref KeyData keyData = ref GetDataFromKey(key);
+                SetActive(ref keyData);
+                keyData.TotalRepeatCount++;
+                OnKeyDown?.Invoke(key);
+                keyData.FrameRepeatCount++;
+
                 return true;
             }
             return false;
@@ -66,11 +65,13 @@ namespace Microsoft.Xna.Framework.Input
 
         internal static bool KeyUp(Keycode keyCode)
         {
-            Keys key;
-            if (KeyMap.TryGetValue(keyCode, out key) && key != Keys.None)
+            if (KeyMap.TryGetValue(keyCode, out Keys key))
             {
-                if (keys.Contains(key))
-                    keys.Remove(key);
+                ref KeyData keyData = ref GetDataFromKey(key);
+                keyData.TotalRepeatCount = 1;
+                OnKeyUp?.Invoke(key);
+                SetDeactive(ref keyData);
+
                 return true;
             }
             return false;
@@ -79,116 +80,105 @@ namespace Microsoft.Xna.Framework.Input
         private static IDictionary<Keycode, Keys> LoadKeyMap()
         {
             // create a map for every Keycode and default it to none so that every possible key is mapped
-            var maps = Enum.GetValues(typeof (Keycode))
-                .Cast<Keycode>()
-                .ToDictionary(key => key, key => Keys.None);
-
-            // then update it with the actual mappings
-            maps[Keycode.DpadLeft] = Keys.Left;
-            maps[Keycode.DpadRight] = Keys.Right;
-            maps[Keycode.DpadUp] = Keys.Up;
-            maps[Keycode.DpadDown] = Keys.Down;
-            maps[Keycode.DpadCenter] = Keys.Enter;
-            maps[Keycode.Num0] = Keys.D0;
-            maps[Keycode.Num1] = Keys.D1;
-            maps[Keycode.Num2] = Keys.D2;
-            maps[Keycode.Num3] = Keys.D3;
-            maps[Keycode.Num4] = Keys.D4;
-            maps[Keycode.Num5] = Keys.D5;
-            maps[Keycode.Num6] = Keys.D6;
-            maps[Keycode.Num7] = Keys.D7;
-            maps[Keycode.Num8] = Keys.D8;
-            maps[Keycode.Num9] = Keys.D9;
-            maps[Keycode.A] = Keys.A;
-            maps[Keycode.B] = Keys.B;
-            maps[Keycode.C] = Keys.C;
-            maps[Keycode.D] = Keys.D;
-            maps[Keycode.E] = Keys.E;
-            maps[Keycode.F] = Keys.F;
-            maps[Keycode.G] = Keys.G;
-            maps[Keycode.H] = Keys.H;
-            maps[Keycode.I] = Keys.I;
-            maps[Keycode.J] = Keys.J;
-            maps[Keycode.K] = Keys.K;
-            maps[Keycode.L] = Keys.L;
-            maps[Keycode.M] = Keys.M;
-            maps[Keycode.N] = Keys.N;
-            maps[Keycode.O] = Keys.O;
-            maps[Keycode.P] = Keys.P;
-            maps[Keycode.Q] = Keys.Q;
-            maps[Keycode.R] = Keys.R;
-            maps[Keycode.S] = Keys.S;
-            maps[Keycode.T] = Keys.T;
-            maps[Keycode.U] = Keys.U;
-            maps[Keycode.V] = Keys.V;
-            maps[Keycode.W] = Keys.W;
-            maps[Keycode.X] = Keys.X;
-            maps[Keycode.Y] = Keys.Y;
-            maps[Keycode.Z] = Keys.Z;
-            maps[Keycode.Space] = Keys.Space;
-            maps[Keycode.Escape] = Keys.Escape;
-            maps[Keycode.Back] = Keys.Back;
-            maps[Keycode.Home] = Keys.Home;
-            maps[Keycode.Enter] = Keys.Enter;
-            maps[Keycode.Period] = Keys.OemPeriod;
-            maps[Keycode.Comma] = Keys.OemComma;
-            maps[Keycode.Menu] = Keys.Help;
-            maps[Keycode.Search] = Keys.BrowserSearch;
-            maps[Keycode.VolumeUp] = Keys.VolumeUp;
-            maps[Keycode.VolumeDown] = Keys.VolumeDown;
-            maps[Keycode.MediaPause] = Keys.Pause;
-            maps[Keycode.MediaPlayPause] = Keys.MediaPlayPause;
-            maps[Keycode.MediaStop] = Keys.MediaStop;
-            maps[Keycode.MediaNext] = Keys.MediaNextTrack;
-            maps[Keycode.MediaPrevious] = Keys.MediaPreviousTrack;
-            maps[Keycode.Mute] = Keys.VolumeMute;
-            maps[Keycode.AltLeft] = Keys.LeftAlt;
-            maps[Keycode.AltRight] = Keys.RightAlt;
-            maps[Keycode.ShiftLeft] = Keys.LeftShift;
-            maps[Keycode.ShiftRight] = Keys.RightShift;
-            maps[Keycode.Tab] = Keys.Tab;
-            maps[Keycode.Del] = Keys.Delete;
-            maps[Keycode.Minus] = Keys.OemMinus;
-            maps[Keycode.LeftBracket] = Keys.OemOpenBrackets;
-            maps[Keycode.RightBracket] = Keys.OemCloseBrackets;
-            maps[Keycode.Backslash] = Keys.OemBackslash;
-            maps[Keycode.Semicolon] = Keys.OemSemicolon;
-            maps[Keycode.PageUp] = Keys.PageUp;
-            maps[Keycode.PageDown] = Keys.PageDown;
-            maps[Keycode.CtrlLeft] = Keys.LeftControl;
-            maps[Keycode.CtrlRight] = Keys.RightControl;
-            maps[Keycode.CapsLock] = Keys.CapsLock;
-            maps[Keycode.ScrollLock] = Keys.Scroll;
-            maps[Keycode.NumLock] = Keys.NumLock;
-            maps[Keycode.Insert] = Keys.Insert;
-            maps[Keycode.F1] = Keys.F1;
-            maps[Keycode.F2] = Keys.F2;
-            maps[Keycode.F3] = Keys.F3;
-            maps[Keycode.F4] = Keys.F4;
-            maps[Keycode.F5] = Keys.F5;
-            maps[Keycode.F6] = Keys.F6;
-            maps[Keycode.F7] = Keys.F7;
-            maps[Keycode.F8] = Keys.F8;
-            maps[Keycode.F9] = Keys.F9;
-            maps[Keycode.F10] = Keys.F10;
-            maps[Keycode.F11] = Keys.F11;
-            maps[Keycode.F12] = Keys.F12;
-            maps[Keycode.NumpadDivide] = Keys.Divide;
-            maps[Keycode.NumpadMultiply] = Keys.Multiply;
-            maps[Keycode.NumpadSubtract] = Keys.Subtract;
-            maps[Keycode.NumpadAdd] = Keys.Add;
+            Dictionary<Keycode, Keys> maps = new()
+            {
+                // then update it with the actual mappings
+                [Keycode.DpadLeft] = Keys.Left,
+                [Keycode.DpadRight] = Keys.Right,
+                [Keycode.DpadUp] = Keys.Up,
+                [Keycode.DpadDown] = Keys.Down,
+                [Keycode.DpadCenter] = Keys.Enter,
+                [Keycode.Num0] = Keys.D0,
+                [Keycode.Num1] = Keys.D1,
+                [Keycode.Num2] = Keys.D2,
+                [Keycode.Num3] = Keys.D3,
+                [Keycode.Num4] = Keys.D4,
+                [Keycode.Num5] = Keys.D5,
+                [Keycode.Num6] = Keys.D6,
+                [Keycode.Num7] = Keys.D7,
+                [Keycode.Num8] = Keys.D8,
+                [Keycode.Num9] = Keys.D9,
+                [Keycode.A] = Keys.A,
+                [Keycode.B] = Keys.B,
+                [Keycode.C] = Keys.C,
+                [Keycode.D] = Keys.D,
+                [Keycode.E] = Keys.E,
+                [Keycode.F] = Keys.F,
+                [Keycode.G] = Keys.G,
+                [Keycode.H] = Keys.H,
+                [Keycode.I] = Keys.I,
+                [Keycode.J] = Keys.J,
+                [Keycode.K] = Keys.K,
+                [Keycode.L] = Keys.L,
+                [Keycode.M] = Keys.M,
+                [Keycode.N] = Keys.N,
+                [Keycode.O] = Keys.O,
+                [Keycode.P] = Keys.P,
+                [Keycode.Q] = Keys.Q,
+                [Keycode.R] = Keys.R,
+                [Keycode.S] = Keys.S,
+                [Keycode.T] = Keys.T,
+                [Keycode.U] = Keys.U,
+                [Keycode.V] = Keys.V,
+                [Keycode.W] = Keys.W,
+                [Keycode.X] = Keys.X,
+                [Keycode.Y] = Keys.Y,
+                [Keycode.Z] = Keys.Z,
+                [Keycode.Space] = Keys.Space,
+                [Keycode.Escape] = Keys.Escape,
+                [Keycode.Back] = Keys.Back,
+                [Keycode.Home] = Keys.Home,
+                [Keycode.Enter] = Keys.Enter,
+                [Keycode.Period] = Keys.OemPeriod,
+                [Keycode.Comma] = Keys.OemComma,
+                [Keycode.Menu] = Keys.Help,
+                [Keycode.Search] = Keys.BrowserSearch,
+                [Keycode.VolumeUp] = Keys.VolumeUp,
+                [Keycode.VolumeDown] = Keys.VolumeDown,
+                [Keycode.MediaPause] = Keys.Pause,
+                [Keycode.MediaPlayPause] = Keys.MediaPlayPause,
+                [Keycode.MediaStop] = Keys.MediaStop,
+                [Keycode.MediaNext] = Keys.MediaNextTrack,
+                [Keycode.MediaPrevious] = Keys.MediaPreviousTrack,
+                [Keycode.Mute] = Keys.VolumeMute,
+                [Keycode.AltLeft] = Keys.LeftAlt,
+                [Keycode.AltRight] = Keys.RightAlt,
+                [Keycode.ShiftLeft] = Keys.LeftShift,
+                [Keycode.ShiftRight] = Keys.RightShift,
+                [Keycode.Tab] = Keys.Tab,
+                [Keycode.Del] = Keys.Delete,
+                [Keycode.Minus] = Keys.OemMinus,
+                [Keycode.LeftBracket] = Keys.OemOpenBrackets,
+                [Keycode.RightBracket] = Keys.OemCloseBrackets,
+                [Keycode.Backslash] = Keys.OemBackslash,
+                [Keycode.Semicolon] = Keys.OemSemicolon,
+                [Keycode.PageUp] = Keys.PageUp,
+                [Keycode.PageDown] = Keys.PageDown,
+                [Keycode.CtrlLeft] = Keys.LeftControl,
+                [Keycode.CtrlRight] = Keys.RightControl,
+                [Keycode.CapsLock] = Keys.CapsLock,
+                [Keycode.ScrollLock] = Keys.Scroll,
+                [Keycode.NumLock] = Keys.NumLock,
+                [Keycode.Insert] = Keys.Insert,
+                [Keycode.F1] = Keys.F1,
+                [Keycode.F2] = Keys.F2,
+                [Keycode.F3] = Keys.F3,
+                [Keycode.F4] = Keys.F4,
+                [Keycode.F5] = Keys.F5,
+                [Keycode.F6] = Keys.F6,
+                [Keycode.F7] = Keys.F7,
+                [Keycode.F8] = Keys.F8,
+                [Keycode.F9] = Keys.F9,
+                [Keycode.F10] = Keys.F10,
+                [Keycode.F11] = Keys.F11,
+                [Keycode.F12] = Keys.F12,
+                [Keycode.NumpadDivide] = Keys.Divide,
+                [Keycode.NumpadMultiply] = Keys.Multiply,
+                [Keycode.NumpadSubtract] = Keys.Subtract,
+                [Keycode.NumpadAdd] = Keys.Add
+            };
 
             return maps;
         }
-
-	    public static KeyboardState GetState()
-		{
-			return new KeyboardState(keys);
-		}
-		
-		public static KeyboardState GetState(PlayerIndex playerIndex)
-		{
-            return new KeyboardState(keys);
-		}
-	}
+    }
 }

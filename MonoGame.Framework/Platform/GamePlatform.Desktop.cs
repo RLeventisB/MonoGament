@@ -2,7 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 
 #if WINDOWS_UAP
 using Windows.UI.ViewManagement;
@@ -10,7 +9,7 @@ using Windows.UI.ViewManagement;
 
 namespace Microsoft.Xna.Framework
 {
-    partial class GamePlatform
+    public partial class GamePlatform
     {
         internal static GamePlatform PlatformCreate(Game game)
         {
@@ -22,5 +21,5 @@ namespace Microsoft.Xna.Framework
             return new UAPGamePlatform(game);
 #endif
         }
-   }
+    }
 }

@@ -32,7 +32,7 @@ namespace MonoGame.Framework.Utilities
             [DllImport("/usr/lib/libSystem.dylib")]
             public static extern IntPtr dlsym(IntPtr handle, string symbol);
         }
-        
+
         private const int RTLD_LAZY = 0x0001;
 
         public static IntPtr LoadLibraryExt(string libname)
@@ -68,7 +68,7 @@ namespace MonoGame.Framework.Utilities
             // Try alternate way of checking current folder
             // assemblyLocation is null if we are inside macOS app bundle
             if (ret == IntPtr.Zero)
-                ret = LoadLibrary(Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, libname));
+                ret = LoadLibrary(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, libname));
 
             // Try loading system library
             if (ret == IntPtr.Zero)
@@ -91,7 +91,6 @@ namespace MonoGame.Framework.Utilities
 
             return Linux.dlopen(libname, RTLD_LAZY);
         }
-
         public static T LoadFunction<T>(IntPtr library, string function, bool throwIfNotFound = false)
         {
             var ret = IntPtr.Zero;

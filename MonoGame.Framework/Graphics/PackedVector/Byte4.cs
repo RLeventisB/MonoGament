@@ -64,14 +64,8 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         [CLSCompliant(false)]
         public uint PackedValue
         {
-            get
-            {
-                return packedValue;
-            }
-            set
-            {
-                packedValue = value;
-            }
+            get => packedValue;
+            set => packedValue = value;
         }
 
         /// <summary>
@@ -81,8 +75,8 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         /// <returns>true if the current instance is equal to the specified object; false otherwise.</returns>
         public override bool Equals(object obj)
         {
-            if (obj is Byte4)
-                return this == (Byte4)obj;
+            if (obj is Byte4 byte4)
+                return this == byte4;
             return false;
         }
 
@@ -125,10 +119,10 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             const float min = 0.0f;
 
             // clamp the value between min and max values
-            var byte4 = (uint) MathF.Round(MathHelper.Clamp(vector.X, min, max)) & 0xFF;
-            var byte3 = ((uint) MathF.Round(MathHelper.Clamp(vector.Y, min, max)) & 0xFF) << 0x8;
-            var byte2 = ((uint) MathF.Round(MathHelper.Clamp(vector.Z, min, max)) & 0xFF) << 0x10;
-            var byte1 = ((uint) MathF.Round(MathHelper.Clamp(vector.W, min, max)) & 0xFF) << 0x18;
+            var byte4 = (uint)MathF.Round(MathHelper.Clamp(vector.X, min, max)) & 0xFF;
+            var byte3 = ((uint)MathF.Round(MathHelper.Clamp(vector.Y, min, max)) & 0xFF) << 0x8;
+            var byte2 = ((uint)MathF.Round(MathHelper.Clamp(vector.Z, min, max)) & 0xFF) << 0x10;
+            var byte1 = ((uint)MathF.Round(MathHelper.Clamp(vector.W, min, max)) & 0xFF) << 0x18;
 
             return byte4 | byte3 | byte2 | byte1;
         }
@@ -149,11 +143,10 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         public Vector4 ToVector4()
         {
             return new Vector4(
-                (float)(packedValue & 0xFF),
-                (float)((packedValue >> 0x8) & 0xFF),
-                (float)((packedValue >> 0x10) & 0xFF),
-                (float)((packedValue >> 0x18) & 0xFF));
+                packedValue & 0xFF,
+                packedValue >> 0x8 & 0xFF,
+                packedValue >> 0x10 & 0xFF,
+                packedValue >> 0x18 & 0xFF);
         }
     }
 }
-

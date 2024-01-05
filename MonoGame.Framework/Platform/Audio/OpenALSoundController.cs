@@ -1,14 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.IO;
-using System.Runtime.InteropServices;
-using MonoGame.Framework.Utilities;
+
 using MonoGame.OpenAL;
-using MonoGame.OpenGL;
 
 #if ANDROID
 using System.Globalization;
+
 using Android.Content.PM;
 using Android.Content;
 using Android.Media;
@@ -31,19 +29,18 @@ namespace Microsoft.Xna.Framework.Audio
             if ((error = AL.GetError()) != ALError.NoError)
             {
                 if (args != null && args.Length > 0)
-                    message = String.Format(message, args);
-                
+                    message = string.Format(message, args);
                 throw new InvalidOperationException(message + " (Reason: " + AL.GetErrorString(error) + ")");
             }
         }
 
         public static bool IsStereoFormat(ALFormat format)
         {
-            return (format == ALFormat.Stereo8
+            return format == ALFormat.Stereo8
                 || format == ALFormat.Stereo16
                 || format == ALFormat.StereoFloat32
                 || format == ALFormat.StereoIma4
-                || format == ALFormat.StereoMSAdpcm);
+                || format == ALFormat.StereoMSAdpcm;
         }
     }
 
@@ -57,7 +54,7 @@ namespace Microsoft.Xna.Framework.Audio
             if ((error = Alc.GetError()) != AlcError.NoError)
             {
                 if (args != null && args.Length > 0)
-                    message = String.Format(message, args);
+                    message = string.Format(message, args);
 
                 throw new InvalidOperationException(message + " (Reason: " + error.ToString() + ")");
             }
@@ -66,8 +63,8 @@ namespace Microsoft.Xna.Framework.Audio
 
     internal sealed class OpenALSoundController : IDisposable
     {
-        private static OpenALSoundController _instance = null;
-        private static EffectsExtension _efx = null;
+        private static OpenALSoundController _instance;
+        private static EffectsExtension _efx;
         private IntPtr _device;
         private IntPtr _context;
         IntPtr NullContext = IntPtr.Zero;
@@ -78,12 +75,10 @@ namespace Microsoft.Xna.Framework.Audio
         internal const int MAX_NUMBER_OF_SOURCES = 256;
 
 #elif IOS
-
         // Reference: http://stackoverflow.com/questions/3894044/maximum-number-of-openal-sound-buffers-on-iphone
         internal const int MAX_NUMBER_OF_SOURCES = 32;
 
 #elif ANDROID
-
         // Set to the same as OpenAL on iOS
         internal const int MAX_NUMBER_OF_SOURCES = 32;
 
@@ -102,11 +97,12 @@ namespace Microsoft.Xna.Framework.Audio
         public bool SupportsAdpcm { get; private set; }
         public bool SupportsEfx { get; private set; }
         public bool SupportsIeee { get; private set; }
+        public bool SupportsLoopPoints { get; private set; }
 
         /// <summary>
         /// Sets up the hardware resources used by the controller.
         /// </summary>
-		private OpenALSoundController()
+        private OpenALSoundController()
         {
             if (AL.NativeLibrary == IntPtr.Zero)
                 throw new DllNotFoundException("Couldn't initialize OpenAL because the native binaries couldn't be found.");
@@ -121,8 +117,8 @@ namespace Microsoft.Xna.Framework.Audio
 
             // We have hardware here and it is ready
 
-			allSourcesArray = new int[MAX_NUMBER_OF_SOURCES];
-			AL.GenSources(allSourcesArray);
+            allSourcesArray = new int[MAX_NUMBER_OF_SOURCES];
+            AL.GenSources(allSourcesArray);
             ALHelper.CheckError("Failed to generate sources.");
             Filter = 0;
             if (Efx.IsInitialized)
@@ -130,8 +126,8 @@ namespace Microsoft.Xna.Framework.Audio
                 Filter = Efx.GenFilter();
             }
             availableSourcesCollection = new List<int>(allSourcesArray);
-			inUseSourcesCollection = new List<int>();
-		}
+            inUseSourcesCollection = new List<int>();
+        }
 
         ~OpenALSoundController()
         {
@@ -280,6 +276,7 @@ namespace Microsoft.Xna.Framework.Audio
                     SupportsAdpcm = AL.IsExtensionPresent("AL_SOFT_MSADPCM");
                     SupportsEfx = AL.IsExtensionPresent("AL_EXT_EFX");
                     SupportsIeee = AL.IsExtensionPresent("AL_EXT_float32");
+                    SupportsLoopPoints = AL.IsExtensionPresent("AL_SOFT_loop_points");
                     return true;
                 }
             }
@@ -304,7 +301,7 @@ namespace Microsoft.Xna.Framework.Audio
                 }
                 catch (Exception ex)
                 {
-                    throw (new NoAudioHardwareException("Failed to init OpenALSoundController", ex));
+                    throw new NoAudioHardwareException("Failed to init OpenALSoundController", ex);
                 }
             }
         }
@@ -312,13 +309,13 @@ namespace Microsoft.Xna.Framework.Audio
 
         public static OpenALSoundController Instance
         {
-			get
+            get
             {
                 if (_instance == null)
                     throw new NoAudioHardwareException("OpenAL context has failed to initialize. Call SoundEffect.Initialize() before sound operation to get more specific errors.");
-				return _instance;
-			}
-		}
+                return _instance;
+            }
+        }
 
         public static EffectsExtension Efx
         {
@@ -332,7 +329,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         public int Filter
         {
-            get; private set;
+            get;
+            private set;
         }
 
         public static void DestroyInstance()
@@ -353,12 +351,12 @@ namespace Microsoft.Xna.Framework.Audio
 
             if (_context != NullContext)
             {
-                Alc.DestroyContext (_context);
+                Alc.DestroyContext(_context);
                 _context = NullContext;
             }
             if (_device != IntPtr.Zero)
             {
-                Alc.CloseDevice (_device);
+                Alc.CloseDevice(_device);
                 _device = IntPtr.Zero;
             }
         }
@@ -376,15 +374,14 @@ namespace Microsoft.Xna.Framework.Audio
         /// Dispose of the OpenALSoundCOntroller.
         /// </summary>
         /// <param name="disposing">If true, the managed resources are to be disposed.</param>
-		void Dispose(bool disposing)
-		{
+        void Dispose(bool disposing)
+        {
             if (!_isDisposed)
             {
                 if (disposing)
                 {
 #if DESKTOPGL
-                    if(_oggstreamer != null)
-                        _oggstreamer.Dispose();
+                    _oggstreamer?.Dispose();
 #endif
                     for (int i = 0; i < allSourcesArray.Length; i++)
                     {
@@ -396,11 +393,11 @@ namespace Microsoft.Xna.Framework.Audio
                         Efx.DeleteFilter(Filter);
 
                     Microphone.StopMicrophones();
-                    CleanUpOpenAL();                    
+                    CleanUpOpenAL();
                 }
                 _isDisposed = true;
             }
-		}
+        }
 
         /// <summary>
         /// Reserves a sound buffer and return its identifier. If there are no available sources
@@ -408,12 +405,12 @@ namespace Microsoft.Xna.Framework.Audio
         /// <see cref="InstancePlayLimitException"/> is thrown.
         /// </summary>
         /// <returns>The source number of the reserved sound buffer.</returns>
-		public int ReserveSource()
-		{
+        public int ReserveSource()
+        {
             int sourceNumber;
 
             lock (availableSourcesCollection)
-            {                
+            {
                 if (availableSourcesCollection.Count == 0)
                 {
                     throw new InstancePlayLimitException();
@@ -425,7 +422,7 @@ namespace Microsoft.Xna.Framework.Audio
             }
 
             return sourceNumber;
-		}
+        }
 
         public void RecycleSource(int sourceId)
         {
@@ -445,15 +442,14 @@ namespace Microsoft.Xna.Framework.Audio
             inst.SourceId = 0;
             inst.HasSourceId = false;
             inst.SoundState = SoundState.Stopped;
-		}
+        }
 
-        public double SourceCurrentPosition (int sourceId)
-		{
-            int pos;
-			AL.GetSource (sourceId, ALGetSourcei.SampleOffset, out pos);
+        public double SourceCurrentPosition(int sourceId)
+        {
+            AL.GetSource(sourceId, ALGetSourcei.SampleOffset, out int pos);
             ALHelper.CheckError("Failed to set source offset.");
-			return pos;
-		}
+            return pos;
+        }
 
 #if ANDROID
         void Activity_Paused(object sender, EventArgs e)

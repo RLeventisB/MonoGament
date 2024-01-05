@@ -2,9 +2,11 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using Microsoft.Xna.Framework.Graphics;
+
 using Nvidia.TextureTools;
+
+using System;
 using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
@@ -58,7 +60,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         private void NvttEndImage()
         {
         }
-        
+
         private static void PrepareNVTT(byte[] data)
         {
             for (var x = 0; x < data.Length; x += 4)
@@ -135,35 +137,32 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             AlphaMode alphaMode;
             Format outputFormat;
-            var alphaDither = false;
             switch (format)
             {
                 case SurfaceFormat.Dxt1:
                 case SurfaceFormat.Dxt1SRgb:
-                {
-                    bool hasTransparency;
-                    PrepareNVTT_DXT1(sourceData, out hasTransparency);
-                    outputFormat = hasTransparency ? Format.DXT1a : Format.DXT1;
-                    alphaMode = hasTransparency ? AlphaMode.Transparency : AlphaMode.None;
-                    alphaDither = true;
-                    break;
-                }
+                    {
+                        PrepareNVTT_DXT1(sourceData, out bool hasTransparency);
+                        outputFormat = hasTransparency ? Format.DXT1a : Format.DXT1;
+                        alphaMode = hasTransparency ? AlphaMode.Transparency : AlphaMode.None;
+                        break;
+                    }
                 case SurfaceFormat.Dxt3:
                 case SurfaceFormat.Dxt3SRgb:
-                {
-                    PrepareNVTT(sourceData);
-                    outputFormat = Format.DXT3;
-                    alphaMode = AlphaMode.Transparency;
-                    break;
-                }
+                    {
+                        PrepareNVTT(sourceData);
+                        outputFormat = Format.DXT3;
+                        alphaMode = AlphaMode.Transparency;
+                        break;
+                    }
                 case SurfaceFormat.Dxt5:
                 case SurfaceFormat.Dxt5SRgb:
-                {
-                    PrepareNVTT(sourceData);
-                    outputFormat = Format.DXT5;
-                    alphaMode = AlphaMode.Transparency;
-                    break;
-                }
+                    {
+                        PrepareNVTT(sourceData);
+                        outputFormat = Format.DXT5;
+                        alphaMode = AlphaMode.Transparency;
+                        break;
+                    }
                 default:
                     throw new InvalidOperationException("Invalid DXT surface format!");
             }
@@ -191,7 +190,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 // See https://github.com/MonoGame/MonoGame/issues/6259
                 //
                 //if (alphaDither)
-                    //compressionOptions.SetQuantization(false, false, true);
+                //compressionOptions.SetQuantization(false, false, true);
 
                 var outputOptions = new OutputOptions();
                 outputOptions.SetOutputHeader(false);

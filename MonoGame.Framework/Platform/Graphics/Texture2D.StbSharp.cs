@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
             {
-                // If stream doesnt provide seek functionaly, use MemoryStream instead
+                // If stream doesn't provide seek functionality, use MemoryStream instead
                 using (var ms = new MemoryStream())
                 {
                     stream.CopyTo(ms);
@@ -36,10 +36,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
-            if (colorProcessor != null)
-            {
-                colorProcessor(result.Data);
-            }
+            colorProcessor?.Invoke(result.Data);
 
             Texture2D texture = null;
             texture = new Texture2D(graphicsDevice, result.Width, result.Height);

@@ -32,9 +32,9 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 //GLExt.Oes.GenVertexArrays(1, out this.vao);
                 //GLExt.Oes.BindVertexArray(this.vao);
-                GL.GenBuffers(1, out this.vbo);
+                GL.GenBuffers(1, out vbo);
                 GraphicsExtensions.CheckGLError();
-                GL.BindBuffer(BufferTarget.ArrayBuffer, this.vbo);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
                 GraphicsExtensions.CheckGLError();
                 GL.BufferData(BufferTarget.ArrayBuffer,
                               new IntPtr(VertexDeclaration.VertexStride * VertexCount), IntPtr.Zero,
@@ -138,7 +138,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // to the device to discard the previous content.
                 GL.BufferData(
                     BufferTarget.ArrayBuffer,
-                    (IntPtr)bufferSize,
+                    bufferSize,
                     IntPtr.Zero,
                     _isDynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
                 GraphicsExtensions.CheckGLError();
@@ -153,7 +153,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInBytes);
 
-                    GL.BufferSubData(BufferTarget.ArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)(elementSizeInBytes * elementCount), dataPtr);
+                    GL.BufferSubData(BufferTarget.ArrayBuffer, offsetInBytes, elementSizeInBytes * elementCount, dataPtr);
                     GraphicsExtensions.CheckGLError();
                 }
                 finally
@@ -172,7 +172,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     for (int i = 0; i < elementCount; i++)
                     {
-                        GL.BufferSubData(BufferTarget.ArrayBuffer, (IntPtr)dstOffset, (IntPtr)elementSizeInByte, dataPtr);
+                        GL.BufferSubData(BufferTarget.ArrayBuffer, dstOffset, elementSizeInByte, dataPtr);
                         GraphicsExtensions.CheckGLError();
 
                         dstOffset += vertexStride;
@@ -191,8 +191,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed)
             {
-                if (GraphicsDevice != null)
-                    GraphicsDevice.DisposeBuffer(vbo);
+                GraphicsDevice?.DisposeBuffer(vbo);
             }
             base.Dispose(disposing);
         }

@@ -47,16 +47,12 @@ namespace MonoGame.Framework.Utilities
         /// <summary>
         /// Graphics backend
         /// </summary>
-        public static GraphicsBackend GraphicsBackend
-        {
-            get
-            {
+        public static GraphicsBackend GraphicsBackend =>
 #if DIRECTX
                 return GraphicsBackend.DirectX;
 #else
-                return GraphicsBackend.OpenGL;
+                GraphicsBackend.OpenGL;
 #endif
-            }
-        }
+
     }
 }

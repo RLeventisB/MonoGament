@@ -84,16 +84,15 @@ namespace MonoGame.Framework.Utilities
         {
             get
             {
-                if (CurrentPlatform.OS == OS.Windows && Environment.Is64BitProcess)
+                if (OS == OS.Windows && Environment.Is64BitProcess)
                     return "win-x64";
-                else if (CurrentPlatform.OS == OS.Windows && !Environment.Is64BitProcess)
+                if (OS == OS.Windows && !Environment.Is64BitProcess)
                     return "win-x86";
-                else if (CurrentPlatform.OS == OS.Linux)
+                if (OS == OS.Linux)
                     return "linux-x64";
-                else if (CurrentPlatform.OS == OS.MacOSX)
+                if (OS == OS.MacOSX)
                     return "osx";
-                else
-                    return "unknown";
+                return "unknown";
             }
         }
     }

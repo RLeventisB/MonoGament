@@ -26,13 +26,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// The <see cref="IGameComponent"/> that the event notifies about.
         /// </summary>
-        public IGameComponent GameComponent
-        {
-            get
-            {
-                return _gameComponent;
-            }
-        }
+        public IGameComponent GameComponent => _gameComponent;
     }
 }
 

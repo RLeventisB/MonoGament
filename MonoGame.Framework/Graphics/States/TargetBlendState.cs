@@ -45,8 +45,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	    public BlendFunction AlphaBlendFunction
 	    {
-	        get { return _alphaBlendFunction; }
-	        set
+	        get => _alphaBlendFunction;
+            set
 	        {
 	            _parent.ThrowIfBound();
 	            _alphaBlendFunction = value;
@@ -55,8 +55,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	    public Blend AlphaDestinationBlend
 	    {
-	        get { return _alphaDestinationBlend; }
-	        set
+	        get => _alphaDestinationBlend;
+            set
 	        {
                 _parent.ThrowIfBound();
 	            _alphaDestinationBlend = value;
@@ -65,8 +65,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	    public Blend AlphaSourceBlend
 	    {
-	        get { return _alphaSourceBlend; }
-	        set
+	        get => _alphaSourceBlend;
+            set
 	        {
                 _parent.ThrowIfBound();
 	            _alphaSourceBlend = value;
@@ -75,8 +75,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	    public BlendFunction ColorBlendFunction
 	    {
-	        get { return _colorBlendFunction; }
-	        set
+	        get => _colorBlendFunction;
+            set
 	        {
                 _parent.ThrowIfBound();
 	            _colorBlendFunction = value;
@@ -85,8 +85,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	    public Blend ColorDestinationBlend
 	    {
-	        get { return _colorDestinationBlend; }
-	        set
+	        get => _colorDestinationBlend;
+            set
 	        {
                 _parent.ThrowIfBound();
 	            _colorDestinationBlend = value;
@@ -95,8 +95,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	    public Blend ColorSourceBlend
 	    {
-	        get { return _colorSourceBlend; }
-	        set
+	        get => _colorSourceBlend;
+            set
 	        {
                 _parent.ThrowIfBound();
 	            _colorSourceBlend = value;
@@ -105,8 +105,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	    public ColorWriteChannels ColorWriteChannels
 	    {
-	        get { return _colorWriteChannels; }
-	        set
+	        get => _colorWriteChannels;
+            set
 	        {
                 _parent.ThrowIfBound();
 	            _colorWriteChannels = value;

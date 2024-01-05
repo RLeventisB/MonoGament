@@ -2,12 +2,13 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using MonoGame.Framework.Utilities;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -22,23 +23,20 @@ namespace Microsoft.Xna.Framework.Content
         private ContentTypeReader _baseTypeReader;
 
 
-        public ReflectiveReader() 
+        public ReflectiveReader()
             : base(typeof(T))
         {
         }
 
-        public override bool CanDeserializeIntoExistingObject
-        {
-            get { return TargetType.IsClass(); }
-        }
+        public override bool CanDeserializeIntoExistingObject => TargetType.IsClass();
 
-        protected internal override void Initialize(ContentTypeReaderManager manager)
+        public override void Initialize(ContentTypeReaderManager manager)
         {
             base.Initialize(manager);
 
             var baseType = ReflectionHelpers.GetBaseType(TargetType);
             if (baseType != null && baseType != typeof(object))
-				_baseTypeReader = manager.GetTypeReader(baseType);
+                _baseTypeReader = manager.GetTypeReader(baseType);
 
             _constructor = TargetType.GetDefaultConstructor();
 
@@ -53,7 +51,7 @@ namespace Microsoft.Xna.Framework.Content
                 if (read != null)
                     _readers.Add(read);
             }
-            
+
             // Gather the fields.
             foreach (var field in fields)
             {
@@ -81,7 +79,7 @@ namespace Microsoft.Xna.Framework.Content
             }
 
             // Are we explicitly asked to ignore this item?
-            if (ReflectionHelpers.GetCustomAttribute<ContentSerializerIgnoreAttribute>(member) != null) 
+            if (ReflectionHelpers.GetCustomAttribute<ContentSerializerIgnoreAttribute>(member) != null)
                 return null;
 
             var contentSerializerAttribute = ReflectionHelpers.GetCustomAttribute<ContentSerializerAttribute>(member);
@@ -146,12 +144,12 @@ namespace Microsoft.Xna.Framework.Content
             // We need to have a reader at this point.
             var reader = manager.GetTypeReader(elementType);
             if (reader == null)
-                if (elementType == typeof(System.Array))
+                if (elementType == typeof(Array))
                     reader = new ArrayReader<Array>();
                 else
                     throw new ContentLoadException(string.Format("Content reader could not be found for {0} type.", elementType.FullName));
 
-            // We use the construct delegate to pick the correct existing 
+            // We use the construct delegate to pick the correct existing
             // object to be the target of deserialization.
             Func<object, object> construct = parent => null;
             if (property != null && !property.CanWrite)
@@ -164,17 +162,16 @@ namespace Microsoft.Xna.Framework.Content
                 setter(parent, obj2);
             };
         }
-      
-        protected internal override object Read(ContentReader input, object existingInstance)
+
+        public override object Read(ContentReader input, object existingInstance)
         {
             T obj;
             if (existingInstance != null)
                 obj = (T)existingInstance;
             else
-                obj = (_constructor == null ? (T)Activator.CreateInstance(typeof(T)) : (T)_constructor.Invoke(null));
-		
-			if(_baseTypeReader != null)
-				_baseTypeReader.Read(input, obj);
+                obj = _constructor == null ? (T)Activator.CreateInstance(typeof(T)) : (T)_constructor.Invoke(null);
+
+            _baseTypeReader?.Read(input, obj);
 
             // Box the type.
             var boxed = (object)obj;

@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Content
 
         }
 
-        protected internal override object Read(ContentReader input, object existingInstance)
+        public override object Read(ContentReader input, object existingInstance)
         {
             return input.ReadExternalReference<object>();
         }

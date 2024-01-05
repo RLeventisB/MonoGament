@@ -7,8 +7,8 @@ namespace Microsoft.Xna.Framework.Input
     /// <summary>
     /// Defines the keys on a keyboard.
     /// </summary>	
-	public enum Keys
-	{
+	public enum Keys : byte
+    {
         /// <summary>
         /// Reserved.
         /// </summary>
@@ -477,9 +477,9 @@ namespace Microsoft.Xna.Framework.Input
         /// Browser Start and Home key.
         /// </summary>
 		BrowserHome = 172,
-		/// <summary>
+        /// <summary>
         /// Volume Mute key.
-		/// </summary>
+        /// </summary>
         VolumeMute = 173,
         /// <summary>
         /// Volume Down key.
@@ -649,5 +649,5 @@ namespace Microsoft.Xna.Framework.Input
         /// OEM Enlarge Window key.
         /// </summary>
 		OemEnlW = 0xf4
-	}
+    }
 }

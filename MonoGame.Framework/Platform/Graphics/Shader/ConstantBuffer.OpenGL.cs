@@ -9,10 +9,10 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     internal partial class ConstantBuffer
     {
-        private ShaderProgram _shaderProgram = null;
+        private ShaderProgram _shaderProgram;
         private int _location;
 
-        static ConstantBuffer _lastConstantBufferApplied = null;
+        static ConstantBuffer _lastConstantBufferApplied;
 
         /// <summary>
         /// A hash value which can be used to compare constant buffers.
@@ -58,7 +58,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // If the shader program is the same, the effect may still be different and have different values in the buffer
-            if (!Object.ReferenceEquals(this, _lastConstantBufferApplied))
+            if (!ReferenceEquals(this, _lastConstantBufferApplied))
                 _dirty = true;
 
             // If the buffer content hasn't changed then we're

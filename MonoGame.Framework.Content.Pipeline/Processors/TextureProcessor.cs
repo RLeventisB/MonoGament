@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
-    [ContentProcessor(DisplayName="Texture - MonoGame")]
+    [ContentProcessor(DisplayName = "Texture - MonoGame")]
     public class TextureProcessor : ContentProcessor<TextureContent, TextureContent>
     {
         public TextureProcessor()
@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 catch (Exception ex)
                 {
                     context.Logger.LogImportantMessage("Could not convert input texture for processing. " + ex.ToString());
-                    throw ex; 
+                    throw;
                 }
 
                 if (GenerateMipmaps)
@@ -116,7 +116,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
             // Get the texture profile for the platform and let it convert the texture.
             var texProfile = TextureProfile.ForPlatform(context.TargetPlatform);
-            texProfile.ConvertTexture(context, input, TextureFormat, false);	
+            texProfile.ConvertTexture(context, input, TextureFormat, false);
 
             return input;
         }

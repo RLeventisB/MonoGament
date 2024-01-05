@@ -64,14 +64,8 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         [CLSCompliant(false)]
         public ulong PackedValue
         {
-            get
-            {
-                return packedValue;
-            }
-            set
-            {
-                packedValue = value;
-            }
+            get => packedValue;
+            set => packedValue = value;
         }
 
         /// <summary>
@@ -81,8 +75,8 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         /// <returns>true if the current instance is equal to the specified object; false otherwise.</returns>
         public override bool Equals(object obj)
         {
-            if (obj is Short4)
-                return this == (Short4)obj;
+            if (obj is Short4 short4)
+                return this == short4;
             return false;
         }
 
@@ -123,13 +117,13 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         {
             const long mask = 0xFFFF;
             const long maxPos = 0x7FFF; // Largest two byte positive number 0xFFFF >> 1;
-			const float minNeg = ~(int)maxPos; // two's complement
+            const float minNeg = ~(int)maxPos; // two's complement
 
             // clamp the value between min and max values
-            var word4 = ((ulong)((int) MathF.Round(MathHelper.Clamp(vector.X, minNeg, maxPos))) & mask);
-			var word3 = ((ulong)((int) MathF.Round(MathHelper.Clamp(vector.Y, minNeg, maxPos)) & mask)) << 0x10;
-			var word2 = ((ulong)((int) MathF.Round(MathHelper.Clamp(vector.Z, minNeg, maxPos)) & mask)) << 0x20;
-			var word1 = ((ulong)((int) MathF.Round(MathHelper.Clamp(vector.W, minNeg, maxPos)) & mask)) << 0x30;
+            var word4 = (ulong)(int)MathF.Round(MathHelper.Clamp(vector.X, minNeg, maxPos)) & mask;
+            var word3 = (ulong)((int)MathF.Round(MathHelper.Clamp(vector.Y, minNeg, maxPos)) & mask) << 0x10;
+            var word2 = (ulong)((int)MathF.Round(MathHelper.Clamp(vector.Z, minNeg, maxPos)) & mask) << 0x20;
+            var word1 = (ulong)((int)MathF.Round(MathHelper.Clamp(vector.W, minNeg, maxPos)) & mask) << 0x30;
 
             return word4 | word3 | word2 | word1;
         }
@@ -151,9 +145,9 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         {
             return new Vector4(
                 (short)(packedValue & 0xFFFF),
-                (short)((packedValue >> 0x10) & 0xFFFF),
-                (short)((packedValue >> 0x20) & 0xFFFF),
-                (short)((packedValue >> 0x30) & 0xFFFF));
+                (short)(packedValue >> 0x10 & 0xFFFF),
+                (short)(packedValue >> 0x20 & 0xFFFF),
+                (short)(packedValue >> 0x30 & 0xFFFF));
         }
     }
 }

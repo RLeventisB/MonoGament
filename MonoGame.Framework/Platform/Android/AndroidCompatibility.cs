@@ -41,10 +41,7 @@ namespace Microsoft.Xna.Framework
             {
                 return Orientation.Landscape;
             }
-            else
-            {
-                return Orientation.Portrait;
-            }
+            return Orientation.Portrait;
         }
 
         internal static DisplayOrientation GetAbsoluteOrientation(int orientation)

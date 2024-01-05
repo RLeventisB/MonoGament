@@ -15,35 +15,29 @@ namespace Microsoft.Xna.Framework
     public class CurveKey : IEquatable<CurveKey>, IComparable<CurveKey>
     {
         #region Private Fields
-
         private CurveContinuity _continuity;
         private readonly float _position;
         private float _tangentIn;
         private float _tangentOut;
         private float _value;
-
         #endregion
 
         #region Properties
-
         /// <summary>
         /// Gets or sets the indicator whether the segment between this point and the next point on the curve is discrete or continuous.
         /// </summary>
         [DataMember]
         public CurveContinuity Continuity
         {
-            get { return this._continuity; }
-            set { this._continuity = value; }
+            get => _continuity;
+            set => _continuity = value;
         }
 
         /// <summary>
         /// Gets a position of the key on the curve.
         /// </summary>
         [DataMember]
-        public float Position
-        {
-            get { return this._position; }
-        }
+        public float Position => _position;
 
         /// <summary>
         /// Gets or sets a tangent when approaching this point from the previous point on the curve.
@@ -51,8 +45,8 @@ namespace Microsoft.Xna.Framework
         [DataMember]
         public float TangentIn
         {
-            get { return this._tangentIn; }
-            set { this._tangentIn = value; }
+            get => _tangentIn;
+            set => _tangentIn = value;
         }
 
         /// <summary>
@@ -61,8 +55,8 @@ namespace Microsoft.Xna.Framework
         [DataMember]
         public float TangentOut
         {
-            get { return this._tangentOut; }
-            set { this._tangentOut = value; }
+            get => _tangentOut;
+            set => _tangentOut = value;
         }
 
         /// <summary>
@@ -71,14 +65,12 @@ namespace Microsoft.Xna.Framework
         [DataMember]
         public float Value
         {
-            get { return this._value; }
-            set { this._value = value; }
+            get => _value;
+            set => _value = value;
         }
-
         #endregion
 
         #region Constructors
-
         /// <summary>
         /// Creates a new instance of <see cref="CurveKey"/> class with position: 0 and value: 0.
         /// </summary>
@@ -121,13 +113,12 @@ namespace Microsoft.Xna.Framework
         /// <param name="continuity">Indicates whether the curve is discrete or continuous.</param>
         public CurveKey(float position, float value, float tangentIn, float tangentOut, CurveContinuity continuity)
         {
-            this._position = position;
-            this._value = value;
-            this._tangentIn = tangentIn;
-            this._tangentOut = tangentOut;
-            this._continuity = continuity;
+            _position = position;
+            _value = value;
+            _tangentIn = tangentIn;
+            _tangentOut = tangentOut;
+            _continuity = continuity;
         }
-
         #endregion
 
         /// <summary>
@@ -150,17 +141,17 @@ namespace Microsoft.Xna.Framework
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public static bool operator ==(CurveKey value1, CurveKey value2)
         {
-            if (object.Equals(value1, null))
-                return object.Equals(value2, null);
+            if (Equals(value1, null))
+                return Equals(value2, null);
 
-            if (object.Equals(value2, null))
-                return object.Equals(value1, null);
+            if (Equals(value2, null))
+                return Equals(value1, null);
 
-            return (value1._position == value2._position)
-                && (value1._value == value2._value)
-                && (value1._tangentIn == value2._tangentIn)
-                && (value1._tangentOut == value2._tangentOut)
-                && (value1._continuity == value2._continuity);
+            return value1._position == value2._position
+                && value1._value == value2._value
+                && value1._tangentIn == value2._tangentIn
+                && value1._tangentOut == value2._tangentOut
+                && value1._continuity == value2._continuity;
         }
 
         /// <summary>
@@ -169,32 +160,30 @@ namespace Microsoft.Xna.Framework
         /// <returns>A copy of this key.</returns>
         public CurveKey Clone()
         {
-            return new CurveKey(this._position, this._value, this._tangentIn, this._tangentOut, this._continuity);
+            return new CurveKey(_position, _value, _tangentIn, _tangentOut, _continuity);
         }
 
         #region Inherited Methods
-
         public int CompareTo(CurveKey other)
         {
-            return this._position.CompareTo(other._position);
+            return _position.CompareTo(other._position);
         }
 
         public bool Equals(CurveKey other)
         {
-            return (this == other);
+            return this == other;
         }
 
         public override bool Equals(object obj)
         {
-            return (obj as CurveKey) != null && Equals((CurveKey)obj);
+            return obj as CurveKey != null && Equals((CurveKey)obj);
         }
 
         public override int GetHashCode()
         {
-            return this._position.GetHashCode() ^ this._value.GetHashCode() ^ this._tangentIn.GetHashCode() ^
-                this._tangentOut.GetHashCode() ^ this._continuity.GetHashCode();
-        } 
-
+            return _position.GetHashCode() ^ _value.GetHashCode() ^ _tangentIn.GetHashCode() ^
+                   _tangentOut.GetHashCode() ^ _continuity.GetHashCode();
+        }
         #endregion
     }
 }

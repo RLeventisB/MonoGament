@@ -73,29 +73,25 @@ namespace Microsoft.Xna.Framework.Media
                             long albumId = albumIdColumn > -1 ? musicCursor.GetInt(albumIdColumn) : -1;
                             var albumArtUri = albumId > -1 ? ContentUris.WithAppendedId(Uri.Parse("content://media/external/audio/albumart"), albumId) : null;
 
-                            Artist artist;
-                            if (!artists.TryGetValue(artistProperty, out artist))
+                            if (!artists.TryGetValue(artistProperty, out Artist artist))
                             {
                                 artist = new Artist(artistProperty);
                                 artists.Add(artist.Name, artist);
                             }
 
-                            Artist albumArtist;
-                            if (!artists.TryGetValue(albumArtistProperty, out albumArtist))
+                            if (!artists.TryGetValue(albumArtistProperty, out Artist albumArtist))
                             {
                                 albumArtist = new Artist(albumArtistProperty);
                                 artists.Add(albumArtist.Name, albumArtist);
                             }
 
-                            Genre genre;
-                            if (!genres.TryGetValue(genreProperty, out genre))
+                            if (!genres.TryGetValue(genreProperty, out Genre genre))
                             {
                                 genre = new Genre(genreProperty);
                                 genres.Add(genre.Name, genre);
                             }
 
-                            Album album;
-                            if (!albums.TryGetValue(albumNameProperty, out album))
+                            if (!albums.TryGetValue(albumNameProperty, out Album album))
                             {
                                 album = new Album(new SongCollection(), albumNameProperty, albumArtist, genre, albumArtUri);
                                 albums.Add(album.Name, album);

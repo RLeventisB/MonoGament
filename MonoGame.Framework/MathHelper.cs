@@ -11,47 +11,48 @@ namespace Microsoft.Xna.Framework
     /// </summary>
     public static class MathHelper
     {
-    	/// <summary>
+        public static readonly float MachineEpsilonFloat = GetMachineEpsilonFloat();
+        /// <summary>
         /// Represents the mathematical constant e(2.71828175).
         /// </summary>
         public const float E = MathF.E;
-        
+
         /// <summary>
         /// Represents the log base ten of e(0.4342945).
         /// </summary>
         public const float Log10E = 0.4342945f;
-        
+
         /// <summary>
         /// Represents the log base two of e(1.442695).
         /// </summary>
         public const float Log2E = 1.442695f;
-        
+
         /// <summary>
         /// Represents the value of pi(3.14159274).
         /// </summary>
         public const float Pi = MathF.PI;
-        
+
         /// <summary>
         /// Represents the value of pi divided by two(1.57079637).
         /// </summary>
         public const float PiOver2 = (float)(Math.PI / 2.0);
-        
+
         /// <summary>
         /// Represents the value of pi divided by four(0.7853982).
         /// </summary>
         public const float PiOver4 = (float)(Math.PI / 4.0);
-        
+
         /// <summary>
         /// Represents the value of pi times two(6.28318548).
         /// </summary>
         public const float TwoPi = (float)(Math.PI * 2.0);
-        
+
         /// <summary>
         /// Represents the value of pi times two(6.28318548).
         /// This is an alias of TwoPi.
         /// </summary>
         public const float Tau = TwoPi;
-        
+
         /// <summary>
         /// Returns the Cartesian coordinate for one axis of a point that is defined by a given triangle and two normalized barycentric (areal) coordinates.
         /// </summary>
@@ -66,7 +67,7 @@ namespace Microsoft.Xna.Framework
             return value1 + (value2 - value1) * amount1 + (value3 - value1) * amount2;
         }
 
-	/// <summary>
+        /// <summary>
         /// Performs a Catmull-Rom interpolation using the specified positions.
         /// </summary>
         /// <param name="value1">The first position in the interpolation.</param>
@@ -82,12 +83,37 @@ namespace Microsoft.Xna.Framework
             double amountSquared = amount * amount;
             double amountCubed = amountSquared * amount;
             return (float)(0.5 * (2.0 * value2 +
-                (value3 - value1) * amount +
-                (2.0 * value1 - 5.0 * value2 + 4.0 * value3 - value4) * amountSquared +
-                (3.0 * value2 - value1 - 3.0 * value3 + value4) * amountCubed));
+                                  (value3 - value1) * amount +
+                                  (2.0 * value1 - 5.0 * value2 + 4.0 * value3 - value4) * amountSquared +
+                                  (3.0 * value2 - value1 - 3.0 * value3 + value4) * amountCubed));
         }
-
- 	/// <summary>
+        /// <summary>
+        /// Restricts a value to be within a specified range and returns true if a change was made to the value.
+        /// </summary>
+        /// <param name="value">The reference to the value to clamp.</param>
+        /// <param name="min">
+        /// The minimum value.
+        /// </param>
+        /// <param name="max">
+        /// The maximum value. 
+        /// </param>
+        /// <returns>The clamped value and a boolean representing if the clamped value is the same.</returns>
+        public static bool Clamp(ref float value, float min, float max)
+        {
+            // First we check to see if we're greater than the max.
+            if (value > max)
+            {
+                value = max;
+                return true;
+            }
+            if (value < min)
+            {
+                value = min;
+                return true;
+            }
+            return false;
+        }
+        /// <summary>
         /// Restricts a value to be within a specified range.
         /// </summary>
         /// <param name="value">The value to clamp.</param>
@@ -97,15 +123,15 @@ namespace Microsoft.Xna.Framework
         public static float Clamp(float value, float min, float max)
         {
             // First we check to see if we're greater than the max
-            value = (value > max) ? max : value;
+            value = value > max ? max : value;
 
             // Then we check to see if we're less than the min.
-            value = (value < min) ? min : value;
+            value = value < min ? min : value;
 
             // There's no check to see if min > max.
             return value;
         }
-        
+
         /// <summary>
         /// Restricts a value to be within a specified range.
         /// </summary>
@@ -114,12 +140,38 @@ namespace Microsoft.Xna.Framework
         /// <param name="max">The maximum value. If <c>value</c> is greater than <c>max</c>, <c>max</c> will be returned.</param>
         /// <returns>The clamped value.</returns>
         public static int Clamp(int value, int min, int max)
-        { 
-            value = (value > max) ? max : value; 
-            value = (value < min) ? min : value; 
+        {
+            value = value > max ? max : value;
+            value = value < min ? min : value;
             return value;
         }
-        
+        /// <summary>
+        /// Restricts a value to be between 0 and 1.
+        /// </summary>
+        /// <param name="v">The value to clamp.</param>
+        /// <returns>The clamped value.</returns>
+        public static float Clamp01(float v) => Clamp(v, 0, 1);
+        /// <summary>
+        /// Restricts a value to be between 0 and 1 and returns true if a change was made to the value.
+        /// </summary>
+        /// <param name="value">The reference to the value to clamp.</param>
+        /// <returns>The clamped value and a boolean representing if the clamped value is the same.</returns>
+        public static bool Clamp01(ref float value)
+        {
+            // First we check to see if we're greater than the max.
+            if (value > 1)
+            {
+                value = 1;
+                return true;
+            }
+            if (value < 0)
+            {
+                value = 0;
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Calculates the absolute value of the difference of two values.
         /// </summary>
@@ -130,7 +182,7 @@ namespace Microsoft.Xna.Framework
         {
             return Math.Abs(value1 - value2);
         }
-        
+
         /// <summary>
         /// Performs a Hermite spline interpolation.
         /// </summary>
@@ -154,13 +206,13 @@ namespace Microsoft.Xna.Framework
                 result = value2;
             else
                 result = (2 * v1 - 2 * v2 + t2 + t1) * sCubed +
-                    (3 * v2 - 3 * v1 - 2 * t1 - t2) * sSquared +
-                    t1 * s +
-                    v1;
+                         (3 * v2 - 3 * v1 - 2 * t1 - t2) * sSquared +
+                         t1 * s +
+                         v1;
             return (float)result;
         }
-        
-        
+
+
         /// <summary>
         /// Linearly interpolates between two values.
         /// </summary>
@@ -201,7 +253,7 @@ namespace Microsoft.Xna.Framework
         /// </remarks>
         public static float LerpPrecise(float value1, float value2, float amount)
         {
-            return ((1 - amount) * value1) + (value2 * amount);
+            return (1 - amount) * value1 + value2 * amount;
         }
 
         /// <summary>
@@ -225,7 +277,7 @@ namespace Microsoft.Xna.Framework
         {
             return value1 > value2 ? value1 : value2;
         }
-        
+
         /// <summary>
         /// Returns the lesser of two values.
         /// </summary>
@@ -247,7 +299,7 @@ namespace Microsoft.Xna.Framework
         {
             return value1 < value2 ? value1 : value2;
         }
-        
+
         /// <summary>
         /// Interpolates between two values using a cubic equation.
         /// </summary>
@@ -260,12 +312,12 @@ namespace Microsoft.Xna.Framework
             // It is expected that 0 < amount < 1
             // If amount < 0, return value1
             // If amount > 1, return value2
-            float result = MathHelper.Clamp(amount, 0f, 1f);
-            result = MathHelper.Hermite(value1, 0f, value2, 0f, result);
+            float result = Clamp(amount, 0f, 1f);
+            result = Hermite(value1, 0f, value2, 0f, result);
 
             return result;
         }
-        
+
         /// <summary>
         /// Converts radians to degrees.
         /// </summary>
@@ -277,10 +329,10 @@ namespace Microsoft.Xna.Framework
         /// Factor = 180 / pi
         /// </remarks>
         public static float ToDegrees(float radians)
-        { 
+        {
             return (float)(radians * 57.295779513082320876798154814105);
         }
-        
+
         /// <summary>
         /// Converts degrees to radians.
         /// </summary>
@@ -292,10 +344,10 @@ namespace Microsoft.Xna.Framework
         /// Factor = pi / 180
         /// </remarks>
         public static float ToRadians(float degrees)
-        { 
+        {
             return (float)(degrees * 0.017453292519943295769236907684886);
         }
-	 
+
         /// <summary>
         /// Reduces a given angle to a value between π and -π.
         /// </summary>
@@ -303,7 +355,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>The new angle, in radians.</returns>
         public static float WrapAngle(float angle)
         {
-            if ((angle > -Pi) && (angle <= Pi))
+            if (angle > -Pi && angle <= Pi)
                 return angle;
             angle %= TwoPi;
             if (angle <= -Pi)
@@ -312,15 +364,30 @@ namespace Microsoft.Xna.Framework
                 return angle - TwoPi;
             return angle;
         }
-
- 	/// <summary>
+        /// <summary>
         /// Determines if value is powered by two.
         /// </summary>
         /// <param name="value">A value.</param>
         /// <returns><c>true</c> if <c>value</c> is powered by two; otherwise <c>false</c>.</returns>
-	public static bool IsPowerOfTwo(int value)
-	{
-	     return (value > 0) && ((value & (value - 1)) == 0);
-	}
+        public static bool IsPowerOfTwo(int value)
+        {
+            return value > 0 && (value & value - 1) == 0;
+        }
+        private static float GetMachineEpsilonFloat()
+        {
+            float machineEpsilon = 1.0f;
+            float comparison;
+
+            /* Keep halving the working value of machineEpsilon until we get a number that
+             * when added to 1.0f will still evaluate as equal to 1.0f.
+             */
+            do
+            {
+                machineEpsilon *= 0.5f;
+                comparison = 1.0f + machineEpsilon;
+            } while (comparison > 1.0f);
+
+            return machineEpsilon;
+        }
     }
 }

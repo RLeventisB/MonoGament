@@ -19,24 +19,12 @@ namespace Microsoft.Xna.Framework.Media
 			_name = name;
 			_type = type;
 		}
-				
-        public Microsoft.Xna.Framework.Media.MediaSourceType MediaSourceType
-        {
-            get
-            {
-				return _type;
-            }
-        }
 
-        public string Name
-        {
-            get
-            {
-				return _name;
-            }
-        }
-	
-		public static IList<MediaSource> GetAvailableMediaSources()
+        public MediaSourceType MediaSourceType => _type;
+
+        public string Name => _name;
+
+        public static IList<MediaSource> GetAvailableMediaSources()
         {
 #if IOS
 			MediaSource[] result = { new MediaSource(UIDevice.CurrentDevice.SystemName, MediaSourceType.LocalDevice) };

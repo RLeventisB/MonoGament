@@ -30,23 +30,23 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         protected override void ClearItems()
         {
-            for (int i = 0; i < base.Count; i++)
+            for (int i = 0; i < Count; i++)
             {
-                this.OnComponentRemoved(new GameComponentCollectionEventArgs(base[i]));
+                OnComponentRemoved(new GameComponentCollectionEventArgs(base[i]));
             }
             base.ClearItems();
         }
 
         protected override void InsertItem(int index, IGameComponent item)
         {
-            if (base.IndexOf(item) != -1)
+            if (IndexOf(item) != -1)
             {
                 throw new ArgumentException("Cannot Add Same Component Multiple Times");
             }
             base.InsertItem(index, item);
             if (item != null)
             {
-                this.OnComponentAdded(new GameComponentCollectionEventArgs(item));
+                OnComponentAdded(new GameComponentCollectionEventArgs(item));
             }
         }
 
@@ -66,7 +66,7 @@ namespace Microsoft.Xna.Framework
             base.RemoveItem(index);
             if (gameComponent != null)
             {
-                this.OnComponentRemoved(new GameComponentCollectionEventArgs(gameComponent));
+                OnComponentRemoved(new GameComponentCollectionEventArgs(gameComponent));
             }
         }
 

@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+
 using Microsoft.Xna.Framework.Content;
 
 namespace MonoGame.Framework.Utilities
@@ -29,7 +30,7 @@ namespace MonoGame.Framework.Utilities
             decompressedStream = new MemoryStream(decompressedSize);
             long startPos = stream.Position;
             long pos = startPos;
-            
+
             while (pos - startPos < compressedSize)
             {
                 // the compressed stream is seperated into blocks that will decompress
@@ -42,17 +43,17 @@ namespace MonoGame.Framework.Utilities
                 // all shorts for these cases are encoded in big endian order
                 int hi = stream.ReadByte();
                 int lo = stream.ReadByte();
-                int block_size = (hi << 8) | lo;
+                int block_size = hi << 8 | lo;
                 int frame_size = 0x8000; // frame size is 32Kb by default
-                                         // does this block define a frame size?
+                // does this block define a frame size?
                 if (hi == 0xFF)
                 {
                     hi = lo;
                     lo = (byte)stream.ReadByte();
-                    frame_size = (hi << 8) | lo;
+                    frame_size = hi << 8 | lo;
                     hi = (byte)stream.ReadByte();
                     lo = (byte)stream.ReadByte();
-                    block_size = (hi << 8) | lo;
+                    block_size = hi << 8 | lo;
                     pos += 5;
                 }
                 else
@@ -81,50 +82,37 @@ namespace MonoGame.Framework.Utilities
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
-            if(disposing)
-            {                
+            if (disposing)
+            {
                 decompressedStream.Dispose();
-            }            
+            }
             dec = null;
             decompressedStream = null;
         }
 
         #region Stream internals
-
         public override int Read(byte[] buffer, int offset, int count)
         {
             return decompressedStream.Read(buffer, offset, count);
         }
 
-        public override bool CanRead
-        {
-            get { return true; }
-        }
+        public override bool CanRead => true;
 
 
-        public override bool CanSeek
-        {
-            get { return false; }
-        }
+        public override bool CanSeek => false;
 
-        public override bool CanWrite
-        {
-            get { return false; }
-        }
+        public override bool CanWrite => false;
 
         public override void Flush()
         {
         }
 
-        public override long Length
-        {
-            get { throw new NotSupportedException(); }
-        }
+        public override long Length => throw new NotSupportedException();
 
         public override long Position
         {
-            get { throw new NotSupportedException(); }
-            set { throw new NotSupportedException(); }
+            get => throw new NotSupportedException();
+            set => throw new NotSupportedException();
         }
 
 
@@ -142,7 +130,6 @@ namespace MonoGame.Framework.Utilities
         {
             throw new NotImplementedException();
         }
-
         #endregion
     }
 }

@@ -2,14 +2,14 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.IO;
-using System.Text;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
 using MonoGame.Framework.Utilities;
 
-internal static class Sdl
+using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Text;
+
+public static class Sdl
 {
     public static IntPtr NativeLibrary = GetNativeLibrary();
 
@@ -17,17 +17,14 @@ internal static class Sdl
     {
         if (CurrentPlatform.OS == OS.Windows)
             return FuncLoader.LoadLibraryExt("SDL2.dll");
-        else if (CurrentPlatform.OS == OS.Linux)
+        if (CurrentPlatform.OS == OS.Linux)
             return FuncLoader.LoadLibraryExt("libSDL2-2.0.so.0");
-        else if (CurrentPlatform.OS == OS.MacOSX)
+        if (CurrentPlatform.OS == OS.MacOSX)
             return FuncLoader.LoadLibraryExt("libSDL2.dylib");
-        else
-            return FuncLoader.LoadLibraryExt("sdl2");
+        return FuncLoader.LoadLibraryExt("sdl2");
     }
 
-    public static int Major;
-    public static int Minor;
-    public static int Patch;
+    public static Version version;
 
     [Flags]
     public enum InitFlags
@@ -143,12 +140,74 @@ internal static class Sdl
         public byte Major;
         public byte Minor;
         public byte Patch;
+
+        public static bool operator >(Version version1, Version version2)
+        {
+            return ConcatenateVersion(version1) > ConcatenateVersion(version2);
+        }
+
+        public static bool operator <(Version version1, Version version2)
+        {
+            return ConcatenateVersion(version1) < ConcatenateVersion(version2);
+        }
+
+
+        public static bool operator ==(Version version1, Version version2)
+        {
+            return version1.Major == version2.Major &&
+                   version1.Minor == version2.Minor &&
+                   version1.Patch == version2.Patch;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is Version version1))
+                return false;
+
+            return version == version1;
+        }
+
+        public static bool operator !=(Version version1, Version version2)
+        {
+            return !(version1 == version2);
+        }
+
+        public static bool operator >=(Version version1, Version version2)
+        {
+            return version1 == version2 || version1 > version2;
+        }
+
+        public static bool operator <=(Version version1, Version version2)
+        {
+            return version1 == version2 || version1 < version2;
+        }
+
+        public override string ToString()
+        {
+            return Major + "." + Minor + "." + Patch;
+        }
+
+        private static int ConcatenateVersion(Version version)
+        {
+            // Account for a change in SDL2 version convention. After version 2.0.22,
+            // SDL switched formats from 2.0.x to 2.x.y (with y being optional)
+            if (version.Major == 2 && version.Minor == 0 && version.Patch < 23)
+            {
+                return version.Major * 1_000_000 + version.Patch * 1000;
+            }
+            return version.Major * 1_000_000 + version.Minor * 1000 + version.Patch;
+        }
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate int d_sdl_init(int flags);
     public static d_sdl_init SDL_Init = FuncLoader.LoadFunction<d_sdl_init>(NativeLibrary, "SDL_Init");
-
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void d_sdl_free(IntPtr ptr);
+    public static d_sdl_free SDL_Free = FuncLoader.LoadFunction<d_sdl_free>(NativeLibrary, "SDL_free");
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate IntPtr d_sdl_malloc(IntPtr size);
+    public static d_sdl_malloc SDL_Malloc = FuncLoader.LoadFunction<d_sdl_malloc>(NativeLibrary, "SDL_malloc");
     public static void Init(int flags)
     {
         GetError(SDL_Init(flags));
@@ -228,6 +287,26 @@ internal static class Sdl
     {
         return InteropHelpers.Utf8ToString(SDL_GetHint(name));
     }
+    internal static int Utf8Size(string str)
+    {
+        if (str == null)
+        {
+            return 0;
+        }
+        return str.Length * 4 + 1;
+    }
+    internal static unsafe byte* Utf8Encode(string str, byte* buffer, int bufferSize)
+    {
+        if (str == null)
+        {
+            return (byte*)0;
+        }
+        fixed (char* strPtr = str)
+        {
+            Encoding.UTF8.GetBytes(strPtr, str.Length + 1, buffer, bufferSize);
+        }
+        return buffer;
+    }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate IntPtr d_sdl_loadbmp_rw(IntPtr src, int freesrc);
@@ -254,7 +333,163 @@ internal static class Sdl
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate int d_sdl_sethint(string name, string value);
     public static d_sdl_sethint SetHint = FuncLoader.LoadFunction<d_sdl_sethint>(NativeLibrary, "SDL_SetHint");
+    public static class MessageBox
+    {
+        [Flags]
+        public enum MessageBoxFlags : uint
+        {
+            Error = 0x00000010,
+            Warning = 0x00000020,
+            Information = 0x00000040
+        }
+        [Flags]
+        public enum MessageBoxButtonFlags : uint
+        {
+            ReturnKey = 0x00000001,
+            EscapeKey = 0x00000002
+        }
+        [StructLayout(LayoutKind.Sequential)]
+        public struct SDL_MessageBoxButtonData
+        {
+            public MessageBoxButtonFlags flags;
+            public int buttonid;
+            public string text; /* The UTF-8 button text */
+        }
+        [StructLayout(LayoutKind.Sequential)]
+        public struct INTERNAL_SDL_MessageBoxButtonData
+        {
+            public MessageBoxButtonFlags flags;
+            public int buttonid;
+            public nint text; /* The UTF-8 button text */
+        }
+        [StructLayout(LayoutKind.Sequential)]
+        public struct SDL_MessageBoxColor
+        {
+            public byte r, g, b;
+        }
+        public enum MessageBoxColorType
+        {
+            Background,
+            Text,
+            ButtonBorder,
+            ButtonBackground,
+            ButtonSelected,
+            Max
+        }
+        [StructLayout(LayoutKind.Sequential)]
+        public struct SDL_MessageBoxColorScheme
+        {
+            [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.Struct, SizeConst = (int)MessageBoxColorType.Max)]
+            public SDL_MessageBoxColor[] colors;
+        }
+        [StructLayout(LayoutKind.Sequential)]
+        public struct INTERNAL_SDL_MessageBoxData
+        {
+            public MessageBoxFlags flags;
+            public IntPtr window; /* Parent window, can be NULL */
+            public IntPtr title; /* UTF-8 title */
+            public IntPtr message; /* UTF-8 message text */
+            public int numbuttons;
+            public IntPtr buttons;
+            public IntPtr colorScheme; /* Can be NULL to use system settings */
+        }
 
+        [StructLayout(LayoutKind.Sequential)]
+        public struct SDL_MessageBoxData
+        {
+            public MessageBoxFlags flags;
+            public IntPtr window; /* Parent window, can be NULL */
+            public string title; /* UTF-8 title */
+            public string message; /* UTF-8 message text */
+            public int numbuttons;
+            public SDL_MessageBoxButtonData[] buttons;
+            public SDL_MessageBoxColorScheme? colorScheme; /* Can be NULL to use system settings */
+        }
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate int d_sdl_showmessagebox([In()] ref INTERNAL_SDL_MessageBoxData messageboxdata, out int buttonid);
+        public static d_sdl_showmessagebox INTERNAL_SDL_ShowMessageBox = FuncLoader.LoadFunction<d_sdl_showmessagebox>(NativeLibrary, "SDL_ShowMessageBox");
+
+        /* Ripped from Jameson's LpUtf8StrMarshaler */
+        private static IntPtr INTERNAL_AllocUTF8(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                return IntPtr.Zero;
+            }
+            byte[] bytes = Encoding.UTF8.GetBytes(str + '\0');
+            IntPtr mem = SDL_Malloc(bytes.Length);
+            Marshal.Copy(bytes, 0, mem, bytes.Length);
+            return mem;
+        }
+        public static unsafe int SDL_ShowMessageBox([In()] ref SDL_MessageBoxData messageboxdata, out int buttonid)
+        {
+            var data = new INTERNAL_SDL_MessageBoxData()
+            {
+                flags = messageboxdata.flags,
+                window = messageboxdata.window,
+                title = INTERNAL_AllocUTF8(messageboxdata.title),
+                message = INTERNAL_AllocUTF8(messageboxdata.message),
+                numbuttons = messageboxdata.numbuttons,
+            };
+
+            var buttons = new INTERNAL_SDL_MessageBoxButtonData[messageboxdata.numbuttons];
+            for (int i = 0; i < messageboxdata.numbuttons; i++)
+            {
+                buttons[i] = new INTERNAL_SDL_MessageBoxButtonData()
+                {
+                    flags = messageboxdata.buttons[i].flags,
+                    buttonid = messageboxdata.buttons[i].buttonid,
+                    text = INTERNAL_AllocUTF8(messageboxdata.buttons[i].text),
+                };
+            }
+
+            if (messageboxdata.colorScheme != null)
+            {
+                data.colorScheme = Marshal.AllocHGlobal(Marshal.SizeOf<SDL_MessageBoxColorScheme>());
+                Marshal.StructureToPtr(messageboxdata.colorScheme.Value, data.colorScheme, false);
+            }
+
+            int result;
+            fixed (INTERNAL_SDL_MessageBoxButtonData* buttonsPtr = &buttons[0])
+            {
+                data.buttons = (IntPtr)buttonsPtr;
+                result = INTERNAL_SDL_ShowMessageBox(ref data, out buttonid);
+            }
+
+            Marshal.FreeHGlobal(data.colorScheme);
+            for (int i = 0; i < messageboxdata.numbuttons; i++)
+            {
+                SDL_Free(buttons[i].text);
+            }
+            SDL_Free(data.message);
+            SDL_Free(data.title);
+
+            return result;
+        }
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public unsafe delegate int d_sdl_showsimplemessagebox(MessageBoxFlags flags, byte* title, byte* message, IntPtr window);
+        public static d_sdl_showsimplemessagebox SDL_ShowSimpleMssageBox = FuncLoader.LoadFunction<d_sdl_showsimplemessagebox>(NativeLibrary, "SDL_ShowSimpleMessageBox");
+        public static unsafe int SDL_ShowSimpleMessageBox(
+            MessageBoxFlags flags,
+            string title,
+            string message,
+            IntPtr window
+        )
+        {
+            int utf8TitleBufSize = Utf8Size(title);
+            byte* utf8Title = stackalloc byte[utf8TitleBufSize];
+
+            int utf8MessageBufSize = Utf8Size(message);
+            byte* utf8Message = stackalloc byte[utf8MessageBufSize];
+
+            return SDL_ShowSimpleMssageBox(
+                flags,
+                Utf8Encode(title, utf8Title, utf8TitleBufSize),
+                Utf8Encode(message, utf8Message, utf8MessageBufSize),
+                window
+            );
+        }
+    }
     public static class Window
     {
         public const int PosUndefined = 0x1FFF0000;
@@ -278,7 +513,6 @@ internal static class Sdl
             FocusLost,
             Close,
         }
-
         public static class State
         {
             public const int Fullscreen = 0x00000001;
@@ -422,6 +656,9 @@ internal static class Sdl
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int d_sdl_getwindowborderssize(IntPtr window, out int top, out int left, out int right, out int bottom);
         public static d_sdl_getwindowborderssize GetBorderSize = FuncLoader.LoadFunction<d_sdl_getwindowborderssize>(NativeLibrary, "SDL_GetWindowBordersSize");
+
+        public static d_sdl_destroywindow RestoreWindow = FuncLoader.LoadFunction<d_sdl_destroywindow>(NativeLibrary, "SDL_RestoreWindow");
+        public static d_sdl_destroywindow MaximizeWindow = FuncLoader.LoadFunction<d_sdl_destroywindow>(NativeLibrary, "SDL_MaximizeWindow");
     }
 
     public static class Display
@@ -717,10 +954,10 @@ internal static class Sdl
             CapsLock = 0x2000,
             AltGr = 0x4000,
             Reserved = 0x8000,
-            Ctrl = (LeftCtrl | RightCtrl),
-            Shift = (LeftShift | RightShift),
-            Alt = (LeftAlt | RightAlt),
-            Gui = (LeftGui | RightGui)
+            Ctrl = LeftCtrl | RightCtrl,
+            Shift = LeftShift | RightShift,
+            Alt = LeftAlt | RightAlt,
+            Gui = LeftGui | RightGui
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -759,6 +996,19 @@ internal static class Sdl
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate Keymod d_sdl_getmodstate();
         public static d_sdl_getmodstate GetModState = FuncLoader.LoadFunction<d_sdl_getmodstate>(NativeLibrary, "SDL_GetModState");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate IntPtr d_sdl_getclipboardtext();
+        private static d_sdl_getclipboardtext INTERNAL_SDL_GetClipboardText = FuncLoader.LoadFunction<d_sdl_getclipboardtext>(NativeLibrary, "SDL_GetClipboardText");
+        public static string SDL_GetClipboardText()
+        {
+            nint nativeStr = INTERNAL_SDL_GetClipboardText();
+            string clipboardstr = InteropHelpers.Utf8ToString(nativeStr);
+
+            //The mapping string returned by SDL is owned by us and thus must be freed
+            SDL_Free(nativeStr);
+            return clipboardstr;
+        }
     }
 
     public static class Joystick
@@ -871,6 +1121,19 @@ internal static class Sdl
 
     public static class GameController
     {
+        public enum GameControllerType
+        {
+            Unknown = 0,
+            Xbox360,
+            XboxOne,
+            PS3,
+            PS4,
+            NintentoSwitchPro,
+            Virtual, /* Requires >= 2.0.14 */
+            PS5, /* Requires >= 2.0.14 */
+            AmazonLuna, /* Requires >= 2.0.16 */
+            GoogleStadia /* Requires >= 2.0.16 */
+        }
         public enum Axis
         {
             Invalid = -1,
@@ -911,10 +1174,6 @@ internal static class Sdl
             public uint TimeStamp;
             public int Which;
         }
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void d_sdl_free(IntPtr ptr);
-        public static d_sdl_free SDL_Free = FuncLoader.LoadFunction<d_sdl_free>(NativeLibrary, "SDL_free");
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int d_sdl_gamecontrolleraddmapping(string mappingString);
@@ -979,7 +1238,6 @@ internal static class Sdl
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate IntPtr d_sdl_gamecontrolleropen(int joystickIndex);
         private static d_sdl_gamecontrolleropen SDL_GameControllerOpen = FuncLoader.LoadFunction<d_sdl_gamecontrolleropen>(NativeLibrary, "SDL_GameControllerOpen");
-
         public static IntPtr Open(int joystickIndex)
         {
             return GetError(SDL_GameControllerOpen(joystickIndex));
@@ -987,11 +1245,10 @@ internal static class Sdl
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate IntPtr d_sdl_gamecontrollername(IntPtr gamecontroller);
-        private static d_sdl_gamecontrollername SDL_GameControllerName = FuncLoader.LoadFunction<d_sdl_gamecontrollername>(NativeLibrary, "SDL_GameControllerName");
-
+        private static d_sdl_gamecontrollername INTERNAL_SDL_GameControllerName = FuncLoader.LoadFunction<d_sdl_gamecontrollername>(NativeLibrary, "SDL_GameControllerName");
         public static string GetName(IntPtr gamecontroller)
         {
-            return InteropHelpers.Utf8ToString(SDL_GameControllerName(gamecontroller));
+            return InteropHelpers.Utf8ToString(INTERNAL_SDL_GameControllerName(gamecontroller));
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -1003,18 +1260,24 @@ internal static class Sdl
         public delegate byte d_sdl_gamecontrollerhasrumble(IntPtr gamecontroller);
         public static d_sdl_gamecontrollerhasrumble HasRumble = FuncLoader.LoadFunction<d_sdl_gamecontrollerhasrumble>(NativeLibrary, "SDL_GameControllerHasRumble");
         public static d_sdl_gamecontrollerhasrumble HasRumbleTriggers = FuncLoader.LoadFunction<d_sdl_gamecontrollerhasrumble>(NativeLibrary, "SDL_GameControllerHasRumbleTriggers");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate GameControllerType d_sdl_gamecontrollergettype(IntPtr gamecontroller);
+        public delegate GameControllerType d_sdl_gamecontrollertypeforindex(int joystick_index);
+        public static d_sdl_gamecontrollergettype GameControllerGetType = FuncLoader.LoadFunction<d_sdl_gamecontrollergettype>(NativeLibrary, "SDL_GameControllerGetType");
+        public static d_sdl_gamecontrollertypeforindex GameControllerTypeForIndex = FuncLoader.LoadFunction<d_sdl_gamecontrollertypeforindex>(NativeLibrary, "SDL_GameControllerTypeForIndex");
     }
 
     public static class Haptic
     {
-        // For some reason, different game controllers have different maximum value supported
-        // Also, the more the value is close to their limit, the more they tend to randomly ignore it
-        // Hence, we're setting an abitrary safe value as a maximum
+        // For some reason, different game controllers support different maximum values
+        // Also, the closer a given value is to the maximum, the more likely the value will be ignored
+        // Hence, we're setting an arbitrary safe value as a maximum
         public const uint Infinity = 1000000U;
 
         public enum EffectId : ushort
         {
-            LeftRight = (1 << 2),
+            LeftRight = 1 << 2,
         }
 
         [StructLayout(LayoutKind.Sequential)]

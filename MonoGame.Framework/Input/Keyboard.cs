@@ -3,32 +3,49 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Input
 {
     /// <summary>
     /// Allows getting keystrokes from keyboard.
     /// </summary>
-	public static partial class Keyboard
-	{
-        /// <summary>
-        /// Returns the current keyboard state.
-        /// </summary>
-        /// <returns>Current keyboard state.</returns>
-		public static KeyboardState GetState()
-		{
-            return PlatformGetState();
-		}
-		
-        /// <summary>
-        /// Returns the current keyboard state for a given player.
-        /// </summary>
-        /// <param name="playerIndex">Player index of the keyboard.</param>
-        /// <returns>Current keyboard state.</returns>
-        [Obsolete("Use GetState() instead. In future versions this method can be removed.")]
-        public static KeyboardState GetState(PlayerIndex playerIndex)
-		{
-            return PlatformGetState();
-		}
-	}
+    public static partial class Keyboard
+    {
+        public static List<KeyData> ActiveKeyDatas = new List<KeyData>(6);
+        public static Action<Keys> OnKeyDown;
+        public static Action<Keys> OnKeyUp;
+        public static Action<char> TextInput;
+        public static unsafe readonly KeyData* KeysPointer;
+        unsafe static Keyboard()
+        {
+            KeysPointer = (KeyData*)NativeMemory.AllocZeroed(sizeof(uint) * 255);
+            for (int i = 0; i < byte.MaxValue; i++)
+            {
+                KeysPointer[i] = new KeyData();
+            }
+        }
+        #region Public Static Methods
+        public static void SetActive(ref KeyData data)
+        {
+            data.HasPressedThisFrame = true;
+            if (!ActiveKeyDatas.Contains(data))
+            {
+                ActiveKeyDatas.Add(data);
+            }
+        }
+        public static void SetDeactive(ref KeyData data)
+        {
+            ActiveKeyDatas.Remove(data);
+        }
+        public static bool IsKeyPressed(Keys key) => GetDataFromKey(key).TotalRepeatCount > 1;
+        public static bool IsKeyRepeat(Keys key) => GetDataFromKey(key).TotalRepeatCount > 2;
+        public static ushort KeyRepeatCount(Keys key) => GetDataFromKey(key).TotalRepeatCount;
+        public static bool IsKeyPressedWithDelay(Keys key) => GetDataFromKey(key).HasPressedThisFrame;
+        public static ushort GetFrameInputCount(Keys key) => GetDataFromKey(key).FrameRepeatCount;
+        public static bool IsKeyPressedFirst(Keys key) => GetDataFromKey(key).HasPressedThisFrame && GetDataFromKey(key).TotalRepeatCount == 2;
+        public static unsafe ref KeyData GetDataFromKey(Keys key) => ref KeysPointer[(byte)key];
+        #endregion
+    }
 }

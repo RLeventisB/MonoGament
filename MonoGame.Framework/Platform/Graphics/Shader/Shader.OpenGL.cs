@@ -2,14 +2,14 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.IO;
-using System.Diagnostics;
 using MonoGame.OpenGL;
+
+using System;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    internal partial class Shader
+    public partial class Shader
     {
         // The shader handle.
         private int _shaderHandle = -1;
@@ -25,8 +25,6 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformConstruct(ShaderStage stage, byte[] shaderBytecode)
         {
             _glslCode = System.Text.Encoding.ASCII.GetString(shaderBytecode);
-
-            HashKey = MonoGame.Framework.Utilities.Hash.ComputeHash(shaderBytecode);
         }
 
         internal int GetShaderHandle()
@@ -34,7 +32,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // If the shader has already been created then return it.
             if (_shaderHandle != -1)
                 return _shaderHandle;
-            
+
             //
             _shaderHandle = GL.CreateShader(Stage == ShaderStage.Vertex ? ShaderType.VertexShader : ShaderType.FragmentShader);
             GraphicsExtensions.CheckGLError();
@@ -42,8 +40,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
             GL.CompileShader(_shaderHandle);
             GraphicsExtensions.CheckGLError();
-            int compiled = 0;
-            GL.GetShader(_shaderHandle, ShaderParameter.CompileStatus, out compiled);
+            GL.GetShader(_shaderHandle, ShaderParameter.CompileStatus, out int compiled);
             GraphicsExtensions.CheckGLError();
             if (compiled != (int)Bool.True)
             {
@@ -72,7 +69,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             for (int i = 0; i < Attributes.Length; ++i)
             {
-                if ((Attributes[i].usage == usage) && (Attributes[i].index == index))
+                if (Attributes[i].usage == usage && Attributes[i].index == index)
                     return Attributes[i].location;
             }
             return -1;

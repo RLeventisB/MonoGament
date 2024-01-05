@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework.Input
 
         /// <summary>
         /// Gets the gamepad display name.
-        /// 
+        ///
         /// This property is not available in XNA.
         /// </summary>
         /// <value>String representing the display name of the gamepad.</value>
@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Input
 
         /// <summary>
         /// Gets the unique identifier of the gamepad.
-        /// 
+        ///
         /// This property is not available in XNA.
         /// </summary>
         /// <value>String representing the unique identifier of the gamepad.</value>
@@ -156,6 +156,17 @@ namespace Microsoft.Xna.Framework.Input
         /// </summary>
         /// <value><c>true</c> if it has the right trigger button; otherwise, <c>false</c>.</value>
         public bool HasRightTrigger { get; internal set; }
+        public bool HasMisc { get; internal set; }
+        public bool HasPaddle1 { get; internal set; }
+        public bool HasPaddle2 { get; internal set; }
+        public bool HasPaddle3 { get; internal set; }
+        public bool HasPaddle4 { get; internal set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the controller has a touchpad.
+        /// </summary>
+        /// <value><c>true</c> if it has a touchpad; otherwise, <c>false</c>.</value>
+        public bool HasTouchPad { get; internal set; }
 
         /// <summary>
         /// Gets a value indicating whether the controller has the left vibration motor.
@@ -192,34 +203,40 @@ namespace Microsoft.Xna.Framework.Input
         {
             var eq = true;
 
-            eq &= (left.DisplayName == right.DisplayName);
-            eq &= (left.Identifier == right.Identifier);
-            eq &= (left.IsConnected == right.IsConnected);
-            eq &= (left.HasAButton == right.HasAButton);
-            eq &= (left.HasBackButton == right.HasBackButton);
-            eq &= (left.HasBButton == right.HasBButton);
-            eq &= (left.HasDPadDownButton == right.HasDPadDownButton);
-            eq &= (left.HasDPadLeftButton == right.HasDPadLeftButton);
-            eq &= (left.HasDPadRightButton == right.HasDPadRightButton);
-            eq &= (left.HasDPadUpButton == right.HasDPadUpButton);
-            eq &= (left.HasLeftShoulderButton == right.HasLeftShoulderButton);
-            eq &= (left.HasLeftStickButton == right.HasLeftStickButton);
-            eq &= (left.HasRightShoulderButton == right.HasRightShoulderButton);
-            eq &= (left.HasRightStickButton == right.HasRightStickButton);
-            eq &= (left.HasStartButton == right.HasStartButton);
-            eq &= (left.HasXButton == right.HasXButton);
-            eq &= (left.HasYButton == right.HasYButton);
-            eq &= (left.HasBigButton == right.HasBigButton);
-            eq &= (left.HasLeftXThumbStick == right.HasLeftXThumbStick);
-            eq &= (left.HasLeftYThumbStick == right.HasLeftYThumbStick);
-            eq &= (left.HasRightXThumbStick == right.HasRightXThumbStick);
-            eq &= (left.HasRightYThumbStick == right.HasRightYThumbStick);
-            eq &= (left.HasLeftTrigger == right.HasLeftTrigger);
-            eq &= (left.HasRightTrigger == right.HasRightTrigger);
-            eq &= (left.HasLeftVibrationMotor == right.HasLeftVibrationMotor);
-            eq &= (left.HasRightVibrationMotor == right.HasRightVibrationMotor);
-            eq &= (left.HasVoiceSupport == right.HasVoiceSupport);
-            eq &= (left.GamePadType == right.GamePadType);
+            eq &= left.DisplayName == right.DisplayName;
+            eq &= left.Identifier == right.Identifier;
+            eq &= left.IsConnected == right.IsConnected;
+            eq &= left.HasAButton == right.HasAButton;
+            eq &= left.HasBackButton == right.HasBackButton;
+            eq &= left.HasBButton == right.HasBButton;
+            eq &= left.HasDPadDownButton == right.HasDPadDownButton;
+            eq &= left.HasDPadLeftButton == right.HasDPadLeftButton;
+            eq &= left.HasDPadRightButton == right.HasDPadRightButton;
+            eq &= left.HasDPadUpButton == right.HasDPadUpButton;
+            eq &= left.HasLeftShoulderButton == right.HasLeftShoulderButton;
+            eq &= left.HasLeftStickButton == right.HasLeftStickButton;
+            eq &= left.HasRightShoulderButton == right.HasRightShoulderButton;
+            eq &= left.HasRightStickButton == right.HasRightStickButton;
+            eq &= left.HasStartButton == right.HasStartButton;
+            eq &= left.HasXButton == right.HasXButton;
+            eq &= left.HasYButton == right.HasYButton;
+            eq &= left.HasBigButton == right.HasBigButton;
+            eq &= left.HasLeftXThumbStick == right.HasLeftXThumbStick;
+            eq &= left.HasLeftYThumbStick == right.HasLeftYThumbStick;
+            eq &= left.HasRightXThumbStick == right.HasRightXThumbStick;
+            eq &= left.HasRightYThumbStick == right.HasRightYThumbStick;
+            eq &= left.HasLeftTrigger == right.HasLeftTrigger;
+            eq &= left.HasRightTrigger == right.HasRightTrigger;
+            eq &= left.HasMisc == right.HasMisc;
+            eq &= left.HasPaddle1 == right.HasPaddle1;
+            eq &= left.HasPaddle2 == right.HasPaddle2;
+            eq &= left.HasPaddle3 == right.HasPaddle3;
+            eq &= left.HasPaddle4 == right.HasPaddle4;
+            eq &= left.HasTouchPad == right.HasTouchPad;
+            eq &= left.HasLeftVibrationMotor == right.HasLeftVibrationMotor;
+            eq &= left.HasRightVibrationMotor == right.HasRightVibrationMotor;
+            eq &= left.HasVoiceSupport == right.HasVoiceSupport;
+            eq &= left.GamePadType == right.GamePadType;
 
             return eq;
         }
@@ -244,7 +261,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <see cref="T:Microsoft.Xna.Framework.Input.GamePadCapabilities"/>; otherwise, <c>false</c>.</returns>
         public override bool Equals(object obj)
         {
-            return (obj is GamePadCapabilities) && (this == (GamePadCapabilities)obj);
+            return obj is GamePadCapabilities capabilities && this == capabilities;
         }
 
         /// <summary>
@@ -264,34 +281,40 @@ namespace Microsoft.Xna.Framework.Input
         public override string ToString()
         {
             return "[GamePadCapabilities: IsConnected=" + IsConnected +
-                ", DisplayName=" + DisplayName +
-                ", Identifier=" + Identifier +
-                ", HasAButton=" + HasAButton +
-                ", HasBackButton=" + HasBackButton +
-                ", HasBButton=" + HasBButton +
-                ", HasDPadDownButton=" + HasDPadDownButton +
-                ", HasDPadLeftButton=" + HasDPadLeftButton +
-                ", HasDPadRightButton=" + HasDPadRightButton +
-                ", HasDPadUpButton=" + HasDPadUpButton +
-                ", HasLeftShoulderButton=" + HasLeftShoulderButton +
-                ", HasLeftStickButton=" + HasLeftStickButton +
-                ", HasRightShoulderButton=" + HasRightShoulderButton +
-                ", HasRightStickButton=" + HasRightStickButton +
-                ", HasStartButton=" + HasStartButton +
-                ", HasXButton=" + HasXButton +
-                ", HasYButton=" + HasYButton +
-                ", HasBigButton=" + HasBigButton +
-                ", HasLeftXThumbStick=" + HasLeftXThumbStick +
-                ", HasLeftYThumbStick=" + HasLeftYThumbStick +
-                ", HasRightXThumbStick=" + HasRightXThumbStick +
-                ", HasRightYThumbStick=" + HasRightYThumbStick +
-                ", HasLeftTrigger=" + HasLeftTrigger +
-                ", HasRightTrigger=" + HasRightTrigger +
-                ", HasLeftVibrationMotor=" + HasLeftVibrationMotor +
-                ", HasRightVibrationMotor=" + HasRightVibrationMotor +
-                ", HasVoiceSupport=" + HasVoiceSupport +
-                ", GamePadType=" + GamePadType +
-                "]";
+                   ", DisplayName=" + DisplayName +
+                   ", Identifier=" + Identifier +
+                   ", HasAButton=" + HasAButton +
+                   ", HasBackButton=" + HasBackButton +
+                   ", HasBButton=" + HasBButton +
+                   ", HasDPadDownButton=" + HasDPadDownButton +
+                   ", HasDPadLeftButton=" + HasDPadLeftButton +
+                   ", HasDPadRightButton=" + HasDPadRightButton +
+                   ", HasDPadUpButton=" + HasDPadUpButton +
+                   ", HasLeftShoulderButton=" + HasLeftShoulderButton +
+                   ", HasLeftStickButton=" + HasLeftStickButton +
+                   ", HasRightShoulderButton=" + HasRightShoulderButton +
+                   ", HasRightStickButton=" + HasRightStickButton +
+                   ", HasStartButton=" + HasStartButton +
+                   ", HasXButton=" + HasXButton +
+                   ", HasYButton=" + HasYButton +
+                   ", HasBigButton=" + HasBigButton +
+                   ", HasLeftXThumbStick=" + HasLeftXThumbStick +
+                   ", HasLeftYThumbStick=" + HasLeftYThumbStick +
+                   ", HasRightXThumbStick=" + HasRightXThumbStick +
+                   ", HasRightYThumbStick=" + HasRightYThumbStick +
+                   ", HasLeftTrigger=" + HasLeftTrigger +
+                   ", HasRightTrigger=" + HasRightTrigger +
+                   ", HasMisc=" + HasMisc +
+                   ", HasPaddle1=" + HasPaddle1 +
+                   ", HasPaddle2=" + HasPaddle2 +
+                   ", HasPaddle3=" + HasPaddle3 +
+                   ", HasPaddle4=" + HasPaddle4 +
+                   ", HasTouchPad=" + HasTouchPad +
+                   ", HasLeftVibrationMotor=" + HasLeftVibrationMotor +
+                   ", HasRightVibrationMotor=" + HasRightVibrationMotor +
+                   ", HasVoiceSupport=" + HasVoiceSupport +
+                   ", GamePadType=" + GamePadType +
+                   "]";
         }
     }
 }

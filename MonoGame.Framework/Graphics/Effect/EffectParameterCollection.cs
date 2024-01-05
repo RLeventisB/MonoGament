@@ -39,22 +39,15 @@ namespace Microsoft.Xna.Framework.Graphics
             return new EffectParameterCollection(parameters, _indexLookup);
         }
 
-        public int Count
-        {
-            get { return _parameters.Length; }
-        }
-		
-		public EffectParameter this[int index]
-		{
-			get { return _parameters[index]; }
-		}
-		
-		public EffectParameter this[string name]
+        public int Count => _parameters.Length;
+
+        public EffectParameter this[int index] => _parameters[index];
+
+        public EffectParameter this[string name]
         {
             get
             {
-                int index;
-                if (_indexLookup.TryGetValue(name, out index))
+                if (_indexLookup.TryGetValue(name, out int index))
                     return _parameters[index];
                 return null;
 			}

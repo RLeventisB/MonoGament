@@ -30,14 +30,14 @@ namespace Microsoft.Xna.Framework
         private bool _drawBegun;
         bool disposed;
         private bool _hardwareModeSwitch = true;
-        private bool _preferHalfPixelOffset = false;
+        private bool _preferHalfPixelOffset;
 
 #if (WINDOWS || WINDOWS_UAP) && DIRECTX
         private bool _firstLaunch = true;
 #endif
 
 #if !WINRT || WINDOWS_UAP
-        private bool _wantFullScreen = false;
+        private bool _wantFullScreen;
 #endif
         public static readonly int DefaultBackBufferHeight = 480;
         public static readonly int DefaultBackBufferWidth = 800;
@@ -403,13 +403,7 @@ namespace Microsoft.Xna.Framework
 
         public GraphicsProfile GraphicsProfile { get; set; }
 
-        public GraphicsDevice GraphicsDevice
-        {
-            get
-            {
-                return _graphicsDevice;
-            }
-        }
+        public GraphicsDevice GraphicsDevice => _graphicsDevice;
 
         public bool IsFullScreen
         {
@@ -475,7 +469,7 @@ namespace Microsoft.Xna.Framework
         /// </remarks>
         public bool PreferHalfPixelOffset
         {
-            get { return _preferHalfPixelOffset; }
+            get => _preferHalfPixelOffset;
             set
             {
                 if (this.GraphicsDevice != null)
@@ -491,91 +485,49 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public bool HardwareModeSwitch
         {
-            get { return _hardwareModeSwitch; }
-            set
-            {
-                _hardwareModeSwitch = value;
-            }
+            get => _hardwareModeSwitch;
+            set => _hardwareModeSwitch = value;
         }
 
         public bool PreferMultiSampling
         {
-            get
-            {
-                return _preferMultiSampling;
-            }
-            set
-            {
-                _preferMultiSampling = value;
-            }
+            get => _preferMultiSampling;
+            set => _preferMultiSampling = value;
         }
 
         public SurfaceFormat PreferredBackBufferFormat
         {
-            get
-            {
-                return _preferredBackBufferFormat;
-            }
-            set
-            {
-                _preferredBackBufferFormat = value;
-            }
+            get => _preferredBackBufferFormat;
+            set => _preferredBackBufferFormat = value;
         }
 
         public int PreferredBackBufferHeight
         {
-            get
-            {
-                return _preferredBackBufferHeight;
-            }
-            set
-            {
-                _preferredBackBufferHeight = value;
-            }
+            get => _preferredBackBufferHeight;
+            set => _preferredBackBufferHeight = value;
         }
 
         public int PreferredBackBufferWidth
         {
-            get
-            {
-                return _preferredBackBufferWidth;
-            }
-            set
-            {
-                _preferredBackBufferWidth = value;
-            }
+            get => _preferredBackBufferWidth;
+            set => _preferredBackBufferWidth = value;
         }
 
         public DepthFormat PreferredDepthStencilFormat
         {
-            get
-            {
-                return _preferredDepthStencilFormat;
-            }
-            set
-            {
-                _preferredDepthStencilFormat = value;
-            }
+            get => _preferredDepthStencilFormat;
+            set => _preferredDepthStencilFormat = value;
         }
 
         public bool SynchronizeWithVerticalRetrace
         {
-            get
-            {
-                return _synchronizedWithVerticalRetrace;
-            }
-            set
-            {
-                _synchronizedWithVerticalRetrace = value;
-            }
+            get => _synchronizedWithVerticalRetrace;
+            set => _synchronizedWithVerticalRetrace = value;
         }
 
         public DisplayOrientation SupportedOrientations
         {
-            get
-            {
-                return _supportedOrientations;
-            }
+            get => _supportedOrientations;
             set
             {
                 _supportedOrientations = value;

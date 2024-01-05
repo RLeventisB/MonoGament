@@ -4,9 +4,9 @@
 
 using System;
 using System.IO;
+using FreeImageAPI;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
-using FreeImageAPI;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -15,8 +15,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         internal static BitmapContent Resize(this BitmapContent bitmap, int newWidth, int newHeight)
         {
             BitmapContent src = bitmap;
-            SurfaceFormat format;
-            src.TryGetFormat(out format);
+            src.TryGetFormat(out SurfaceFormat format);
             if (format != SurfaceFormat.Vector4)
             {
                 var v4 = new PixelBitmapContent<Vector4>(src.Width, src.Height);
@@ -104,11 +103,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>A member of the AlphaRange enum to describe the range of alpha in the pixel data.</returns>
 		static AlphaRange CalculateAlphaRange(BitmapContent bitmap)
         {
-			AlphaRange result = AlphaRange.Opaque;
-			var pixelBitmap = bitmap as PixelBitmapContent<Vector4>;
-			if (pixelBitmap != null)
-			{
-				for (int y = 0; y < pixelBitmap.Height; ++y)
+            AlphaRange result = AlphaRange.Opaque;
+            var pixelBitmap = bitmap as PixelBitmapContent<Vector4>;
+            if (pixelBitmap != null)
+            {
+                for (int y = 0; y < pixelBitmap.Height; ++y)
                 {
                     var row = pixelBitmap.GetRow(y);
                     foreach (var pixel in row)
@@ -118,8 +117,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                         else if (pixel.W < 1.0)
                             return AlphaRange.Full;
                     }
-				}
-			}
+                }
+            }
             return result;
         }
 
@@ -136,7 +135,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var width = content.Faces[0][0].Height;
             var height = content.Faces[0][0].Width;
 
-			if (!IsPowerOfTwo(width) || !IsPowerOfTwo(height) || (width != height))
+            if (!IsPowerOfTwo(width) || !IsPowerOfTwo(height) || (width != height))
             {
                 context.Logger.LogWarning(null, content.Identity, "PVR compression requires width and height to be powers of two and equal. Falling back to 16-bit color.");
                 CompressColor16Bit(context, content);
@@ -160,7 +159,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             if (context.TargetProfile == GraphicsProfile.Reach)
             {
                 if (!IsPowerOfTwo(face.Width) || !IsPowerOfTwo(face.Height))
-                    throw new PipelineException("DXT compression requires width and height must be powers of two in Reach graphics profile.");                
+                    throw new PipelineException("DXT compression requires width and height must be powers of two in Reach graphics profile.");
             }
 
             // Test the alpha channel to figure out if we have alpha.
@@ -199,7 +198,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
 
             var face = content.Faces[0][0];
-			var alphaRange = CalculateAlphaRange(face);
+            var alphaRange = CalculateAlphaRange(face);
 
             if (alphaRange == AlphaRange.Full)
                 content.ConvertBitmapType(typeof(AtcExplicitBitmapContent));

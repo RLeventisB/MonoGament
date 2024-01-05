@@ -1,7 +1,7 @@
 #region License
 // /*
 // Microsoft Public License (Ms-PL)
-// MonoGame - Copyright © 2009-2010 The MonoGame Team
+// MonoGame - Copyright Â© 2009-2010 The MonoGame Team
 // 
 // All rights reserved.
 // 
@@ -79,63 +79,27 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// </summary>
         internal static readonly TouchLocation Invalid = new TouchLocation();
 
-		#region Properties
+        #region Properties
 
-        internal Vector2 PressPosition
-        {
-            get { return _pressPosition; }
-        }
+        internal Vector2 PressPosition => _pressPosition;
 
-        internal TimeSpan PressTimestamp
-        {
-            get { return _pressTimestamp; }
-        }
+        internal TimeSpan PressTimestamp => _pressTimestamp;
 
-        internal TimeSpan Timestamp
-        {
-            get { return _timestamp; }
-        }
+        internal TimeSpan Timestamp => _timestamp;
 
-        internal Vector2 Velocity
-        {
-            get { return _velocity; }
-        }
+        internal Vector2 Velocity => _velocity;
 
-		public int Id 
-		{ 
-			get
-	        {
-	            return _id;
-	        }
-		}
+        public int Id => _id;
 
-        public Vector2 Position 
-		{ 
-			get
-	        {
-	            return _position;
-	        }
-		}
-		
-		public float Pressure 
-		{ 
-			get
-        	{
-            	return _pressure;
-        	}
-		}
-								
-        public TouchLocationState State 
-		{ 
-			get
-	        {
-	            return _state;
-	        } 
-		}
-		
-		#endregion
-		
-		#region Constructors
+        public Vector2 Position => _position;
+
+        public float Pressure => _pressure;
+
+        public TouchLocationState State => _state;
+
+        #endregion
+
+        #region Constructors
 
         public TouchLocation(int id, TouchLocationState state, Vector2 position)
             : this(id, state, position, TouchLocationState.Invalid, Vector2.Zero)
@@ -255,8 +219,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         public override bool Equals(object obj)
         {
-			if (obj is TouchLocation)
-				return Equals((TouchLocation)obj);
+			if (obj is TouchLocation location)
+				return Equals(location);
 
 			return false;
 		}

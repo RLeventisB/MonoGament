@@ -11,7 +11,7 @@ namespace Microsoft.Xna.Framework.Content
 {
     internal class VideoReader : ContentTypeReader<Video>
     {
-        protected internal override Video Read(ContentReader input, Video existingInstance)
+        public override Video Read(ContentReader input, Video existingInstance)
         {
             string path = input.ReadObject<string>();
 

@@ -21,10 +21,7 @@ namespace Microsoft.Xna.Framework.Media
         private Android.Net.Uri assetUri;
 
         [CLSCompliant(false)]
-        public Android.Net.Uri AssetUri
-        {
-            get { return this.assetUri; }
-        }
+        public Android.Net.Uri AssetUri => this.assetUri;
 
         static Song()
         {
@@ -120,15 +117,9 @@ namespace Microsoft.Xna.Framework.Media
 
         internal float Volume
         {
-            get
-            {
-                return 0.0f;
-            }
+            get => 0.0f;
 
-            set
-            {
-                _androidPlayer.SetVolume(value, value);
-            }
+            set => _androidPlayer.SetVolume(value, value);
         }
 
         public TimeSpan Position
@@ -140,10 +131,7 @@ namespace Microsoft.Xna.Framework.Media
 
                 return position;
             }
-            set
-            {
-                _androidPlayer.SeekTo((int)value.TotalMilliseconds);   
-            }
+            set => _androidPlayer.SeekTo((int)value.TotalMilliseconds);
         }
 
 

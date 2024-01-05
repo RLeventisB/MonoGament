@@ -2,16 +2,17 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using MonoGame.Framework.Utilities;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
-using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Input
 {
-    static partial class GamePad
+    public static partial class GamePad
     {
-        private class GamePadInfo
+        public class GamePadInfo
         {
             public IntPtr Device;
             public int PacketNumber;
@@ -19,7 +20,8 @@ namespace Microsoft.Xna.Framework.Input
 
         private static readonly Dictionary<int, GamePadInfo> Gamepads = new Dictionary<int, GamePadInfo>();
         private static readonly Dictionary<int, int> _translationTable = new Dictionary<int, int>();
-
+        public static GamePadInfo GetGamepadAt(int index) => Gamepads[index];
+        public static int GetTranslatedIndex(int index) => _translationTable[index];
         public static void InitDatabase()
         {
             using (var stream = ReflectionHelpers.GetAssembly(typeof(GamePad)).GetManifestResourceStream("gamecontrollerdb.txt"))
@@ -33,7 +35,9 @@ namespace Microsoft.Xna.Framework.Input
                             var src = Sdl.RwFromMem(reader.ReadBytes((int)stream.Length), (int)stream.Length);
                             Sdl.GameController.AddMappingFromRw(src, 1);
                         }
-                        catch { }
+                        catch
+                        {
+                        }
                     }
                 }
             }
@@ -79,14 +83,10 @@ namespace Microsoft.Xna.Framework.Input
 
         internal static void UpdatePacketInfo(int instanceid, uint packetNumber)
         {
-            int index;
-            if (_translationTable.TryGetValue(instanceid, out index))
+            if (!_translationTable.TryGetValue(instanceid, out var index)) return;
+            if (Gamepads.TryGetValue(index, out var info))
             {
-                GamePadInfo info = null;
-                if (Gamepads.TryGetValue(index, out info))
-                {
-                    info.PacketNumber = packetNumber < int.MaxValue ? (int)packetNumber : (int)(packetNumber - (uint)int.MaxValue);
-                }
+                info.PacketNumber = packetNumber < int.MaxValue ? (int)packetNumber : (int)(packetNumber - int.MaxValue);
             }
         }
 
@@ -110,10 +110,10 @@ namespace Microsoft.Xna.Framework.Input
 
         private static GamePadCapabilities PlatformGetCapabilities(int index)
         {
-            if (!Gamepads.ContainsKey(index))
+            if (!Gamepads.TryGetValue(index, out GamePadInfo value))
                 return new GamePadCapabilities();
 
-            var gamecontroller = Gamepads[index].Device;
+            var gamecontroller = value.Device;
             var caps = new GamePadCapabilities();
             var mapping = Sdl.GameController.GetMapping(gamecontroller).Split(',');
 
@@ -194,6 +194,24 @@ namespace Microsoft.Xna.Framework.Input
                     case "righty":
                         caps.HasRightYThumbStick = true;
                         break;
+                    case "touchpad":
+                        caps.HasTouchPad = true;
+                        break;
+                    case "misc1":
+                        caps.HasMisc = true;
+                        break;
+                    case "paddle1":
+                        caps.HasPaddle1 = true;
+                        break;
+                    case "paddle2":
+                        caps.HasPaddle2 = true;
+                        break;
+                    case "paddle3":
+                        caps.HasPaddle3 = true;
+                        break;
+                    case "paddle4":
+                        caps.HasPaddle4 = true;
+                        break;
                 }
             }
 
@@ -211,11 +229,10 @@ namespace Microsoft.Xna.Framework.Input
 
         private static GamePadState PlatformGetState(int index, GamePadDeadZone leftDeadZoneMode, GamePadDeadZone rightDeadZoneMode)
         {
-            if (!Gamepads.ContainsKey(index))
+            if (!Gamepads.TryGetValue(index, out GamePadInfo value))
                 return GamePadState.Default;
 
-            var gamepadInfo = Gamepads[index];
-            var gdevice = gamepadInfo.Device;
+            var gdevice = value.Device;
 
             // Y gamepad axis is rotate between SDL and XNA
             var thumbSticks =
@@ -237,46 +254,56 @@ namespace Microsoft.Xna.Framework.Input
                 GetFromSdlAxis(Sdl.GameController.GetAxis(gdevice, Sdl.GameController.Axis.TriggerRight))
             );
 
-            var buttons =
-                new GamePadButtons(
-                    ((Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.A) == 1) ? Buttons.A : 0) |
-                    ((Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.B) == 1) ? Buttons.B : 0) |
-                    ((Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.Back) == 1) ? Buttons.Back : 0) |
-                    ((Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.Guide) == 1) ? Buttons.BigButton : 0) |
-                    ((Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.LeftShoulder) == 1) ? Buttons.LeftShoulder : 0) |
-                    ((Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.RightShoulder) == 1) ? Buttons.RightShoulder : 0) |
-                    ((Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.LeftStick) == 1) ? Buttons.LeftStick : 0) |
-                    ((Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.RightStick) == 1) ? Buttons.RightStick : 0) |
-                    ((Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.Start) == 1) ? Buttons.Start : 0) |
-                    ((Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.X) == 1) ? Buttons.X : 0) |
-                    ((Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.Y) == 1) ? Buttons.Y : 0) |
-                    ((triggers.Left > 0f) ? Buttons.LeftTrigger : 0) |
-                    ((triggers.Right > 0f) ? Buttons.RightTrigger : 0)
-                );
 
             var dPad =
                 new GamePadDPad(
-                    (Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.DpadUp) == 1) ? ButtonState.Pressed : ButtonState.Released,
-                    (Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.DpadDown) == 1) ? ButtonState.Pressed : ButtonState.Released,
-                    (Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.DpadLeft) == 1) ? ButtonState.Pressed : ButtonState.Released,
-                    (Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.DpadRight) == 1) ? ButtonState.Pressed : ButtonState.Released
+                    Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.DpadUp) == 1 ? ButtonState.Pressed : ButtonState.Released,
+                    Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.DpadDown) == 1 ? ButtonState.Pressed : ButtonState.Released,
+                    Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.DpadLeft) == 1 ? ButtonState.Pressed : ButtonState.Released,
+                    Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.DpadRight) == 1 ? ButtonState.Pressed : ButtonState.Released
                 );
 
+            var buttons =
+                new GamePadButtons(
+                    (Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.A) == 1 ? Buttons.A : 0) |
+                    (Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.B) == 1 ? Buttons.B : 0) |
+                    (Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.Back) == 1 ? Buttons.Back : 0) |
+                    (Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.Guide) == 1 ? Buttons.BigButton : 0) |
+                    (Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.LeftShoulder) == 1 ? Buttons.LeftShoulder : 0) |
+                    (Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.RightShoulder) == 1 ? Buttons.RightShoulder : 0) |
+                    (Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.LeftStick) == 1 ? Buttons.LeftStick : 0) |
+                    (Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.RightStick) == 1 ? Buttons.RightStick : 0) |
+                    (Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.Start) == 1 ? Buttons.Start : 0) |
+                    (Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.X) == 1 ? Buttons.X : 0) |
+                    (Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.Y) == 1 ? Buttons.Y : 0) |
+                    (triggers.Left > 0f ? Buttons.LeftTrigger : 0) |
+                    (triggers.Right > 0f ? Buttons.RightTrigger : 0) |
+                    (dPad.Down == ButtonState.Pressed ? Buttons.DPadDown : 0) |
+                    (dPad.Up == ButtonState.Pressed ? Buttons.DPadUp : 0) |
+                    (dPad.Left == ButtonState.Pressed ? Buttons.DPadLeft : 0) |
+                    (dPad.Right == ButtonState.Pressed ? Buttons.DPadRight : 0) |
+                    (thumbSticks.Left.Y < 0 ? Buttons.LeftThumbstickDown : 0) |
+                    (thumbSticks.Left.Y > 0 ? Buttons.LeftThumbstickUp : 0) |
+                    (thumbSticks.Left.X < 0 ? Buttons.LeftThumbstickLeft : 0) |
+                    (thumbSticks.Left.X > 0 ? Buttons.LeftThumbstickRight : 0) |
+                    (thumbSticks.Right.Y < 0 ? Buttons.RightThumbstickDown : 0) |
+                    (thumbSticks.Right.Y > 0 ? Buttons.RightThumbstickUp : 0) |
+                    (thumbSticks.Right.X < 0 ? Buttons.RightThumbstickLeft : 0) |
+                    (thumbSticks.Right.X > 0 ? Buttons.RightThumbstickRight : 0)
+                );
             var ret = new GamePadState(thumbSticks, triggers, buttons, dPad);
-            ret.PacketNumber = gamepadInfo.PacketNumber;
+            ret.PacketNumber = value.PacketNumber;
             return ret;
         }
 
         private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor, float leftTrigger, float rightTrigger)
         {
-            if (!Gamepads.ContainsKey(index))
+            if (!Gamepads.TryGetValue(index, out GamePadInfo value))
                 return false;
 
-            var gamepad = Gamepads[index];
-
-            return Sdl.GameController.Rumble(gamepad.Device, (ushort)(65535f * leftMotor),
+            return Sdl.GameController.Rumble(value.Device, (ushort)(65535f * leftMotor),
                        (ushort)(65535f * rightMotor), uint.MaxValue) == 0 &&
-                   Sdl.GameController.RumbleTriggers(gamepad.Device, (ushort)(65535f * leftTrigger),
+                   Sdl.GameController.RumbleTriggers(value.Device, (ushort)(65535f * leftTrigger),
                        (ushort)(65535f * rightTrigger), uint.MaxValue) == 0;
         }
     }

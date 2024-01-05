@@ -20,7 +20,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public CullMode CullMode
 	    {
-	        get { return _cullMode; }
+	        get => _cullMode;
             set
             {
                 ThrowIfBound();
@@ -30,8 +30,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	    public float DepthBias
 	    {
-	        get { return _depthBias; }
-	        set
+	        get => _depthBias;
+            set
 	        {
                 ThrowIfBound();
                 _depthBias = value;
@@ -40,8 +40,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	    public FillMode FillMode
 	    {
-	        get { return _fillMode; }
-	        set
+	        get => _fillMode;
+            set
 	        {
                 ThrowIfBound();
                 _fillMode = value;
@@ -50,8 +50,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	    public bool MultiSampleAntiAlias
 	    {
-	        get { return _multiSampleAntiAlias; }
-	        set
+	        get => _multiSampleAntiAlias;
+            set
 	        {
                 ThrowIfBound();
                 _multiSampleAntiAlias = value;
@@ -60,8 +60,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	    public bool ScissorTestEnable
 	    {
-	        get { return _scissorTestEnable; }
-	        set
+	        get => _scissorTestEnable;
+            set
 	        {
                 ThrowIfBound();
                 _scissorTestEnable = value;
@@ -70,8 +70,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	    public float SlopeScaleDepthBias
 	    {
-	        get { return _slopeScaleDepthBias; }
-	        set
+	        get => _slopeScaleDepthBias;
+            set
 	        {
                 ThrowIfBound();
                 _slopeScaleDepthBias = value;
@@ -80,7 +80,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public bool DepthClipEnable
         {
-            get { return _depthClipEnable; }
+            get => _depthClipEnable;
             set
             {
                 ThrowIfBound();

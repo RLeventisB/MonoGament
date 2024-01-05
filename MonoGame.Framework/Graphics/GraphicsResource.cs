@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal GraphicsResource()
         {
-            
+
         }
 
         ~GraphicsResource()
@@ -107,8 +107,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     EventHelpers.Raise(this, Disposing, EventArgs.Empty);
 
                 // Remove from the global list of graphics resources
-                if (graphicsDevice != null)
-                    graphicsDevice.RemoveResourceReference(_selfReference);
+                graphicsDevice?.RemoveResourceReference(_selfReference);
 
                 _selfReference = null;
                 graphicsDevice = null;
@@ -116,16 +115,13 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-		public event EventHandler<EventArgs> Disposing;
-		
-		public GraphicsDevice GraphicsDevice
-		{
-			get
-			{
-				return graphicsDevice;
-			}
+        public event EventHandler<EventArgs> Disposing;
 
-            internal set
+        public GraphicsDevice GraphicsDevice
+        {
+            get => graphicsDevice;
+
+            set
             {
                 Debug.Assert(value != null);
 
@@ -145,24 +141,18 @@ namespace Microsoft.Xna.Framework.Graphics
                 _selfReference = new WeakReference(this);
                 graphicsDevice.AddResourceReference(_selfReference);
             }
-		}
-		
-		public bool IsDisposed
-		{
-			get
-			{
-				return disposed;
-			}
-		}
-		
-		public string Name { get; set; }
-		
-		public Object Tag { get; set; }
+        }
+
+        public bool IsDisposed => disposed;
+
+        public string Name { get; set; }
+
+        public object Tag { get; set; }
 
         public override string ToString()
         {
             return string.IsNullOrEmpty(Name) ? base.ToString() : Name;
         }
-	}
+    }
 }
 

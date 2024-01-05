@@ -50,8 +50,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             internal FramebufferHelper(GraphicsDevice graphicsDevice)
             {
-                this.SupportsBlitFramebuffer = GL.BlitFramebuffer != null;
-                this.SupportsInvalidateFramebuffer = GL.InvalidateFramebuffer != null;
+                SupportsBlitFramebuffer = GL.BlitFramebuffer != null;
+                SupportsInvalidateFramebuffer = GL.InvalidateFramebuffer != null;
             }
 
             internal virtual void GenRenderbuffer(out int renderbuffer)
@@ -107,13 +107,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
             internal virtual void InvalidateDrawFramebuffer()
             {
-                Debug.Assert(this.SupportsInvalidateFramebuffer);
+                Debug.Assert(SupportsInvalidateFramebuffer);
                 GL.InvalidateFramebuffer (FramebufferTarget.Framebuffer, 3, FramebufferAttachements);
             }
 
             internal virtual void InvalidateReadFramebuffer()
             {
-                Debug.Assert(this.SupportsInvalidateFramebuffer);
+                Debug.Assert(SupportsInvalidateFramebuffer);
                 GL.InvalidateFramebuffer(FramebufferTarget.Framebuffer, 3, FramebufferAttachements);
             }
 

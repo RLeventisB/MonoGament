@@ -3,10 +3,10 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
-using System.IO;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -61,17 +61,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             Yuv = 0x200,
             Luminance = 0x20000,
         }
-
-        static uint MakeFourCC(char c1, char c2, char c3, char c4)
-        {
-            return ((uint)c1 << 24) | ((uint)c2 << 16) | ((uint)c3 << 8) | (uint)c4;
-        }
-
-        static uint MakeFourCC(string cc)
-        {
-            return ((uint)cc[0] << 24) | ((uint)cc[1] << 16) | ((uint)cc[2] << 8) | (uint)cc[3];
-        }
-
         enum FourCC : uint
         {
             A32B32G32R32F = 116,
@@ -214,11 +203,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
         static int GetBitmapSize(SurfaceFormat format, int width, int height)
         {
+
             // It is recommended that the dwPitchOrLinearSize field is ignored and we calculate it ourselves
             // https://msdn.microsoft.com/en-us/library/bb943991.aspx
-            int pitch = 0;
-            int rows = 0;
-
+            int pitch;
+            int rows;
             switch (format)
             {
                 case SurfaceFormat.Color:
@@ -233,8 +222,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 case SurfaceFormat.Dxt1:
                 case SurfaceFormat.Dxt3:
                 case SurfaceFormat.Dxt5:
-                    pitch = ((width + 3) / 4) * format.GetSize();
-                    rows = (height + 3) / 4;
+                    pitch = (width + 3) >> 2 * format.GetSize();
+                    rows = (height + 3) >> 2;
                     break;
 
                 default:
@@ -244,7 +233,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             return pitch * rows;
         }
 
-        static internal TextureContent Import(string filename, ContentImporterContext context)
+        static internal TextureContent Import(string filename)
         {
             var identity = new ContentIdentity(filename);
             TextureContent output = null;
@@ -259,10 +248,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 if (!valid)
                     throw new ContentLoadException("Invalid file signature");
 
-                var header = new DdsHeader();
-
-                // Read DDS_HEADER
-                header.dwSize = reader.ReadUInt32();
+                var header = new DdsHeader
+                {
+                    // Read DDS_HEADER
+                    dwSize = reader.ReadUInt32()
+                };
                 if (header.dwSize != 124)
                     throw new ContentLoadException("Invalid DDS_HEADER dwSize value");
                 header.dwFlags = (Ddsd)reader.ReadUInt32();
@@ -315,8 +305,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     output = new Texture2DContent() { Identity = identity };
                 }
 
-                bool rbSwap;
-                var format = GetSurfaceFormat(ref header.ddspf, out rbSwap);
+                var format = GetSurfaceFormat(ref header.ddspf, out bool rbSwap);
 
                 for (int f = 0; f < faceCount; ++f)
                 {
@@ -399,9 +388,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         {
             for (int i = 0; i < bytes.Length; i += 3)
             {
-                byte r = bytes[i];
-                bytes[i] = bytes[i + 2];
-                bytes[i + 2] = r;
+                (bytes[i + 2], bytes[i]) = (bytes[i], bytes[i + 2]);
             }
         }
 
@@ -409,9 +396,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         {
             for (int i = 0; i < bytes.Length; i += 4)
             {
-                byte r = bytes[i];
-                bytes[i] = bytes[i + 2];
-                bytes[i + 2] = r;
+                (bytes[i + 2], bytes[i]) = (bytes[i], bytes[i + 2]);
             }
         }
 
@@ -458,15 +443,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 writer.Write((byte)0x53);
                 writer.Write((byte)0x20);
 
-                var header = new DdsHeader();
-                header.dwSize = 124;
-                header.dwFlags = Ddsd.Caps | Ddsd.Width | Ddsd.Height | Ddsd.Pitch | Ddsd.PixelFormat;
-                header.dwWidth = (uint)bitmapContent.Width;
-                header.dwHeight = (uint)bitmapContent.Height;
-                header.dwPitchOrLinearSize = (uint)(bitmapContent.Width * 4);
-                header.dwDepth = (uint)0;
-                header.dwMipMapCount = (uint)0;
-                
+                var header = new DdsHeader
+                {
+                    dwSize = 124,
+                    dwFlags = Ddsd.Caps | Ddsd.Width | Ddsd.Height | Ddsd.Pitch | Ddsd.PixelFormat,
+                    dwWidth = (uint)bitmapContent.Width,
+                    dwHeight = (uint)bitmapContent.Height,
+                    dwPitchOrLinearSize = (uint)(bitmapContent.Width * 4),
+                    dwDepth = (uint)0,
+                    dwMipMapCount = (uint)0
+                };
+
                 writer.Write((uint)header.dwSize);
                 writer.Write((uint)header.dwFlags);
                 writer.Write((uint)header.dwHeight);
@@ -488,8 +475,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 writer.Write((uint)0);
                 writer.Write((uint)0);
 
-                SurfaceFormat format;
-                if (!bitmapContent.TryGetFormat(out format) || format != SurfaceFormat.Color)
+                if (!bitmapContent.TryGetFormat(out SurfaceFormat format) || format != SurfaceFormat.Color)
                     throw new NotSupportedException("Unsupported bitmap content!");
 
                 header.ddspf.dwSize = 32;

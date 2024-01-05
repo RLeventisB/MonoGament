@@ -14,16 +14,16 @@ namespace Microsoft.Xna.Framework.Content
         {
         }
 
-        protected internal override void Initialize(ContentTypeReaderManager manager)
-        {			
-			Type readerType = Enum.GetUnderlyingType(typeof(T));
-			elementReader = manager.GetTypeReader(readerType);
-        }
-		
-        protected internal override T Read(ContentReader input, T existingInstance)
+        public override void Initialize(ContentTypeReaderManager manager)
         {
-			return input.ReadRawObject<T>(elementReader);
-		}
+            Type readerType = Enum.GetUnderlyingType(typeof(T));
+            elementReader = manager.GetTypeReader(readerType);
+        }
+
+        public override T Read(ContentReader input, T existingInstance)
+        {
+            return input.ReadRawObject<T>(elementReader);
+        }
     }
 }
 

@@ -21,8 +21,8 @@ namespace Microsoft.Devices.Sensors
 
 		public TSensorReading CurrentValue 
         {
-            get { return currentValue; }
-		    protected set
+            get => currentValue;
+            protected set
 		    {
 		        currentValue = value;
 
@@ -38,8 +38,8 @@ namespace Microsoft.Devices.Sensors
 		public bool IsDataValid { get; protected set; }
 		public TimeSpan TimeBetweenUpdates
 		{
-			get { return this.timeBetweenUpdates; }
-			set
+			get => this.timeBetweenUpdates;
+            set
 			{
 				if (this.timeBetweenUpdates != value)
 				{
@@ -51,9 +51,9 @@ namespace Microsoft.Devices.Sensors
 
 		public event EventHandler<SensorReadingEventArgs<TSensorReading>> CurrentValueChanged;
 		protected event EventHandler<EventArgs> TimeBetweenUpdatesChanged;
-        protected bool IsDisposed { get { return disposed; } }
+        protected bool IsDisposed => disposed;
 
-		public SensorBase()
+        public SensorBase()
 		{
 			this.TimeBetweenUpdates = TimeSpan.FromMilliseconds(2);
 		}

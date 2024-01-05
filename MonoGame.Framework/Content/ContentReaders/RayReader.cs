@@ -2,9 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using Microsoft.Xna.Framework;
-
 namespace Microsoft.Xna.Framework.Content
 {
     internal class RayReader : ContentTypeReader<Ray>
@@ -13,7 +10,7 @@ namespace Microsoft.Xna.Framework.Content
         {
         }
 
-        protected internal override Ray Read(ContentReader input, Ray existingInstance)
+        public override Ray Read(ContentReader input, Ray existingInstance)
         {
             Vector3 position = input.ReadVector3();
             Vector3 direction = input.ReadVector3();

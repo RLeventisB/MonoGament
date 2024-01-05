@@ -14,14 +14,14 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int size, bool mipMap, SurfaceFormat format, bool renderTarget)
         {
-            this.glTarget = TextureTarget.TextureCubeMap;
+            glTarget = TextureTarget.TextureCubeMap;
 
             Threading.BlockOnUIThread(() =>
             {
-                GL.GenTextures(1, out this.glTexture);
+                GL.GenTextures(1, out glTexture);
                 GraphicsExtensions.CheckGLError();
 
-                GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
+                GL.BindTexture(TextureTarget.TextureCubeMap, glTexture);
                 GraphicsExtensions.CheckGLError();
 
                 GL.TexParameter(
@@ -111,14 +111,14 @@ namespace Microsoft.Xna.Framework.Graphics
 #if OPENGL && DESKTOPGL
             var target = GetGLCubeFace(cubeMapFace);
             var tSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
-            GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
+            GL.BindTexture(TextureTarget.TextureCubeMap, glTexture);
 
             if (glFormat == GLPixelFormat.CompressedTextureFormats)
             {
                 // Note: for compressed format Format.GetSize() returns the size of a 4x4 block
                 var pixelToT = Format.GetSize() / tSizeInByte;
-                var tFullWidth = Math.Max(this.size >> level, 1) / 4 * pixelToT;
-                var temp = new T[Math.Max(this.size >> level, 1) / 4 * tFullWidth];
+                var tFullWidth = Math.Max(size >> level, 1) / 4 * pixelToT;
+                var temp = new T[Math.Max(size >> level, 1) / 4 * tFullWidth];
                 GL.GetCompressedTexImage(target, level, temp);
                 GraphicsExtensions.CheckGLError();
 
@@ -134,8 +134,8 @@ namespace Microsoft.Xna.Framework.Graphics
             else
             {
                 // we need to convert from our format size to the size of T here
-                var tFullWidth = Math.Max(this.size >> level, 1) * Format.GetSize() / tSizeInByte;
-                var temp = new T[Math.Max(this.size >> level, 1) * tFullWidth];
+                var tFullWidth = Math.Max(size >> level, 1) * Format.GetSize() / tSizeInByte;
+                var temp = new T[Math.Max(size >> level, 1) * tFullWidth];
                 GL.GetTexImage(target, level, glFormat, glType, temp);
                 GraphicsExtensions.CheckGLError();
 
@@ -166,7 +166,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     var startBytes = startIndex * elementSizeInByte;
                     var dataPtr = new IntPtr(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
-                    GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
+                    GL.BindTexture(TextureTarget.TextureCubeMap, glTexture);
                     GraphicsExtensions.CheckGLError();
 
                     var target = GetGLCubeFace(face);

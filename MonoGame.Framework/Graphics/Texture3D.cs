@@ -15,22 +15,13 @@ namespace Microsoft.Xna.Framework.Graphics
         private int _height;
         private int _depth;
 
-        public int Width
-        {
-            get { return _width; }
-        }
+        public int Width => _width;
 
-        public int Height
-        {
-            get { return _height; }
-        }
+        public int Height => _height;
 
-        public int Depth
-        {
-            get { return _depth; }
-        }
+        public int Depth => _depth;
 
-		public Texture3D(GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format)
+        public Texture3D(GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format)
             : this(graphicsDevice, width, height, depth, mipMap, format, false)
 		{
 		}
@@ -46,12 +37,12 @@ namespace Microsoft.Xna.Framework.Graphics
             if (depth <= 0)
                 throw new ArgumentOutOfRangeException("depth","Texture depth must be greater than zero");
 
-		    this.GraphicsDevice = graphicsDevice;
-            this._width = width;
-            this._height = height;
-            this._depth = depth;
-            this._levelCount = 1;
-		    this._format = format;
+		    GraphicsDevice = graphicsDevice;
+            _width = width;
+            _height = height;
+            _depth = depth;
+            _levelCount = 1;
+		    _format = format;
 
             PlatformConstruct(graphicsDevice, width, height, depth, mipMap, format, renderTarget);
         }

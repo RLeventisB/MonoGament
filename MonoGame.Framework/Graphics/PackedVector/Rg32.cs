@@ -17,14 +17,8 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         [CLSCompliant(false)]
         public uint PackedValue
         {
-            get
-            {
-                return packedValue;
-            }
-            set
-            {
-                packedValue = value;
-            }
+            get => packedValue;
+            set => packedValue = value;
         }
 
         private uint packedValue;
@@ -57,8 +51,8 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         public Vector2 ToVector2()
         {
             return new Vector2(
-                (float) ((packedValue & 0xFFFF) / 65535.0f),
-                (float)(((packedValue >> 16) & 0xFFFF) / 65535.0f)
+                (packedValue & 0xFFFF) / 65535.0f,
+                (packedValue >> 16 & 0xFFFF) / 65535.0f
             );
         }
 
@@ -87,7 +81,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         /// <returns>True if the object is equal to the packed vector.</returns>
         public override bool Equals(object obj)
         {
-            return (obj is Rg32) && Equals((Rg32) obj);
+            return obj is Rg32 rg32 && Equals(rg32);
         }
 
         /// <summary>
@@ -130,9 +124,9 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 
         private static uint Pack(float x, float y)
         {
-            return (uint) (
-                (((int) MathF.Round(MathHelper.Clamp(x, 0, 1) * 65535.0f) & 0xFFFF) ) |
-                (((int) MathF.Round(MathHelper.Clamp(y, 0, 1) * 65535.0f) & 0xFFFF) << 16)
+            return (uint)(
+                (int)MathF.Round(MathHelper.Clamp(x, 0, 1) * 65535.0f) & 0xFFFF |
+                ((int)MathF.Round(MathHelper.Clamp(y, 0, 1) * 65535.0f) & 0xFFFF) << 16
             );
         }
     }

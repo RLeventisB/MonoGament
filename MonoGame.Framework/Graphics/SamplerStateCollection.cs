@@ -43,12 +43,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public SamplerState this [int index] 
         {
-			get 
-            { 
-                return _samplers[index]; 
-            }
+			get => _samplers[index];
 
-			set 
+            set 
             {
                 if (value == null)
                     throw new ArgumentNullException("value");

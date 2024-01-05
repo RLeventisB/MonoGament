@@ -6,7 +6,7 @@ namespace Microsoft.Xna.Framework.Content
 {
     class BoundingBoxReader : ContentTypeReader<BoundingBox>
     {
-        protected internal override BoundingBox Read(ContentReader input, BoundingBox existingInstance)
+        public override BoundingBox Read(ContentReader input, BoundingBox existingInstance)
         {
             var min = input.ReadVector3();
             var max = input.ReadVector3();

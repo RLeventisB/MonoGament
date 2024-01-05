@@ -19,8 +19,8 @@ namespace Microsoft.Xna.Framework.Media
         private MediaState _state;
         private Video _currentVideo;
         private float _volume = 1.0f;
-        private bool _isLooped = false;
-        private bool _isMuted = false;
+        private bool _isLooped;
+        private bool _isMuted;
 
         #endregion
 
@@ -36,7 +36,7 @@ namespace Microsoft.Xna.Framework.Media
         /// </summary>
         public bool IsLooped
         {
-            get { return _isLooped; }
+            get => _isLooped;
             set
             {
                 if (_isLooped == value)
@@ -52,7 +52,7 @@ namespace Microsoft.Xna.Framework.Media
         /// </summary>
         public bool IsMuted
         {
-            get { return _isMuted; }
+            get => _isMuted;
             set
             {
                 if (_isMuted == value)
@@ -94,15 +94,15 @@ namespace Microsoft.Xna.Framework.Media
         /// <summary>
         /// Gets the Video that is currently playing.
         /// </summary>
-        public Video Video { get { return _currentVideo; } }
+        public Video Video => _currentVideo;
 
         /// <summary>
         /// Video player volume, from 0.0f (silence) to 1.0f (full volume relative to the current device volume).
         /// </summary>
         public float Volume
         {
-            get { return _volume; }
-            
+            get => _volume;
+
             set
             {
                 if (value < 0.0f || value > 1.0f)

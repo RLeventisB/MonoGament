@@ -28,48 +28,33 @@ namespace Microsoft.Xna.Framework.Media
             return innerlist.GetEnumerator();
         }
 
-        public int Count
-        {
-            get
-            {
-				return innerlist.Count;
-            }
-        }
-		
-		public bool IsReadOnly
-        {
-            get { return this.isReadOnly; }
-        }
+        public int Count => innerlist.Count;
 
-        public Playlist this[int index]
-        {
-            get
-            {
-				return this.innerlist[index];
-            }
-        }
-		
-		public void Add(Playlist item)
+        public bool IsReadOnly => isReadOnly;
+
+        public Playlist this[int index] => innerlist[index];
+
+        public void Add(Playlist item)
         {
             if (item == null)
                 throw new ArgumentNullException();
 
             if (innerlist.Count == 0)
             {
-                this.innerlist.Add(item);
+                innerlist.Add(item);
                 return;
             }
 
-            for (int i = 0; i < this.innerlist.Count; i++)
+            for (int i = 0; i < innerlist.Count; i++)
             {
-                if (item.Duration < this.innerlist[i].Duration)
+                if (item.Duration < innerlist[i].Duration)
                 {
-                    this.innerlist.Insert(i, item);
+                    innerlist.Insert(i, item);
                     return;
                 }
             }
 
-            this.innerlist.Add(item);
+            innerlist.Add(item);
         }
 		
 		public void Clear()
@@ -80,7 +65,7 @@ namespace Microsoft.Xna.Framework.Media
         public PlaylistCollection Clone()
         {
             PlaylistCollection plc = new PlaylistCollection();
-            foreach (Playlist playlist in this.innerlist)
+            foreach (Playlist playlist in innerlist)
                 plc.Add(playlist);
             return plc;
         }

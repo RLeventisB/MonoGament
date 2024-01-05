@@ -8,10 +8,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public Effect Effect 
         {
-            get 
-            {
-                return _effect;
-            }
+            get => _effect;
             set 
             {
                 if (value == _effect)

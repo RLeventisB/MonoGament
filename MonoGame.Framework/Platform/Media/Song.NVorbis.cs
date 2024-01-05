@@ -59,18 +59,14 @@ namespace Microsoft.Xna.Framework.Media
 
         internal void Resume()
         {
-            if (stream == null)
-                return;
 
-            stream.Resume();
+            stream?.Resume();
         }
 
         internal void Pause()
         {
-            if (stream == null)
-                return;
 
-            stream.Pause();
+            stream?.Pause();
         }
 
         internal void Stop()

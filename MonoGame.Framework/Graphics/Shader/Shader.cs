@@ -2,7 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using System.IO;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -11,7 +10,7 @@ namespace Microsoft.Xna.Framework.Graphics
     // TODO: We should convert the types below 
     // into the start of a Shader reflection API.
 
-    internal enum SamplerType
+    public enum SamplerType
     {
         Sampler2D = 0,
         SamplerCube = 1,
@@ -19,19 +18,19 @@ namespace Microsoft.Xna.Framework.Graphics
         Sampler1D = 3,
     }
 
-    internal struct SamplerInfo
+    public struct SamplerInfo
     {
         public SamplerType type;
         public int textureSlot;
         public int samplerSlot;
         public string name;
-		public SamplerState state;
+        public SamplerState state;
 
         // TODO: This should be moved to EffectPass.
         public int parameter;
     }
 
-    internal struct VertexAttribute
+    public struct VertexAttribute
     {
         public VertexElementUsage usage;
         public int index;
@@ -39,21 +38,21 @@ namespace Microsoft.Xna.Framework.Graphics
         public int location;
     }
 
-    internal partial class Shader : GraphicsResource
-	{
+    public partial class Shader : GraphicsResource
+    {
         /// <summary>
         /// Returns the platform specific shader profile identifier.
         /// </summary>
-        public static int Profile { get { return PlatformProfile(); } }
+        public static int Profile => PlatformProfile();
 
         /// <summary>
         /// A hash value which can be used to compare shaders.
         /// </summary>
-        internal int HashKey { get; private set; }
+        public int HashKey { get; private set; }
 
         public SamplerInfo[] Samplers { get; private set; }
 
-	    public int[] CBuffers { get; private set; }
+        public int[] CBuffers { get; private set; }
 
         public ShaderStage Stage { get; private set; }
 
@@ -77,22 +76,22 @@ namespace Microsoft.Xna.Framework.Graphics
                 Samplers[s].textureSlot = reader.ReadByte();
                 Samplers[s].samplerSlot = reader.ReadByte();
 
-				if (reader.ReadBoolean())
-				{
-					Samplers[s].state = new SamplerState();
-					Samplers[s].state.AddressU = (TextureAddressMode)reader.ReadByte();
-					Samplers[s].state.AddressV = (TextureAddressMode)reader.ReadByte();
-					Samplers[s].state.AddressW = (TextureAddressMode)reader.ReadByte();
+                if (reader.ReadBoolean())
+                {
+                    Samplers[s].state = new SamplerState();
+                    Samplers[s].state.AddressU = (TextureAddressMode)reader.ReadByte();
+                    Samplers[s].state.AddressV = (TextureAddressMode)reader.ReadByte();
+                    Samplers[s].state.AddressW = (TextureAddressMode)reader.ReadByte();
                     Samplers[s].state.BorderColor = new Color(
-                        reader.ReadByte(), 
-                        reader.ReadByte(), 
-                        reader.ReadByte(), 
+                        reader.ReadByte(),
+                        reader.ReadByte(),
+                        reader.ReadByte(),
                         reader.ReadByte());
-					Samplers[s].state.Filter = (TextureFilter)reader.ReadByte();
-					Samplers[s].state.MaxAnisotropy = reader.ReadInt32();
-					Samplers[s].state.MaxMipLevel = reader.ReadInt32();
-					Samplers[s].state.MipMapLevelOfDetailBias = reader.ReadSingle();
-				}
+                    Samplers[s].state.Filter = (TextureFilter)reader.ReadByte();
+                    Samplers[s].state.MaxAnisotropy = reader.ReadInt32();
+                    Samplers[s].state.MaxMipLevel = reader.ReadInt32();
+                    Samplers[s].state.MipMapLevelOfDetailBias = reader.ReadSingle();
+                }
 
                 Samplers[s].name = reader.ReadString();
                 Samplers[s].parameter = reader.ReadByte();
@@ -113,6 +112,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 Attributes[a].location = reader.ReadInt16();
             }
 
+            HashKey = MonoGame.Framework.Utilities.Hash.ComputeHash(shaderBytecode);
             PlatformConstruct(Stage, shaderBytecode);
         }
 
@@ -120,6 +120,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             PlatformGraphicsDeviceResetting();
         }
-	}
+    }
 }
 

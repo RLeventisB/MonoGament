@@ -6,7 +6,7 @@ namespace Microsoft.Xna.Framework.Content
 {
     class MatrixReader : ContentTypeReader<Matrix>
     {
-        protected internal override Matrix Read(ContentReader input, Matrix existingInstance)
+        public override Matrix Read(ContentReader input, Matrix existingInstance)
         {
             var m11 = input.ReadSingle();
             var m12 = input.ReadSingle();

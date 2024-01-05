@@ -13,14 +13,13 @@ namespace Microsoft.Xna.Framework
     /// Describes a 3D-vector.
     /// </summary>
 #if XNADESIGNPROVIDED
-    [System.ComponentModel.TypeConverter(typeof(Microsoft.Xna.Framework.Design.Vector3TypeConverter))]
+    [System.ComponentModel.TypeConverter(typeof(Design.Vector3TypeConverter))]
 #endif
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct Vector3 : IEquatable<Vector3>
     {
         #region Private Fields
-
         private static readonly Vector3 zero = new Vector3(0f, 0f, 0f);
         private static readonly Vector3 one = new Vector3(1f, 1f, 1f);
         private static readonly Vector3 unitX = new Vector3(1f, 0f, 0f);
@@ -32,11 +31,9 @@ namespace Microsoft.Xna.Framework
         private static readonly Vector3 left = new Vector3(-1f, 0f, 0f);
         private static readonly Vector3 forward = new Vector3(0f, 0f, -1f);
         private static readonly Vector3 backward = new Vector3(0f, 0f, 1f);
-
         #endregion
 
         #region Public Fields
-
         /// <summary>
         /// The x coordinate of this <see cref="Vector3"/>.
         /// </summary>
@@ -54,119 +51,74 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         [DataMember]
         public float Z;
-
         #endregion
 
         #region Public Properties
-
         /// <summary>
         /// Returns a <see cref="Vector3"/> with components 0, 0, 0.
         /// </summary>
-        public static Vector3 Zero
-        {
-            get { return zero; }
-        }
+        public static Vector3 Zero => zero;
 
         /// <summary>
         /// Returns a <see cref="Vector3"/> with components 1, 1, 1.
         /// </summary>
-        public static Vector3 One
-        {
-            get { return one; }
-        }
+        public static Vector3 One => one;
 
         /// <summary>
         /// Returns a <see cref="Vector3"/> with components 1, 0, 0.
         /// </summary>
-        public static Vector3 UnitX
-        {
-            get { return unitX; }
-        }
+        public static Vector3 UnitX => unitX;
 
         /// <summary>
         /// Returns a <see cref="Vector3"/> with components 0, 1, 0.
         /// </summary>
-        public static Vector3 UnitY
-        {
-            get { return unitY; }
-        }
+        public static Vector3 UnitY => unitY;
 
         /// <summary>
         /// Returns a <see cref="Vector3"/> with components 0, 0, 1.
         /// </summary>
-        public static Vector3 UnitZ
-        {
-            get { return unitZ; }
-        }
+        public static Vector3 UnitZ => unitZ;
 
         /// <summary>
         /// Returns a <see cref="Vector3"/> with components 0, 1, 0.
         /// </summary>
-        public static Vector3 Up
-        {
-            get { return up; }
-        }
+        public static Vector3 Up => up;
 
         /// <summary>
         /// Returns a <see cref="Vector3"/> with components 0, -1, 0.
         /// </summary>
-        public static Vector3 Down
-        {
-            get { return down; }
-        }
+        public static Vector3 Down => down;
 
         /// <summary>
         /// Returns a <see cref="Vector3"/> with components 1, 0, 0.
         /// </summary>
-        public static Vector3 Right
-        {
-            get { return right; }
-        }
+        public static Vector3 Right => right;
 
         /// <summary>
         /// Returns a <see cref="Vector3"/> with components -1, 0, 0.
         /// </summary>
-        public static Vector3 Left
-        {
-            get { return left; }
-        }
+        public static Vector3 Left => left;
 
         /// <summary>
         /// Returns a <see cref="Vector3"/> with components 0, 0, -1.
         /// </summary>
-        public static Vector3 Forward
-        {
-            get { return forward; }
-        }
+        public static Vector3 Forward => forward;
 
         /// <summary>
         /// Returns a <see cref="Vector3"/> with components 0, 0, 1.
         /// </summary>
-        public static Vector3 Backward
-        {
-            get { return backward; }
-        }
-
+        public static Vector3 Backward => backward;
         #endregion
 
         #region Internal Properties
-
-        internal string DebugDisplayString
-        {
-            get
-            {
-                return string.Concat(
-                    this.X.ToString(), "  ",
-                    this.Y.ToString(), "  ",
-                    this.Z.ToString()
-                );
-            }
-        }
-
+        internal string DebugDisplayString => string.Concat(
+            X.ToString(), "  ",
+            Y.ToString(), "  ",
+            Z.ToString()
+        );
         #endregion
 
         #region Constructors
-
         /// <summary>
         /// Constructs a 3d vector with X, Y and Z from three values.
         /// </summary>
@@ -175,9 +127,9 @@ namespace Microsoft.Xna.Framework
         /// <param name="z">The z coordinate in 3d-space.</param>
         public Vector3(float x, float y, float z)
         {
-            this.X = x;
-            this.Y = y;
-            this.Z = z;
+            X = x;
+            Y = y;
+            Z = z;
         }
 
         /// <summary>
@@ -186,9 +138,9 @@ namespace Microsoft.Xna.Framework
         /// <param name="value">The x, y and z coordinates in 3d-space.</param>
         public Vector3(float value)
         {
-            this.X = value;
-            this.Y = value;
-            this.Z = value;
+            X = value;
+            Y = value;
+            Z = value;
         }
 
         /// <summary>
@@ -198,15 +150,13 @@ namespace Microsoft.Xna.Framework
         /// <param name="z">The z coordinate in 3d-space.</param>
         public Vector3(Vector2 value, float z)
         {
-            this.X = value.X;
-            this.Y = value.Y;
-            this.Z = z;
+            X = value.X;
+            Y = value.Y;
+            Z = z;
         }
-        
         #endregion
-        
-        #region Public Methods
 
+        #region Public Methods
         /// <summary>
         /// Performs vector addition on <paramref name="value1"/> and <paramref name="value2"/>.
         /// </summary>
@@ -402,8 +352,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>The distance between two vectors.</returns>
         public static float Distance(Vector3 value1, Vector3 value2)
         {
-            float result;
-            DistanceSquared(ref value1, ref value2, out result);
+            DistanceSquared(ref value1, ref value2, out float result);
             return MathF.Sqrt(result);
         }
 
@@ -427,9 +376,9 @@ namespace Microsoft.Xna.Framework
         /// <returns>The squared distance between two vectors.</returns>
         public static float DistanceSquared(Vector3 value1, Vector3 value2)
         {
-            return  (value1.X - value2.X) * (value1.X - value2.X) +
-                    (value1.Y - value2.Y) * (value1.Y - value2.Y) +
-                    (value1.Z - value2.Z) * (value1.Z - value2.Z);
+            return (value1.X - value2.X) * (value1.X - value2.X) +
+                   (value1.Y - value2.Y) * (value1.Y - value2.Y) +
+                   (value1.Z - value2.Z) * (value1.Z - value2.Z);
         }
 
         /// <summary>
@@ -530,13 +479,12 @@ namespace Microsoft.Xna.Framework
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public override bool Equals(object obj)
         {
-            if (!(obj is Vector3))
+            if (!(obj is Vector3 other))
                 return false;
 
-            var other = (Vector3)obj;
-            return  X == other.X &&
-                    Y == other.Y &&
-                    Z == other.Z;
+            return X == other.X &&
+                   Y == other.Y &&
+                   Z == other.Z;
         }
 
         /// <summary>
@@ -546,9 +494,9 @@ namespace Microsoft.Xna.Framework
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public bool Equals(Vector3 other)
         {
-            return  X == other.X && 
-                    Y == other.Y &&
-                    Z == other.Z;
+            return X == other.X &&
+                   Y == other.Y &&
+                   Z == other.Z;
         }
 
         /// <summary>
@@ -590,12 +538,13 @@ namespace Microsoft.Xna.Framework
         /// Gets the hash code of this <see cref="Vector3"/>.
         /// </summary>
         /// <returns>Hash code of this <see cref="Vector3"/>.</returns>
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             unchecked
             {
                 var hashCode = X.GetHashCode();
-                hashCode = (hashCode * 397) ^ Y.GetHashCode();
-                hashCode = (hashCode * 397) ^ Z.GetHashCode();
+                hashCode = hashCode * 397 ^ Y.GetHashCode();
+                hashCode = hashCode * 397 ^ Z.GetHashCode();
                 return hashCode;
             }
         }
@@ -612,8 +561,8 @@ namespace Microsoft.Xna.Framework
         public static Vector3 Hermite(Vector3 value1, Vector3 tangent1, Vector3 value2, Vector3 tangent2, float amount)
         {
             return new Vector3(MathHelper.Hermite(value1.X, tangent1.X, value2.X, tangent2.X, amount),
-                               MathHelper.Hermite(value1.Y, tangent1.Y, value2.Y, tangent2.Y, amount),
-                               MathHelper.Hermite(value1.Z, tangent1.Z, value2.Z, tangent2.Z, amount));
+                MathHelper.Hermite(value1.Y, tangent1.Y, value2.Y, tangent2.Y, amount),
+                MathHelper.Hermite(value1.Z, tangent1.Z, value2.Z, tangent2.Z, amount));
         }
 
         /// <summary>
@@ -638,7 +587,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>The length of this <see cref="Vector3"/>.</returns>
         public float Length()
         {
-            return MathF.Sqrt((X * X) + (Y * Y) + (Z * Z));
+            return MathF.Sqrt(X * X + Y * Y + Z * Z);
         }
 
         /// <summary>
@@ -647,7 +596,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>The squared length of this <see cref="Vector3"/>.</returns>
         public float LengthSquared()
         {
-            return (X * X) + (Y * Y) + (Z * Z);
+            return X * X + Y * Y + Z * Z;
         }
 
         /// <summary>
@@ -850,7 +799,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public void Normalize()
         {
-            float factor = MathF.Sqrt((X * X) + (Y * Y) + (Z * Z));
+            float factor = MathF.Sqrt(X * X + Y * Y + Z * Z);
             factor = 1f / factor;
             X *= factor;
             Y *= factor;
@@ -864,7 +813,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>Unit vector.</returns>
         public static Vector3 Normalize(Vector3 value)
         {
-            float factor = MathF.Sqrt((value.X * value.X) + (value.Y * value.Y) + (value.Z * value.Z));
+            float factor = MathF.Sqrt(value.X * value.X + value.Y * value.Y + value.Z * value.Z);
             factor = 1f / factor;
             return new Vector3(value.X * factor, value.Y * factor, value.Z * factor);
         }
@@ -876,7 +825,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Unit vector as an output parameter.</param>
         public static void Normalize(ref Vector3 value, out Vector3 result)
         {
-            float factor = MathF.Sqrt((value.X * value.X) + (value.Y * value.Y) + (value.Z * value.Z));
+            float factor = MathF.Sqrt(value.X * value.X + value.Y * value.Y + value.Z * value.Z);
             factor = 1f / factor;
             result.X = value.X * factor;
             result.Y = value.Y * factor;
@@ -896,10 +845,10 @@ namespace Microsoft.Xna.Framework
             // R = I - (2 * N * ( DotProduct[ I,N] ))
             Vector3 reflectedVector;
             // inline the dotProduct here instead of calling method
-            float dotProduct = ((vector.X * normal.X) + (vector.Y * normal.Y)) + (vector.Z * normal.Z);
-            reflectedVector.X = vector.X - (2.0f * normal.X) * dotProduct;
-            reflectedVector.Y = vector.Y - (2.0f * normal.Y) * dotProduct;
-            reflectedVector.Z = vector.Z - (2.0f * normal.Z) * dotProduct;
+            float dotProduct = vector.X * normal.X + vector.Y * normal.Y + vector.Z * normal.Z;
+            reflectedVector.X = vector.X - 2.0f * normal.X * dotProduct;
+            reflectedVector.Y = vector.Y - 2.0f * normal.Y * dotProduct;
+            reflectedVector.Z = vector.Z - 2.0f * normal.Z * dotProduct;
 
             return reflectedVector;
         }
@@ -917,10 +866,10 @@ namespace Microsoft.Xna.Framework
             // R = I - (2 * N * ( DotProduct[ I,N] ))
 
             // inline the dotProduct here instead of calling method
-            float dotProduct = ((vector.X * normal.X) + (vector.Y * normal.Y)) + (vector.Z * normal.Z);
-            result.X = vector.X - (2.0f * normal.X) * dotProduct;
-            result.Y = vector.Y - (2.0f * normal.Y) * dotProduct;
-            result.Z = vector.Z - (2.0f * normal.Z) * dotProduct;
+            float dotProduct = vector.X * normal.X + vector.Y * normal.Y + vector.Z * normal.Z;
+            result.X = vector.X - 2.0f * normal.X * dotProduct;
+            result.Y = vector.Y - 2.0f * normal.Y * dotProduct;
+            result.Z = vector.Z - 2.0f * normal.Z * dotProduct;
         }
 
         /// <summary>
@@ -1023,17 +972,16 @@ namespace Microsoft.Xna.Framework
         {
             StringBuilder sb = new StringBuilder(32);
             sb.Append("{X:");
-            sb.Append(this.X);
+            sb.Append(X);
             sb.Append(" Y:");
-            sb.Append(this.Y);
+            sb.Append(Y);
             sb.Append(" Z:");
-            sb.Append(this.Z);
+            sb.Append(Z);
             sb.Append("}");
             return sb.ToString();
         }
 
         #region Transform
-
         /// <summary>
         /// Creates a new <see cref="Vector3"/> that contains a transformation of 3d-vector by the specified <see cref="Matrix"/>.
         /// </summary>
@@ -1054,9 +1002,9 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Transformed <see cref="Vector3"/> as an output parameter.</param>
         public static void Transform(ref Vector3 position, ref Matrix matrix, out Vector3 result)
         {
-            var x = (position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41;
-            var y = (position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42;
-            var z = (position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43;
+            var x = position.X * matrix.M11 + position.Y * matrix.M21 + position.Z * matrix.M31 + matrix.M41;
+            var y = position.X * matrix.M12 + position.Y * matrix.M22 + position.Z * matrix.M32 + matrix.M42;
+            var z = position.X * matrix.M13 + position.Y * matrix.M23 + position.Z * matrix.M33 + matrix.M43;
             result.X = x;
             result.Y = y;
             result.Z = z;
@@ -1070,8 +1018,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>Transformed <see cref="Vector3"/>.</returns>
         public static Vector3 Transform(Vector3 value, Quaternion rotation)
         {
-            Vector3 result;
-            Transform(ref value, ref rotation, out result);
+            Transform(ref value, ref rotation, out Vector3 result);
             return result;
         }
 
@@ -1119,9 +1066,9 @@ namespace Microsoft.Xna.Framework
                 var position = sourceArray[sourceIndex + i];
                 destinationArray[destinationIndex + i] =
                     new Vector3(
-                        (position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41,
-                        (position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42,
-                        (position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43);
+                        position.X * matrix.M11 + position.Y * matrix.M21 + position.Z * matrix.M31 + matrix.M41,
+                        position.X * matrix.M12 + position.Y * matrix.M22 + position.Z * matrix.M32 + matrix.M42,
+                        position.X * matrix.M13 + position.Y * matrix.M23 + position.Z * matrix.M33 + matrix.M43);
             }
         }
 
@@ -1182,12 +1129,12 @@ namespace Microsoft.Xna.Framework
 
             for (var i = 0; i < sourceArray.Length; i++)
             {
-                var position = sourceArray[i];                
+                var position = sourceArray[i];
                 destinationArray[i] =
                     new Vector3(
-                        (position.X*matrix.M11) + (position.Y*matrix.M21) + (position.Z*matrix.M31) + matrix.M41,
-                        (position.X*matrix.M12) + (position.Y*matrix.M22) + (position.Z*matrix.M32) + matrix.M42,
-                        (position.X*matrix.M13) + (position.Y*matrix.M23) + (position.Z*matrix.M33) + matrix.M43);
+                        position.X * matrix.M11 + position.Y * matrix.M21 + position.Z * matrix.M31 + matrix.M41,
+                        position.X * matrix.M12 + position.Y * matrix.M22 + position.Z * matrix.M32 + matrix.M42,
+                        position.X * matrix.M13 + position.Y * matrix.M23 + position.Z * matrix.M33 + matrix.M43);
             }
         }
 
@@ -1223,11 +1170,9 @@ namespace Microsoft.Xna.Framework
                         position.Z + z * rotation.W + (rotation.X * y - rotation.Y * x));
             }
         }
-
         #endregion
 
         #region TransformNormal
-
         /// <summary>
         /// Creates a new <see cref="Vector3"/> that contains a transformation of the specified normal by the specified <see cref="Matrix"/>.
         /// </summary>
@@ -1248,9 +1193,9 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Transformed normal as an output parameter.</param>
         public static void TransformNormal(ref Vector3 normal, ref Matrix matrix, out Vector3 result)
         {
-            var x = (normal.X * matrix.M11) + (normal.Y * matrix.M21) + (normal.Z * matrix.M31);
-            var y = (normal.X * matrix.M12) + (normal.Y * matrix.M22) + (normal.Z * matrix.M32);
-            var z = (normal.X * matrix.M13) + (normal.Y * matrix.M23) + (normal.Z * matrix.M33);
+            var x = normal.X * matrix.M11 + normal.Y * matrix.M21 + normal.Z * matrix.M31;
+            var y = normal.X * matrix.M12 + normal.Y * matrix.M22 + normal.Z * matrix.M32;
+            var z = normal.X * matrix.M13 + normal.Y * matrix.M23 + normal.Z * matrix.M33;
             result.X = x;
             result.Y = y;
             result.Z = z;
@@ -1266,17 +1211,17 @@ namespace Microsoft.Xna.Framework
         /// <param name="destinationIndex">The starting index in the destination array, where the first <see cref="Vector3"/> should be written.</param>
         /// <param name="length">The number of normals to be transformed.</param>
         public static void TransformNormal(Vector3[] sourceArray,
-         int sourceIndex,
-         ref Matrix matrix,
-         Vector3[] destinationArray,
-         int destinationIndex,
-         int length)
+            int sourceIndex,
+            ref Matrix matrix,
+            Vector3[] destinationArray,
+            int destinationIndex,
+            int length)
         {
             if (sourceArray == null)
                 throw new ArgumentNullException("sourceArray");
             if (destinationArray == null)
                 throw new ArgumentNullException("destinationArray");
-            if(sourceArray.Length < sourceIndex + length)
+            if (sourceArray.Length < sourceIndex + length)
                 throw new ArgumentException("Source array length is lesser than sourceIndex + length");
             if (destinationArray.Length < destinationIndex + length)
                 throw new ArgumentException("Destination array length is lesser than destinationIndex + length");
@@ -1286,10 +1231,10 @@ namespace Microsoft.Xna.Framework
                 var normal = sourceArray[sourceIndex + x];
 
                 destinationArray[destinationIndex + x] =
-                     new Vector3(
-                        (normal.X * matrix.M11) + (normal.Y * matrix.M21) + (normal.Z * matrix.M31),
-                        (normal.X * matrix.M12) + (normal.Y * matrix.M22) + (normal.Z * matrix.M32),
-                        (normal.X * matrix.M13) + (normal.Y * matrix.M23) + (normal.Z * matrix.M33));
+                    new Vector3(
+                        normal.X * matrix.M11 + normal.Y * matrix.M21 + normal.Z * matrix.M31,
+                        normal.X * matrix.M12 + normal.Y * matrix.M22 + normal.Z * matrix.M32,
+                        normal.X * matrix.M13 + normal.Y * matrix.M23 + normal.Z * matrix.M33);
             }
         }
 
@@ -1301,7 +1246,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="destinationArray">Destination array.</param>
         public static void TransformNormal(Vector3[] sourceArray, ref Matrix matrix, Vector3[] destinationArray)
         {
-            if(sourceArray == null)
+            if (sourceArray == null)
                 throw new ArgumentNullException("sourceArray");
             if (destinationArray == null)
                 throw new ArgumentNullException("destinationArray");
@@ -1314,12 +1259,11 @@ namespace Microsoft.Xna.Framework
 
                 destinationArray[i] =
                     new Vector3(
-                        (normal.X*matrix.M11) + (normal.Y*matrix.M21) + (normal.Z*matrix.M31),
-                        (normal.X*matrix.M12) + (normal.Y*matrix.M22) + (normal.Z*matrix.M32),
-                        (normal.X*matrix.M13) + (normal.Y*matrix.M23) + (normal.Z*matrix.M33));
+                        normal.X * matrix.M11 + normal.Y * matrix.M21 + normal.Z * matrix.M31,
+                        normal.X * matrix.M12 + normal.Y * matrix.M22 + normal.Z * matrix.M32,
+                        normal.X * matrix.M13 + normal.Y * matrix.M23 + normal.Z * matrix.M33);
             }
         }
-
         #endregion
 
         /// <summary>
@@ -1340,13 +1284,11 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public System.Numerics.Vector3 ToNumerics()
         {
-            return new System.Numerics.Vector3(this.X, this.Y, this.Z);
+            return new System.Numerics.Vector3(X, Y, Z);
         }
-
         #endregion
 
         #region Operators
-
         /// <summary>
         /// Converts a <see cref="System.Numerics.Vector3"/> to a <see cref="Vector3"/>.
         /// </summary>
@@ -1489,7 +1431,6 @@ namespace Microsoft.Xna.Framework
             value1.Z *= factor;
             return value1;
         }
-
         #endregion
     }
 }

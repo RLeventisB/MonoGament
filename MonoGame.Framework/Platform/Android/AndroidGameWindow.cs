@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework
         private DisplayOrientation _supportedOrientations = DisplayOrientation.Default;
         private DisplayOrientation _currentOrientation;
 
-        public override IntPtr Handle { get { return IntPtr.Zero; } }
+        public override IntPtr Handle => IntPtr.Zero;
 
 
         public void SetResumer(IResumeManager resumer)
@@ -127,15 +127,9 @@ namespace Microsoft.Xna.Framework
                 {
                     return DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
                 }
-                else
-                {
-                    return DisplayOrientation.Portrait | DisplayOrientation.PortraitDown;
-                }
+                return DisplayOrientation.Portrait | DisplayOrientation.PortraitDown;
             }
-            else
-            {
-                return _supportedOrientations;
-            }
+            return _supportedOrientations;
         }
 
         /// <summary>
@@ -167,22 +161,10 @@ namespace Microsoft.Xna.Framework
                 _game.graphicsDeviceManager.ApplyChanges();
         }
 
-        public override string ScreenDeviceName
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public override string ScreenDeviceName => throw new NotImplementedException();
 
 
-        public override Rectangle ClientBounds
-        {
-            get
-            {
-                return _clientBounds;
-            }
-        }
+        public override Rectangle ClientBounds => _clientBounds;
 
         internal void ChangeClientBounds(Rectangle bounds)
         {
@@ -195,10 +177,7 @@ namespace Microsoft.Xna.Framework
 
         public override bool AllowUserResizing
         {
-            get
-            {
-                return false;
-            }
+            get => false;
             set
             {
                 // Do nothing; Ignore rather than raising an exception
@@ -224,15 +203,9 @@ namespace Microsoft.Xna.Framework
             FullSensor = 10,
         }
 
-        public override DisplayOrientation CurrentOrientation
-        {
-            get
-            {
-                return _currentOrientation;
-            }
-        }
+        public override DisplayOrientation CurrentOrientation => _currentOrientation;
 
-        
+
         private void SetDisplayOrientation(DisplayOrientation value)
         {
             if (value != _currentOrientation)

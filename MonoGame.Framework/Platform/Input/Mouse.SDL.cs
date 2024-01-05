@@ -15,16 +15,15 @@ namespace Microsoft.Xna.Framework.Input
         {
             return PrimaryWindow.Handle;
         }
-        
+
         private static void PlatformSetWindowHandle(IntPtr windowHandle)
         {
         }
 
         private static MouseState PlatformGetState(GameWindow window)
         {
-            int x, y;
             var winFlags = Sdl.Window.GetWindowFlags(window.Handle);
-            var state = Sdl.Mouse.GetGlobalState(out x, out y);
+            var state = Sdl.Mouse.GetGlobalState(out int x, out int y);
             var clientBounds = window.ClientBounds;
 
             window.MouseState.LeftButton = (state & Sdl.Mouse.Button.Left) != 0 ? ButtonState.Pressed : ButtonState.Released;
@@ -46,7 +45,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             PrimaryWindow.MouseState.X = x;
             PrimaryWindow.MouseState.Y = y;
-            
+
             Sdl.Mouse.WarpInWindow(PrimaryWindow.Handle, x, y);
         }
 

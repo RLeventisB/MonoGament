@@ -64,19 +64,11 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        public bool IsStopping
-        {
-            get
-            {
+        public bool IsStopping =>
                 // TODO: Implement me!
-                return false;
-            }
-        }
+                false;
 
-        public bool IsPreparing 
-        {
-            get { return false; }
-        }
+        public bool IsPreparing => false;
 
         public bool IsPrepared { get; internal set; }
 
@@ -84,11 +76,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         /// <summary>Gets the friendly name of the cue.</summary>
         /// <remarks>The friendly name is a value set from the designer.</remarks>
-        public string Name
-        {
-            get { return _name; }
-        }
-        
+        public string Name => _name;
+
         internal Cue(AudioEngine engine, string cuename, XactSound sound)
         {
             _engine = engine;
@@ -122,8 +111,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             lock (_engine.UpdateLock)
             {
-                if (_curSound != null)
-                    _curSound.Pause();
+                _curSound?.Pause();
             }
         }
 
@@ -154,8 +142,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             lock (_engine.UpdateLock)
             {
-                if (_curSound != null)
-                    _curSound.Resume();
+                _curSound?.Resume();
             }
         }
 
@@ -167,8 +154,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 _engine.ActiveCues.Remove(this);
 
-                if (_curSound != null)
-                    _curSound.Stop(options);
+                _curSound?.Stop(options);
             }
 
             IsPrepared = false;
@@ -258,8 +244,7 @@ namespace Microsoft.Xna.Framework.Audio
                 var angle = MathHelper.ToDegrees(MathF.Acos(slope));
                 var j = FindVariable("OrientationAngle");
                 _variables[j].SetValue(angle);
-                if (_curSound != null)
-                    _curSound.SetCuePan(Vector3.Dot(direction, right));
+                _curSound?.SetCuePan(Vector3.Dot(direction, right));
 
                 // Calculate doppler effect.
                 var relativeVelocity = emitter.Velocity - listener.Velocity;

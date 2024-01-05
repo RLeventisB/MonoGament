@@ -56,14 +56,14 @@ namespace MonoGame.Framework.Utilities
             var src = new Uri("file://" + UrlEncode(filePath));
 
             var dst = new Uri(src, UrlEncode(relativeFile));
-            // The uri now contains the path to the relativeFile with 
+            // The uri now contains the path to the relativeFile with
             // relative addresses resolved... get the local path.
             var localPath = dst.LocalPath;
 
             if (!hasForwardSlash && localPath.StartsWith("/"))
                 localPath = localPath.Substring(1);
 
-            // Convert the directory separator characters to the 
+            // Convert the directory separator characters to the
             // correct platform specific separator.
             return TrimPath(NormalizeFilePathSeparators(localPath));
         }
@@ -75,7 +75,7 @@ namespace MonoGame.Framework.Utilities
 
             foreach (var c in url)
             {
-                if ((c >= 48 && c <= 57) || (c >= 65 && c <= 90) || (c >= 97 && c <= 122) || Array.IndexOf(UrlSafeChars, c) != -1)
+                if ((c >= 48 && c <= 57) || c >= 65 && c <= 90 || c >= 97 && c <= 122 || Array.IndexOf(UrlSafeChars, c) != -1)
                     safeline.Append(c);
                 else
                 {

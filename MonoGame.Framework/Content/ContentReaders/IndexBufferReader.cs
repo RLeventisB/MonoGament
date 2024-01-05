@@ -8,7 +8,7 @@ namespace Microsoft.Xna.Framework.Content
 {
     class IndexBufferReader : ContentTypeReader<IndexBuffer>
     {
-        protected internal override IndexBuffer Read(ContentReader input, IndexBuffer existingInstance)
+        public override IndexBuffer Read(ContentReader input, IndexBuffer existingInstance)
         {
             IndexBuffer indexBuffer = existingInstance;
 
@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework.Content
             if (indexBuffer == null)
             {
                 indexBuffer = new IndexBuffer(input.GetGraphicsDevice(),
-                    sixteenBits ? IndexElementSize.SixteenBits : IndexElementSize.ThirtyTwoBits, 
+                    sixteenBits ? IndexElementSize.SixteenBits : IndexElementSize.ThirtyTwoBits,
                     dataSize / (sixteenBits ? 2 : 4), BufferUsage.None);
             }
 

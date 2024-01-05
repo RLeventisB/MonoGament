@@ -2,12 +2,12 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using Microsoft.Xna.Framework.Content.Pipeline.Utilities;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
 using System;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework.Content.Pipeline.Utilities;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -20,7 +20,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public PixelBitmapContent(int width, int height)
         {
             if (!TryGetFormat(out _format))
-                throw new InvalidOperationException(string.Format("Color format \"{0}\" is not supported",typeof(T).ToString()));
+                throw new InvalidOperationException(string.Format("Color format \"{0}\" is not supported", typeof(T).ToString()));
             Height = height;
             Width = width;
 
@@ -40,9 +40,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             for (var x = 0; x < Height; x++)
             {
                 var dataHandle = GCHandle.Alloc(_pixelData[x], GCHandleType.Pinned);
-                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64());
+                var dataPtr = (IntPtr)dataHandle.AddrOfPinnedObject().ToInt64();
 
-                Marshal.Copy(dataPtr, outputData, (formatSize * x * Width), (Width * formatSize));
+                Marshal.Copy(dataPtr, outputData, formatSize * x * Width, Width * formatSize);
 
                 dataHandle.Free();
             }

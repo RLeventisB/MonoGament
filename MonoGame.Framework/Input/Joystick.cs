@@ -24,10 +24,7 @@ namespace Microsoft.Xna.Framework.Input
         /// Gets a value indicating whether the current platform supports reading raw joystick data.
         /// </summary>
         /// <value><c>true</c> if the current platform supports reading raw joystick data; otherwise, <c>false</c>.</value>
-        public static bool IsSupported
-        {
-            get { return PlatformIsSupported; }
-        }
+        public static bool IsSupported => PlatformIsSupported;
 
         /// <summary>
         /// Gets a value indicating the last joystick index connected to the system. If this value is less than 0, no joysticks are connected.
@@ -35,10 +32,7 @@ namespace Microsoft.Xna.Framework.Input
         /// As such, this value may be larger than 0 even if only one joystick is connected.
         /// </para>
         /// </summary>
-        public static int LastConnectedIndex
-        {
-            get { return PlatformLastConnectedIndex; }
-        }
+        public static int LastConnectedIndex => PlatformLastConnectedIndex;
 
         /// <summary>
         /// Gets the capabilites of the joystick.

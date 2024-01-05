@@ -120,11 +120,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (Count > 0)
                 {
                     hashCode = VertexDeclarations[0].GetHashCode();
-                    hashCode = (hashCode * 397) ^ InstanceFrequencies[0];
+                    hashCode = hashCode * 397 ^ InstanceFrequencies[0];
                     for (int i = 1; i < Count; i++)
                     {
-                        hashCode = (hashCode * 397) ^ VertexDeclarations[i].GetHashCode();
-                        hashCode = (hashCode * 397) ^ InstanceFrequencies[i];
+                        hashCode = hashCode * 397 ^ VertexDeclarations[i].GetHashCode();
+                        hashCode = hashCode * 397 ^ InstanceFrequencies[i];
                     }
                 }
                 return hashCode;

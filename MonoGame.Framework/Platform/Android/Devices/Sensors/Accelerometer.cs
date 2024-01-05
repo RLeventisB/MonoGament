@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework;
 namespace Microsoft.Devices.Sensors
 {
     /// <summary>
-    /// Provides Android applications access to the device’s accelerometer sensor.
+    /// Provides Android applications access to the deviceâ€™s accelerometer sensor.
     /// </summary>
     public sealed class Accelerometer : SensorBase<AccelerometerReading>
     {
@@ -19,7 +19,7 @@ namespace Microsoft.Devices.Sensors
         static Sensor sensor;
         SensorListener listener;
         SensorState state;
-        bool started = false;
+        bool started;
         static int instanceCount;
 
         /// <summary>
@@ -112,10 +112,7 @@ namespace Microsoft.Devices.Sensors
                 state = SensorState.Ready;
                 return;
             }
-            else
-            {
-                throw new AccelerometerFailedException("Failed to start accelerometer data acquisition. Data acquisition already started.", -1);
-            }
+            throw new AccelerometerFailedException("Failed to start accelerometer data acquisition. Data acquisition already started.", -1);
         }
 
         /// <summary>

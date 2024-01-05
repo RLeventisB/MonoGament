@@ -22,8 +22,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <value>The offset in bytes.</value>
         public int Offset
         {
-            get { return _offset; }
-            set { _offset = value; }
+            get => _offset;
+            set => _offset = value;
         }
 
         /// <summary>
@@ -32,8 +32,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <value>The data format.</value>
         public VertexElementFormat VertexElementFormat
         {
-            get { return _format; }
-            set { _format = value; }
+            get => _format;
+            set => _format = value;
         }
 
         /// <summary>
@@ -42,8 +42,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <value>The HLSL semantic of the element in the vertex shader input.</value>
         public VertexElementUsage VertexElementUsage
         {
-            get { return _usage; }
-            set { _usage = value; }
+            get => _usage;
+            set => _usage = value;
         }
 
         /// <summary>
@@ -61,8 +61,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </remarks>
         public int UsageIndex
         {
-            get { return _usageIndex; }
-            set { _usageIndex = value; }
+            get => _usageIndex;
+            set => _usageIndex = value;
         }
 
         /// <summary>
@@ -97,12 +97,12 @@ namespace Microsoft.Xna.Framework.Graphics
             // - VertexElementFormat has 12 values. --> _format needs 4 bit.
             // - VertexElementUsage has 13 values. --> _usage needs 4 bit.
             // - DirectX 11 has max 32 registers. --> _usageIndex needs 6 bit.
-            // (Note: If these assumptions are correct we get a unique hash code. If these 
+            // (Note: If these assumptions are correct we get a unique hash code. If these
             // assumptions are not correct, we still get a useful hash code because we use XOR.)
             int hashCode = _offset;
             hashCode ^= (int)_format << 9;
-            hashCode ^= (int)_usage << (9 + 4);
-            hashCode ^= _usageIndex << (9 + 4 + 4);
+            hashCode ^= (int)_usage << 9 + 4;
+            hashCode ^= _usageIndex << 9 + 4 + 4;
             return hashCode;
             // ReSharper restore NonReadonlyMemberInGetHashCode
         }
@@ -126,7 +126,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </returns>
         public override bool Equals(object obj)
         {
-            return obj is VertexElement && Equals((VertexElement)obj);
+            return obj is VertexElement element && Equals(element);
         }
 
         /// <summary>
@@ -141,9 +141,9 @@ namespace Microsoft.Xna.Framework.Graphics
         public bool Equals(VertexElement other)
         {
             return _offset == other._offset
-                   && _format == other._format
-                   && _usage == other._usage
-                   && _usageIndex == other._usageIndex;
+                && _format == other._format
+                && _usage == other._usage
+                && _usageIndex == other._usageIndex;
         }
 
         /// <summary>

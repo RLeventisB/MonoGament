@@ -2,12 +2,12 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using MonoGame.Framework.Utilities;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using MonoGame.Framework.Utilities;
-using System.Runtime.InteropServices;
 
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -44,11 +44,11 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
         private Color _blendFactor = Color.White;
-        private bool _blendFactorDirty;
+        public bool blendFactorDirty;
 
         private BlendState _blendState;
         private BlendState _actualBlendState;
-        private bool _blendStateDirty;
+        public bool blendStateDirty;
 
         private BlendState _blendStateAdditive;
         private BlendState _blendStateAlphaBlend;
@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private DepthStencilState _depthStencilState;
         private DepthStencilState _actualDepthStencilState;
-        private bool _depthStencilStateDirty;
+        private bool depthStencilStateDirty;
 
         private DepthStencilState _depthStencilStateDefault;
         private DepthStencilState _depthStencilStateDepthRead;
@@ -65,26 +65,26 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private RasterizerState _rasterizerState;
         private RasterizerState _actualRasterizerState;
-        private bool _rasterizerStateDirty;
+        public bool rasterizerStateDirty;
 
         private RasterizerState _rasterizerStateCullClockwise;
         private RasterizerState _rasterizerStateCullCounterClockwise;
         private RasterizerState _rasterizerStateCullNone;
 
         private Rectangle _scissorRectangle;
-        private bool _scissorRectangleDirty;
+        public bool scissorRectangleDirty;
 
         private VertexBufferBindings _vertexBuffers;
-        private bool _vertexBuffersDirty;
+        public bool vertexBuffersDirty;
 
         private IndexBuffer _indexBuffer;
-        private bool _indexBufferDirty;
+        public bool indexBufferDirty;
 
         private readonly RenderTargetBinding[] _currentRenderTargetBindings = new RenderTargetBinding[8];
         private int _currentRenderTargetCount;
         private readonly RenderTargetBinding[] _tempRenderTargetBinding = new RenderTargetBinding[1];
-
-        internal GraphicsCapabilities GraphicsCapabilities { get; private set; }
+        // WHY IS THIS INTERNAL
+        public GraphicsCapabilities GraphicsCapabilities { get; private set; }
 
         public TextureCollection VertexTextures { get; private set; }
 
@@ -97,30 +97,25 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Get or set the color a <see cref="RenderTarget2D"/> is cleared to when it is set.
         /// </summary>
-        public static Color DiscardColor {
-			get { return _discardColor; }
-			set { _discardColor = value; }
-		}
+        public static Color DiscardColor
+        {
+            get => _discardColor;
+            set => _discardColor = value;
+        }
 
         /// <summary>
         /// The active vertex shader.
         /// </summary>
         private Shader _vertexShader;
         private bool _vertexShaderDirty;
-        private bool VertexShaderDirty
-        {
-            get { return _vertexShaderDirty; }
-        }
+        private bool VertexShaderDirty => _vertexShaderDirty;
 
         /// <summary>
         /// The active pixel shader.
         /// </summary>
         private Shader _pixelShader;
         private bool _pixelShaderDirty;
-        private bool PixelShaderDirty
-        {
-            get { return _pixelShaderDirty; }
-        }
+        private bool PixelShaderDirty => _pixelShaderDirty;
 
         private readonly ConstantBufferCollection _vertexConstantBuffers = new ConstantBufferCollection(ShaderStage.Vertex, 16);
         private readonly ConstantBufferCollection _pixelConstantBuffers = new ConstantBufferCollection(ShaderStage.Pixel, 16);
@@ -138,12 +133,12 @@ namespace Microsoft.Xna.Framework.Graphics
         // collected by holding a strong reference to it in this list.
         private readonly List<WeakReference> _resources = new List<WeakReference>();
 
-		// TODO Graphics Device events need implementing
-		public event EventHandler<EventArgs> DeviceLost;
-		public event EventHandler<EventArgs> DeviceReset;
-		public event EventHandler<EventArgs> DeviceResetting;
-		public event EventHandler<ResourceCreatedEventArgs> ResourceCreated;
-		public event EventHandler<ResourceDestroyedEventArgs> ResourceDestroyed;
+        // TODO Graphics Device events need implementing
+        public event EventHandler<EventArgs> DeviceLost;
+        public event EventHandler<EventArgs> DeviceReset;
+        public event EventHandler<EventArgs> DeviceResetting;
+        public event EventHandler<ResourceCreatedEventArgs> ResourceCreated;
+        public event EventHandler<ResourceDestroyedEventArgs> ResourceDestroyed;
         public event EventHandler<EventArgs> Disposing;
 
         internal event EventHandler<PresentationEventArgs> PresentationChanged;
@@ -152,39 +147,18 @@ namespace Microsoft.Xna.Framework.Graphics
         internal int MaxTextureSlots;
         internal int MaxVertexTextureSlots;
 
-        public bool IsDisposed
-        {
-            get
-            {
-                return _isDisposed;
-            }
-        }
+        public bool IsDisposed => _isDisposed;
 
-		public bool IsContentLost {
-			get {
-				// We will just return IsDisposed for now
-				// as that is the only case I can see for now
-				return IsDisposed;
-			}
-		}
+        public bool IsContentLost =>
+            // We will just return IsDisposed for now
+            // as that is the only case I can see for now
+            IsDisposed;
 
-        internal bool IsRenderTargetBound
-        {
-            get
-            {
-                return _currentRenderTargetCount > 0;
-            }
-        }
+        internal bool IsRenderTargetBound => _currentRenderTargetCount > 0;
 
-        internal DepthFormat ActiveDepthFormat
-        {
-            get
-            {
-                return IsRenderTargetBound
-                    ? _currentRenderTargetBindings[0].DepthFormat
-                    : PresentationParameters.DepthStencilFormat;
-            }
-        }
+        internal DepthFormat ActiveDepthFormat => IsRenderTargetBound
+            ? _currentRenderTargetBindings[0].DepthFormat
+            : PresentationParameters.DepthStencilFormat;
 
         public GraphicsAdapter Adapter
         {
@@ -196,19 +170,19 @@ namespace Microsoft.Xna.Framework.Graphics
 
         /// <summary>
         /// The rendering information for debugging and profiling.
-        /// The metrics are reset every frame after draw within <see cref="GraphicsDevice.Present"/>. 
+        /// The metrics are reset every frame after draw within <see cref="GraphicsDevice.Present"/>.
         /// </summary>
-        public GraphicsMetrics Metrics { get { return _graphicsMetrics; } set { _graphicsMetrics = value; } }
+        public GraphicsMetrics Metrics { get => _graphicsMetrics; set => _graphicsMetrics = value; }
 
         private GraphicsDebug _graphicsDebug;
 
         /// <summary>
         /// Access debugging APIs for the graphics subsystem.
         /// </summary>
-        public GraphicsDebug GraphicsDebug { get { return _graphicsDebug; } set { _graphicsDebug = value; } }
+        public GraphicsDebug GraphicsDebug { get => _graphicsDebug; set => _graphicsDebug = value; }
 
         internal GraphicsDevice()
-		{
+        {
             PresentationParameters = new PresentationParameters();
             PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
             Setup();
@@ -290,9 +264,9 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
             // Initialize the main viewport
-            _viewport = new Viewport (0, 0,
-			                         DisplayMode.Width, DisplayMode.Height);
-			_viewport.MaxDepth = 1.0f;
+            _viewport = new Viewport(0, 0,
+                DisplayMode.Width, DisplayMode.Height);
+            _viewport.MaxDepth = 1.0f;
 
             PlatformSetup();
 
@@ -339,17 +313,17 @@ namespace Microsoft.Xna.Framework.Graphics
                 // for very large numbers. That doesn't matter because
                 // the number will get clamped below anyway in this case.
                 var msc = multiSampleCount;
-                msc = msc | (msc >> 1);
-                msc = msc | (msc >> 2);
-                msc = msc | (msc >> 4);
-                msc -= (msc >> 1);
+                msc = msc | msc >> 1;
+                msc = msc | msc >> 2;
+                msc = msc | msc >> 4;
+                msc -= msc >> 1;
                 // and clamp it to what the device can handle
                 if (msc > GraphicsCapabilities.MaxMultiSampleCount)
                     msc = GraphicsCapabilities.MaxMultiSampleCount;
 
                 return msc;
             }
-            else return 0;
+            return 0;
         }
 
         internal void Initialize()
@@ -357,7 +331,7 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformInitialize();
 
             // Force set the default render states.
-            _blendStateDirty = _depthStencilStateDirty = _rasterizerStateDirty = true;
+            blendStateDirty = depthStencilStateDirty = rasterizerStateDirty = true;
             BlendState = BlendState.Opaque;
             DepthStencilState = DepthStencilState.Default;
             RasterizerState = RasterizerState.CullCounterClockwise;
@@ -375,13 +349,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Force set the buffers and shaders on next ApplyState() call
             _vertexBuffers = new VertexBufferBindings(_maxVertexBufferSlots);
-            _vertexBuffersDirty = true;
-            _indexBufferDirty = true;
+            vertexBuffersDirty = true;
+            indexBufferDirty = true;
             _vertexShaderDirty = true;
             _pixelShaderDirty = true;
 
             // Set the default scissor rect.
-            _scissorRectangleDirty = true;
+            scissorRectangleDirty = true;
             ScissorRectangle = _viewport.Bounds;
 
             // Set the default render target.
@@ -390,10 +364,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public RasterizerState RasterizerState
         {
-            get
-            {
-                return _rasterizerState;
-            }
+            get => _rasterizerState;
 
             set
             {
@@ -423,7 +394,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 _actualRasterizerState = newRasterizerState;
 
-                _rasterizerStateDirty = true;
+                rasterizerStateDirty = true;
             }
         }
 
@@ -436,20 +407,20 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </remarks>
         public Color BlendFactor
         {
-            get { return _blendFactor; }
+            get => _blendFactor;
             set
             {
                 if (_blendFactor == value)
                     return;
                 _blendFactor = value;
-                _blendFactorDirty = true;
+                blendFactorDirty = true;
             }
         }
 
         public BlendState BlendState
         {
-			get { return _blendState; }
-			set
+            get => _blendState;
+            set
             {
                 if (value == null)
                     throw new ArgumentNullException("value");
@@ -458,7 +429,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (_blendState == value)
                     return;
 
-				_blendState = value;
+                _blendState = value;
 
                 // Static state properties never actually get bound;
                 // instead we use our GraphicsDevice-specific version of them.
@@ -483,13 +454,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 BlendFactor = _actualBlendState.BlendFactor;
 
-                _blendStateDirty = true;
+                blendStateDirty = true;
             }
-		}
+        }
 
         public DepthStencilState DepthStencilState
         {
-            get { return _depthStencilState; }
+            get => _depthStencilState;
             set
             {
                 if (value == null)
@@ -515,26 +486,26 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 _actualDepthStencilState = newDepthStencilState;
 
-                _depthStencilStateDirty = true;
+                depthStencilStateDirty = true;
             }
         }
 
-        internal void ApplyState(bool applyShaders)
+        public void ApplyState(bool applyShaders)
         {
             PlatformBeginApplyState();
 
             PlatformApplyBlend();
 
-            if (_depthStencilStateDirty)
+            if (depthStencilStateDirty)
             {
                 _actualDepthStencilState.PlatformApplyState(this);
-                _depthStencilStateDirty = false;
+                depthStencilStateDirty = false;
             }
 
-            if (_rasterizerStateDirty)
+            if (rasterizerStateDirty)
             {
                 _actualRasterizerState.PlatformApplyState(this);
-                _rasterizerStateDirty = false;
+                rasterizerStateDirty = false;
             }
 
             PlatformApplyState(applyShaders);
@@ -563,8 +534,8 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-		public void Clear(ClearOptions options, Vector4 color, float depth, int stencil)
-		{
+        public void Clear(ClearOptions options, Vector4 color, float depth, int stencil)
+        {
             PlatformClear(options, color, depth, stencil);
 
             unchecked
@@ -591,8 +562,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         foreach (var resource in _resources.ToArray())
                         {
                             var target = resource.Target as IDisposable;
-                            if (target != null)
-                                target.Dispose();
+                            target?.Dispose();
                         }
                         _resources.Clear();
                     }
@@ -670,10 +640,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Update the back buffer.
             OnPresentationChanged();
-            
+
             EventHelpers.Raise(this, PresentationChanged, new PresentationEventArgs(PresentationParameters));
             EventHelpers.Raise(this, DeviceReset, EventArgs.Empty);
-       }
+        }
 
         public void Reset(PresentationParameters presentationParameters)
         {
@@ -697,8 +667,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 foreach (var resource in _resources)
                 {
                     var target = resource.Target as GraphicsResource;
-                    if (target != null)
-                        target.GraphicsDeviceResetting();
+                    target?.GraphicsDeviceResetting();
                 }
 
                 // Remove references to resources that have been garbage collected.
@@ -715,21 +684,9 @@ namespace Microsoft.Xna.Framework.Graphics
             EventHelpers.Raise(this, DeviceReset, EventArgs.Empty);
         }
 
-        public DisplayMode DisplayMode
-        {
-            get
-            {
-                return Adapter.CurrentDisplayMode;
-            }
-        }
+        public DisplayMode DisplayMode => Adapter.CurrentDisplayMode;
 
-        public GraphicsDeviceStatus GraphicsDeviceStatus
-        {
-            get
-            {
-                return GraphicsDeviceStatus.Normal;
-            }
-        }
+        public GraphicsDeviceStatus GraphicsDeviceStatus => GraphicsDeviceStatus.Normal;
 
         public PresentationParameters PresentationParameters
         {
@@ -739,10 +696,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public Viewport Viewport
         {
-            get
-            {
-                return _viewport;
-            }
+            get => _viewport;
 
             set
             {
@@ -752,17 +706,11 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         private readonly GraphicsProfile _graphicsProfile;
-        public GraphicsProfile GraphicsProfile
-        {
-            get { return _graphicsProfile; }
-        }
+        public GraphicsProfile GraphicsProfile => _graphicsProfile;
 
         public Rectangle ScissorRectangle
         {
-            get
-            {
-                return _scissorRectangle;
-            }
+            get => _scissorRectangle;
 
             set
             {
@@ -770,30 +718,24 @@ namespace Microsoft.Xna.Framework.Graphics
                     return;
 
                 _scissorRectangle = value;
-                _scissorRectangleDirty = true;
+                scissorRectangleDirty = true;
             }
         }
 
-        public int RenderTargetCount
+        public int RenderTargetCount => _currentRenderTargetCount;
+
+        public void SetRenderTarget(RenderTarget2D renderTarget)
         {
-            get
+            if (renderTarget == null)
             {
-                return _currentRenderTargetCount;
+                SetRenderTargets(null);
+            }
+            else
+            {
+                _tempRenderTargetBinding[0] = new RenderTargetBinding(renderTarget);
+                SetRenderTargets(_tempRenderTargetBinding);
             }
         }
-
-		public void SetRenderTarget(RenderTarget2D renderTarget)
-		{
-			if (renderTarget == null)
-		    {
-                SetRenderTargets(null);
-		    }
-			else
-			{
-				_tempRenderTargetBinding[0] = new RenderTargetBinding(renderTarget);
-				SetRenderTargets(_tempRenderTargetBinding);
-			}
-		}
 
         public void SetRenderTarget(RenderTargetCube renderTarget, CubeMapFace cubeMapFace)
         {
@@ -808,8 +750,8 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-		public void SetRenderTargets(params RenderTargetBinding[] renderTargets)
-		{
+        public void SetRenderTargets(params RenderTargetBinding[] renderTargets)
+        {
             // Avoid having to check for null and zero length.
             var renderTargetCount = 0;
             if (renderTargets != null)
@@ -878,8 +820,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 renderTargetWidth = PresentationParameters.BackBufferWidth;
                 renderTargetHeight = PresentationParameters.BackBufferHeight;
             }
-			else
-			{
+            else
+            {
                 // Copy the new bindings.
                 Array.Copy(renderTargets, _currentRenderTargetBindings, renderTargets.Length);
                 _currentRenderTargetCount = renderTargets.Length;
@@ -906,13 +848,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 Clear(DiscardColor);
         }
 
-		public RenderTargetBinding[] GetRenderTargets()
-		{
+        public RenderTargetBinding[] GetRenderTargets()
+        {
             // Return a correctly sized copy our internal array.
             var bindings = new RenderTargetBinding[_currentRenderTargetCount];
             Array.Copy(_currentRenderTargetBindings, bindings, _currentRenderTargetCount);
             return bindings;
-		}
+        }
 
         public void GetRenderTargets(RenderTargetBinding[] outTargets)
         {
@@ -922,31 +864,31 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SetVertexBuffer(VertexBuffer vertexBuffer)
         {
-            _vertexBuffersDirty |= (vertexBuffer == null)
-                                   ? _vertexBuffers.Clear()
-                                   : _vertexBuffers.Set(vertexBuffer, 0);
+            vertexBuffersDirty |= vertexBuffer == null
+                ? _vertexBuffers.Clear()
+                : _vertexBuffers.Set(vertexBuffer, 0);
         }
 
         public void SetVertexBuffer(VertexBuffer vertexBuffer, int vertexOffset)
         {
             // Validate vertexOffset.
             if (vertexOffset < 0
-                || vertexBuffer == null && vertexOffset != 0
-                || vertexBuffer != null && vertexOffset >= vertexBuffer.VertexCount)
+             || vertexBuffer == null && vertexOffset != 0
+             || vertexBuffer != null && vertexOffset >= vertexBuffer.VertexCount)
             {
                 throw new ArgumentOutOfRangeException("vertexOffset");
             }
 
-            _vertexBuffersDirty |= (vertexBuffer == null)
-                                   ? _vertexBuffers.Clear()
-                                   : _vertexBuffers.Set(vertexBuffer, vertexOffset);
+            vertexBuffersDirty |= vertexBuffer == null
+                ? _vertexBuffers.Clear()
+                : _vertexBuffers.Set(vertexBuffer, vertexOffset);
         }
 
         public void SetVertexBuffers(params VertexBufferBinding[] vertexBuffers)
         {
             if (vertexBuffers == null || vertexBuffers.Length == 0)
             {
-                _vertexBuffersDirty |= _vertexBuffers.Clear();
+                vertexBuffersDirty |= _vertexBuffers.Clear();
             }
             else
             {
@@ -956,7 +898,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     throw new ArgumentOutOfRangeException("vertexBuffers", message);
                 }
 
-                _vertexBuffersDirty |= _vertexBuffers.Set(vertexBuffers);
+                vertexBuffersDirty |= _vertexBuffers.Set(vertexBuffers);
             }
         }
 
@@ -966,14 +908,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 return;
 
             _indexBuffer = indexBuffer;
-            _indexBufferDirty = true;
+            indexBufferDirty = true;
         }
 
-        public IndexBuffer Indices { set { SetIndexBuffer(value); } get { return _indexBuffer; } }
+        public IndexBuffer Indices { set => SetIndexBuffer(value); get => _indexBuffer; }
 
-        internal Shader VertexShader
+        public Shader VertexShader
         {
-            get { return _vertexShader; }
+            get => _vertexShader;
 
             set
             {
@@ -986,9 +928,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        internal Shader PixelShader
+        public Shader PixelShader
         {
-            get { return _pixelShader; }
+            get => _pixelShader;
 
             set
             {
@@ -1136,7 +1078,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount +=  primitiveCount;
+                _graphicsMetrics._primitiveCount += primitiveCount;
             }
         }
 
@@ -1216,7 +1158,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount +=  primitiveCount;
+                _graphicsMetrics._primitiveCount += primitiveCount;
             }
         }
 
@@ -1292,11 +1234,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentOutOfRangeException("vertexDeclaration", "Vertex stride of vertexDeclaration should be at least as big as the stride of the actual vertices.");
 
             PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
-            
+
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount +=  primitiveCount;
+                _graphicsMetrics._primitiveCount += primitiveCount;
             }
         }
 
@@ -1313,7 +1255,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <remarks>Note that minVertexIndex and numVertices are unused in MonoGame and will be ignored.</remarks>
         [Obsolete("Use DrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount) instead. In future versions this method can be removed.")]
         public void DrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex,
-                                            int numVertices, int startIndex, int primitiveCount, int instanceCount)
+            int numVertices, int startIndex, int primitiveCount, int instanceCount)
         {
             DrawInstancedPrimitives(primitiveType, baseVertex, startIndex, primitiveCount, 0, instanceCount);
         }
@@ -1361,7 +1303,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (primitiveCount * instanceCount);
+                _graphicsMetrics._primitiveCount += primitiveCount * instanceCount;
             }
         }
 
@@ -1417,8 +1359,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (elementCount * tSize != dataByteSize)
                 throw new ArgumentException(string.Format("elementCount is not the right size, " +
-                                            "elementCount * sizeof(T) is {0}, but data size is {1} bytes.",
-                                            elementCount * tSize, dataByteSize), "elementCount");
+                                                          "elementCount * sizeof(T) is {0}, but data size is {1} bytes.",
+                    elementCount * tSize, dataByteSize), "elementCount");
 
             PlatformGetBackBufferData(rect, data, startIndex, elementCount);
         }

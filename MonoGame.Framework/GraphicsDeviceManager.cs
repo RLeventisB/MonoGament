@@ -2,9 +2,10 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
+
+using System;
 
 namespace Microsoft.Xna.Framework
 {
@@ -31,7 +32,7 @@ namespace Microsoft.Xna.Framework
         private bool _wantFullScreen;
         private GraphicsProfile _graphicsProfile;
         // dirty flag for ApplyChanges
-        private bool _shouldApplyChanges;
+        public bool shouldApplyChanges;
 
         /// <summary>
         /// The default back buffer width.
@@ -130,11 +131,11 @@ namespace Microsoft.Xna.Framework
             if (_graphicsDevice != null)
                 return;
 
-            _graphicsDevice = new GraphicsDevice(gdi.Adapter, gdi.GraphicsProfile, this.PreferHalfPixelOffset, gdi.PresentationParameters);
-            _shouldApplyChanges = false;
+            _graphicsDevice = new GraphicsDevice(gdi.Adapter, gdi.GraphicsProfile, PreferHalfPixelOffset, gdi.PresentationParameters);
+            shouldApplyChanges = false;
 
             // hook up reset events
-            GraphicsDevice.DeviceReset     += (sender, args) => OnDeviceReset(args);
+            GraphicsDevice.DeviceReset += (sender, args) => OnDeviceReset(args);
             GraphicsDevice.DeviceResetting += (sender, args) => OnDeviceResetting(args);
 
             // update the touchpanel display size when the graphicsdevice is reset
@@ -335,10 +336,10 @@ namespace Microsoft.Xna.Framework
             if (_graphicsDevice == null)
                 CreateDevice();
 
-            if (!_shouldApplyChanges)
+            if (!shouldApplyChanges)
                 return;
 
-            _shouldApplyChanges = false;
+            shouldApplyChanges = false;
 
             _game.Window.SetSupportedOrientations(_supportedOrientations);
 
@@ -408,13 +409,10 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public GraphicsProfile GraphicsProfile
         {
-            get
-            {
-                return _graphicsProfile;
-            }
+            get => _graphicsProfile;
             set
             {
-                _shouldApplyChanges = true;
+                shouldApplyChanges = true;
                 _graphicsProfile = value;
             }
         }
@@ -422,13 +420,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Returns the graphics device for this manager.
         /// </summary>
-        public GraphicsDevice GraphicsDevice
-        {
-            get
-            {
-                return _graphicsDevice;
-            }
-        }
+        public GraphicsDevice GraphicsDevice => _graphicsDevice;
 
         /// <summary>
         /// Indicates the desire to switch into fullscreen mode.
@@ -440,10 +432,10 @@ namespace Microsoft.Xna.Framework
         /// </remarks>
         public bool IsFullScreen
         {
-            get { return _wantFullScreen; }
+            get => _wantFullScreen;
             set
             {
-                _shouldApplyChanges = true;
+                shouldApplyChanges = true;
                 _wantFullScreen = value;
             }
         }
@@ -455,10 +447,10 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public bool HardwareModeSwitch
         {
-            get { return _hardwareModeSwitch;}
+            get => _hardwareModeSwitch;
             set
             {
-                _shouldApplyChanges = true;
+                shouldApplyChanges = true;
                 _hardwareModeSwitch = value;
             }
         }
@@ -479,10 +471,10 @@ namespace Microsoft.Xna.Framework
         /// </remarks>
         public bool PreferHalfPixelOffset
         {
-            get { return _preferHalfPixelOffset; }
+            get => _preferHalfPixelOffset;
             set
             {
-                if (this.GraphicsDevice != null)
+                if (GraphicsDevice != null)
                     throw new InvalidOperationException("Setting PreferHalfPixelOffset is not allowed after the creation of GraphicsDevice.");
                 _preferHalfPixelOffset = value;
             }
@@ -497,13 +489,10 @@ namespace Microsoft.Xna.Framework
         /// </remarks>
         public bool PreferMultiSampling
         {
-            get
-            {
-                return _preferMultiSampling;
-            }
+            get => _preferMultiSampling;
             set
             {
-                _shouldApplyChanges = true;
+                shouldApplyChanges = true;
                 _preferMultiSampling = value;
             }
         }
@@ -517,13 +506,10 @@ namespace Microsoft.Xna.Framework
         /// </remarks>
         public SurfaceFormat PreferredBackBufferFormat
         {
-            get
-            {
-                return _preferredBackBufferFormat;
-            }
+            get => _preferredBackBufferFormat;
             set
             {
-                _shouldApplyChanges = true;
+                shouldApplyChanges = true;
                 _preferredBackBufferFormat = value;
             }
         }
@@ -537,13 +523,10 @@ namespace Microsoft.Xna.Framework
         /// </remarks>
         public int PreferredBackBufferHeight
         {
-            get
-            {
-                return _preferredBackBufferHeight;
-            }
+            get => _preferredBackBufferHeight;
             set
             {
-                _shouldApplyChanges = true;
+                shouldApplyChanges = true;
                 _preferredBackBufferHeight = value;
             }
         }
@@ -557,13 +540,10 @@ namespace Microsoft.Xna.Framework
         /// </remarks>
         public int PreferredBackBufferWidth
         {
-            get
-            {
-                return _preferredBackBufferWidth;
-            }
+            get => _preferredBackBufferWidth;
             set
             {
-                _shouldApplyChanges = true;
+                shouldApplyChanges = true;
                 _preferredBackBufferWidth = value;
             }
         }
@@ -578,13 +558,10 @@ namespace Microsoft.Xna.Framework
         /// </remarks>
         public DepthFormat PreferredDepthStencilFormat
         {
-            get
-            {
-                return _preferredDepthStencilFormat;
-            }
+            get => _preferredDepthStencilFormat;
             set
             {
-                _shouldApplyChanges = true;
+                shouldApplyChanges = true;
                 _preferredDepthStencilFormat = value;
             }
         }
@@ -599,13 +576,10 @@ namespace Microsoft.Xna.Framework
         /// </remarks>
         public bool SynchronizeWithVerticalRetrace
         {
-            get
-            {
-                return _synchronizedWithVerticalRetrace;
-            }
+            get => _synchronizedWithVerticalRetrace;
             set
             {
-                _shouldApplyChanges = true;
+                shouldApplyChanges = true;
                 _synchronizedWithVerticalRetrace = value;
             }
         }
@@ -620,13 +594,10 @@ namespace Microsoft.Xna.Framework
         /// </remarks>
         public DisplayOrientation SupportedOrientations
         {
-            get
-            {
-                return _supportedOrientations;
-            }
+            get => _supportedOrientations;
             set
             {
-                _shouldApplyChanges = true;
+                shouldApplyChanges = true;
                 _supportedOrientations = value;
             }
         }

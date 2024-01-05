@@ -55,76 +55,40 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		private Vector2 _position2;
 		private Vector2 _delta;
 		private Vector2 _delta2;
-		
-		#region Properties
+
+        #region Properties
 
         /// <summary>
         /// Gets the type of the gesture.
         /// </summary>
-        public GestureType GestureType
-        {
-            get
-            {
-				return this._gestureType;
-            }
-        }
+        public GestureType GestureType => _gestureType;
 
         /// <summary>
         /// Gets the starting time for this multi-touch gesture sample.
         /// </summary>
-        public TimeSpan Timestamp
-        {
-            get
-            {
-				return this._timestamp;
-            }
-        }
+        public TimeSpan Timestamp => _timestamp;
 
         /// <summary>
         /// Gets the position of the first touch-point in the gesture sample.
         /// </summary>
-        public Vector2 Position
-        {
-            get
-            {
-				return this._position;
-            }
-        }
+        public Vector2 Position => _position;
 
         /// <summary>
         /// Gets the position of the second touch-point in the gesture sample.
         /// </summary>
-        public Vector2 Position2
-        {
-            get
-            {
-				return this._position2;
-            }
-        }
+        public Vector2 Position2 => _position2;
 
         /// <summary>
         /// Gets the delta information for the first touch-point in the gesture sample.
         /// </summary>
-        public Vector2 Delta
-        {
-            get
-            {
-				return this._delta;
-            }
-        }
+        public Vector2 Delta => _delta;
 
         /// <summary>
         /// Gets the delta information for the second touch-point in the gesture sample.
         /// </summary>
-        public Vector2 Delta2
-        {
-            get
-            {
-				return this._delta2;
-            }
-        }
-		#endregion
-		
+        public Vector2 Delta2 => _delta2;
+        #endregion
+
         /// <summary>
         /// Initializes a new <see cref="GestureSample"/>.
         /// </summary>
@@ -136,12 +100,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <param name="delta2"></param>
         public GestureSample(GestureType gestureType, TimeSpan timestamp, Vector2 position, Vector2 position2, Vector2 delta, Vector2 delta2)
         {
-			this._gestureType = gestureType;
-			this._timestamp = timestamp;
-			this._position = position;
-			this._position2 = position2;
-			this._delta = delta;
-			this._delta2 = delta2;
+			_gestureType = gestureType;
+			_timestamp = timestamp;
+			_position = position;
+			_position2 = position2;
+			_delta = delta;
+			_delta2 = delta2;
         }
     }
 }

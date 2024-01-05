@@ -2,16 +2,15 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using Microsoft.Xna.Framework.Audio;
 
 
 namespace Microsoft.Xna.Framework.Content
 {
-	internal class SoundEffectReader : ContentTypeReader<SoundEffect>
-	{
-		protected internal override SoundEffect Read(ContentReader input, SoundEffect existingInstance)
-		{         
+    internal class SoundEffectReader : ContentTypeReader<SoundEffect>
+    {
+        public override SoundEffect Read(ContentReader input, SoundEffect existingInstance)
+        {
             // XNB format for SoundEffect...
             //            
             // Byte [format size]	Format	WAVEFORMATEX structure
@@ -35,7 +34,7 @@ namespace Microsoft.Xna.Framework.Content
             // We let the sound effect deal with parsing this based
             // on what format the audio data actually is.
 
-		    var headerSize = input.ReadInt32();
+            var headerSize = input.ReadInt32();
             var header = input.ReadBytes(headerSize);
 
             // Read the audio data buffer.
@@ -57,5 +56,5 @@ namespace Microsoft.Xna.Framework.Content
 
             return effect;
         }
-	}
+    }
 }

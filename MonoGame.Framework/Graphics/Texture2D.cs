@@ -2,11 +2,12 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using Microsoft.Xna.Framework.Graphics.PackedVector;
+
+using MonoGame.Framework.Utilities;
+
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
-using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -19,23 +20,27 @@ namespace Microsoft.Xna.Framework.Graphics
             SwapChainRenderTarget,
         }
 
-		internal int width;
-		internal int height;
+        internal int width;
+        internal int height;
+        internal float texelWidth;
+        internal float texelHeight;
         internal int ArraySize;
-                
-        internal float TexelWidth { get; private set; }
-        internal float TexelHeight { get; private set; }
+        /// <summary>
+        /// Gets the width of the texture in pixels.
+        /// </summary>
+        public int Width => width;
+
+        /// <summary>
+        /// Gets the height of the texture in pixels.
+        /// </summary>
+        public int Height => height;
+        public float TexelWidth => texelWidth;
+        public float TexelHeight => texelHeight;
 
         /// <summary>
         /// Gets the dimensions of the texture
         /// </summary>
-        public Rectangle Bounds
-        {
-            get
-            {
-				return new Rectangle(0, 0, this.width, this.height);
-            }
-        }
+        public Rectangle Bounds => new Rectangle(0, 0, width, height);
 
         /// <summary>
         /// Creates a new texture of the given size
@@ -49,7 +54,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Creates a new texture of a given size with a surface format and optional mipmaps 
+        /// Creates a new texture of a given size with a surface format and optional mipmaps
         /// </summary>
         /// <param name="graphicsDevice"></param>
         /// <param name="width"></param>
@@ -74,7 +79,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, int arraySize)
             : this(graphicsDevice, width, height, mipmap, format, SurfaceType.Texture, false, arraySize)
         {
-            
+
         }
 
         /// <summary>
@@ -90,55 +95,33 @@ namespace Microsoft.Xna.Framework.Graphics
             : this(graphicsDevice, width, height, mipmap, format, type, false, 1)
         {
         }
-        
+
         protected Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared, int arraySize)
-		{
+        {
             if (graphicsDevice == null)
                 throw new ArgumentNullException("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
             if (width <= 0)
-                throw new ArgumentOutOfRangeException("width","Texture width must be greater than zero");
+                throw new ArgumentOutOfRangeException("width", "Texture width must be greater than zero");
             if (height <= 0)
-                throw new ArgumentOutOfRangeException("height","Texture height must be greater than zero");
+                throw new ArgumentOutOfRangeException("height", "Texture height must be greater than zero");
             if (arraySize > 1 && !graphicsDevice.GraphicsCapabilities.SupportsTextureArrays)
                 throw new ArgumentException("Texture arrays are not supported on this graphics device", "arraySize");
 
-            this.GraphicsDevice = graphicsDevice;
+            GraphicsDevice = graphicsDevice;
             this.width = width;
             this.height = height;
-            this.TexelWidth = 1f / (float)width;
-            this.TexelHeight = 1f / (float)height;
+            texelWidth = 1f / width;
+            texelHeight = 1f / height;
 
-            this._format = format;
-            this._levelCount = mipmap ? CalculateMipLevels(width, height) : 1;
-            this.ArraySize = arraySize;
+            _format = format;
+            _levelCount = mipmap ? CalculateMipLevels(width, height) : 1;
+            ArraySize = arraySize;
 
             // Texture will be assigned by the swap chain.
-		    if (type == SurfaceType.SwapChainRenderTarget)
-		        return;
+            if (type == SurfaceType.SwapChainRenderTarget)
+                return;
 
             PlatformConstruct(width, height, mipmap, format, type, shared);
-        }
-
-        /// <summary>
-        /// Gets the width of the texture in pixels.
-        /// </summary>
-        public int Width
-        {
-            get
-            {
-                return width;
-            }
-        }
-
-        /// <summary>
-        /// Gets the height of the texture in pixels.
-        /// </summary>
-        public int Height
-        {
-            get
-            {
-                return height;
-            }
         }
 
         /// <summary>
@@ -155,8 +138,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="elementCount"></param>
         public void SetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
-            Rectangle checkedRect;
-            ValidateParams(level, arraySlice, rect, data, startIndex, elementCount, out checkedRect);
+            ValidateParams(level, arraySlice, rect, data, startIndex, elementCount, out Rectangle checkedRect);
             PlatformSetData(level, arraySlice, checkedRect, data, startIndex, elementCount);
         }
 
@@ -169,10 +151,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="data">New data for the texture</param>
         /// <param name="startIndex">Start position of data</param>
         /// <param name="elementCount"></param>
-        public void SetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct 
+        public void SetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
-            Rectangle checkedRect;
-            ValidateParams(level, 0, rect, data, startIndex, elementCount, out checkedRect);
+            ValidateParams(level, 0, rect, data, startIndex, elementCount, out Rectangle checkedRect);
             if (rect.HasValue)
                 PlatformSetData(level, 0, checkedRect, data, startIndex, elementCount);
             else
@@ -186,22 +167,20 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="data">New data for the texture</param>
         /// <param name="startIndex">Start position of data</param>
         /// <param name="elementCount"></param>
-		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
+        public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
-            Rectangle checkedRect;
-            ValidateParams(0, 0, null, data, startIndex, elementCount, out checkedRect);
+            ValidateParams(0, 0, null, data, startIndex, elementCount, out Rectangle checkedRect);
             PlatformSetData(0, data, startIndex, elementCount);
         }
 
-		/// <summary>
+        /// <summary>
         /// Changes the texture's pixels
         /// </summary>
         /// <typeparam name="T">New data for the texture</typeparam>
         /// <param name="data"></param>
-		public void SetData<T>(T[] data) where T : struct
-		{
-            Rectangle checkedRect;
-            ValidateParams(0, 0, null, data, 0, data.Length, out checkedRect);
+        public void SetData<T>(T[] data) where T : struct
+        {
+            ValidateParams(0, 0, null, data, 0, data.Length, out Rectangle checkedRect);
             PlatformSetData(0, data, 0, data.Length);
         }
 
@@ -219,8 +198,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="elementCount">Number of pixels to read</param>
         public void GetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
-            Rectangle checkedRect;
-            ValidateParams(level, arraySlice, rect, data, startIndex, elementCount, out checkedRect);
+            ValidateParams(level, arraySlice, rect, data, startIndex, elementCount, out Rectangle checkedRect);
             PlatformGetData(level, arraySlice, checkedRect, data, startIndex, elementCount);
         }
 
@@ -237,7 +215,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="elementCount">Number of pixels to read</param>
         public void GetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
-            this.GetData(level, 0, rect, data, startIndex, elementCount);
+            GetData(level, 0, rect, data, startIndex, elementCount);
         }
 
         /// <summary>
@@ -249,10 +227,10 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="data">Destination array for the texture data</param>
         /// <param name="startIndex">First position in data where to write the pixel data</param>
         /// <param name="elementCount">Number of pixels to read</param>
-		public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
-		{
-			this.GetData(0, null, data, startIndex, elementCount);
-		}
+        public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
+        {
+            GetData(0, null, data, startIndex, elementCount);
+        }
 
         /// <summary>
         /// Retrieves the contents of the texture
@@ -261,12 +239,12 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="data">Destination array for the texture data</param>
-        public void GetData<T> (T[] data) where T : struct
-		{
-		    if (data == null)
-		        throw new ArgumentNullException("data");
-			this.GetData(0, null, data, 0, data.Length);
-		}
+        public void GetData<T>(T[] data) where T : struct
+        {
+            if (data == null)
+                throw new ArgumentNullException("data");
+            GetData(0, null, data, 0, data.Length);
+        }
 
         /// <summary>
         /// Creates a <see cref="Texture2D"/> from a file, supported formats bmp, gif, jpg, png, tif and dds (only for simple textures).
@@ -277,7 +255,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="path">The path to the image file.</param>
         /// <param name="colorProcessor">Function that is applied to the data in RGBA format before the texture is sent to video memory. Could be null(no processing then).</param>
         /// <returns>The <see cref="Texture2D"/> created from the given file.</returns>
-        /// <remarks>Note that different image decoders may generate slight differences between platforms, but perceptually 
+        /// <remarks>Note that different image decoders may generate slight differences between platforms, but perceptually
         /// the images should be identical.
         /// </remarks>
         public static Texture2D FromFile(GraphicsDevice graphicsDevice, string path, Action<byte[]> colorProcessor)
@@ -297,7 +275,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="graphicsDevice">The graphics device to use to create the texture.</param>
         /// <param name="path">The path to the image file.</param>
         /// <returns>The <see cref="Texture2D"/> created from the given file.</returns>
-        /// <remarks>Note that different image decoders may generate slight differences between platforms, but perceptually 
+        /// <remarks>Note that different image decoders may generate slight differences between platforms, but perceptually
         /// the images should be identical.  This call does not premultiply the image alpha, but areas of zero alpha will
         /// result in black color data.
         /// </remarks>
@@ -314,11 +292,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="stream">The stream from which to read the image data.</param>
         /// <param name="colorProcessor">Function that is applied to the data in RGBA format before the texture is sent to video memory. Could be null(no processing then).</param>
         /// <returns>The <see cref="Texture2D"/> created from the image stream.</returns>
-        /// <remarks>Note that different image decoders may generate slight differences between platforms, but perceptually 
+        /// <remarks>Note that different image decoders may generate slight differences between platforms, but perceptually
         /// the images should be identical.
         /// </remarks>
         public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream, Action<byte[]> colorProcessor)
-		{
+        {
             if (graphicsDevice == null)
                 throw new ArgumentNullException("graphicsDevice");
             if (stream == null)
@@ -328,7 +306,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 return PlatformFromStream(graphicsDevice, stream, colorProcessor);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new InvalidOperationException("This image format is not supported", e);
             }
@@ -341,7 +319,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="graphicsDevice">The graphics device to use to create the texture.</param>
         /// <param name="stream">The stream from which to read the image data.</param>
         /// <returns>The <see cref="Texture2D"/> created from the image stream.</returns>
-        /// <remarks>Note that different image decoders may generate slight differences between platforms, but perceptually 
+        /// <remarks>Note that different image decoders may generate slight differences between platforms, but perceptually
         /// the images should be identical.  This call does not premultiply the image alpha, but areas of zero alpha will
         /// result in black color data.
         /// </remarks>
@@ -372,7 +350,7 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformSaveAsPng(stream, width, height);
         }
 
-        // This method allows games that use Texture2D.FromStream 
+        // This method allows games that use Texture2D.FromStream
         // to reload their textures after the GL context is lost.
         public void Reload(Stream textureStream)
         {
@@ -386,7 +364,7 @@ namespace Microsoft.Xna.Framework.Graphics
             for (int i = 0; i < pixelCount; ++i)
             {
                 uint pixel = (uint)pixels[i];
-                pixels[i] = (int)((pixel & 0xFF00FF00) | ((pixel & 0x00FF0000) >> 16) | ((pixel & 0x000000FF) << 16));
+                pixels[i] = (int)(pixel & 0xFF00FF00 | (pixel & 0x00FF0000) >> 16 | (pixel & 0x000000FF) << 16);
             }
         }
 
@@ -417,13 +395,12 @@ namespace Microsoft.Xna.Framework.Graphics
             int dataByteSize;
             if (Format.IsCompressedFormat())
             {
-                int blockWidth, blockHeight;
-                Format.GetBlockSize(out blockWidth, out blockHeight);
+                Format.GetBlockSize(out int blockWidth, out int blockHeight);
                 int blockWidthMinusOne = blockWidth - 1;
                 int blockHeightMinusOne = blockHeight - 1;
                 // round x and y down to next multiple of block size; width and height up to next multiple of block size
-                var roundedWidth = (checkedRect.Width + blockWidthMinusOne) & ~blockWidthMinusOne;
-                var roundedHeight = (checkedRect.Height + blockHeightMinusOne) & ~blockHeightMinusOne;
+                var roundedWidth = checkedRect.Width + blockWidthMinusOne & ~blockWidthMinusOne;
+                var roundedHeight = checkedRect.Height + blockHeightMinusOne & ~blockHeightMinusOne;
                 checkedRect = new Rectangle(checkedRect.X & ~blockWidthMinusOne, checkedRect.Y & ~blockHeightMinusOne,
 #if OPENGL
                     // OpenGL only: The last two mip levels require the width and height to be
@@ -453,8 +430,8 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             if (elementCount * tSize != dataByteSize)
                 throw new ArgumentException(string.Format("elementCount is not the right size, " +
-                                            "elementCount * sizeof(T) is {0}, but data size is {1}.",
-                                            elementCount * tSize, dataByteSize), "elementCount");
+                                                          "elementCount * sizeof(T) is {0}, but data size is {1}.",
+                    elementCount * tSize, dataByteSize), "elementCount");
         }
 
         internal Color[] GetColorData()

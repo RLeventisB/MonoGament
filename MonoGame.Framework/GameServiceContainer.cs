@@ -59,9 +59,8 @@ namespace Microsoft.Xna.Framework
         {
             if (type == null)
                 throw new ArgumentNullException("type");
-						
-            object service;
-            if (services.TryGetValue(type, out service))
+
+            if (services.TryGetValue(type, out object service))
                 return service;
 
             return null;
@@ -104,9 +103,6 @@ namespace Microsoft.Xna.Framework
  	public T GetService<T>() where T : class
         {
             var service = GetService(typeof(T));
-
-            if (service == null)
-                return null;
 
             return (T)service;
         }

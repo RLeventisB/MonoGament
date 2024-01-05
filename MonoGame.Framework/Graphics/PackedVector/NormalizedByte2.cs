@@ -34,20 +34,14 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         [CLSCompliant(false)]
         public ushort PackedValue
         {
-            get
-            {
-                return _packed;
-            }
-            set
-            {
-                _packed = value;
-            }
+            get => _packed;
+            set => _packed = value;
         }
 
         public override bool Equals(object obj)
         {
-            return (obj is NormalizedByte2) &&
-                    ((NormalizedByte2)obj)._packed == _packed;
+            return obj is NormalizedByte2 byte2 &&
+                   byte2._packed == _packed;
         }
 
         public bool Equals(NormalizedByte2 other)
@@ -67,8 +61,8 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 
         private static ushort Pack(float x, float y)
         {
-            var byte2 = (((ushort) MathF.Round(MathHelper.Clamp(x, -1.0f, 1.0f) * 127.0f)) & 0xFF) << 0;
-            var byte1 = (((ushort) MathF.Round(MathHelper.Clamp(y, -1.0f, 1.0f) * 127.0f)) & 0xFF) << 8;
+            var byte2 = ((ushort)MathF.Round(MathHelper.Clamp(x, -1.0f, 1.0f) * 127.0f) & 0xFF) << 0;
+            var byte1 = ((ushort)MathF.Round(MathHelper.Clamp(y, -1.0f, 1.0f) * 127.0f) & 0xFF) << 8;
 
             return (ushort)(byte2 | byte1);
         }
@@ -90,8 +84,8 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         public Vector2 ToVector2()
         {
             return new Vector2(
-                ((sbyte) ((_packed >> 0) & 0xFF)) / 127.0f,
-                ((sbyte) ((_packed >> 8) & 0xFF)) / 127.0f);
+                (sbyte)(_packed >> 0 & 0xFF) / 127.0f,
+                (sbyte)(_packed >> 8 & 0xFF) / 127.0f);
         }
     }
 }

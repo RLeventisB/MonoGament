@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+
 using MonoGame.OpenAL;
 
 namespace Microsoft.Xna.Framework.Audio
@@ -130,35 +131,35 @@ namespace Microsoft.Xna.Framework.Audio
                 switch (chunkType)
                 {
                     case "fmt ":
-                        {
-                            audioFormat = reader.ReadInt16(); // 2
-                            channels = reader.ReadInt16(); // 4
-                            frequency = reader.ReadInt32();  // 8
-                            int byteRate = reader.ReadInt32();    // 12
-                            blockAlignment = (int)reader.ReadInt16();  // 14
-                            bitsPerSample = reader.ReadInt16(); // 16
+                    {
+                        audioFormat = reader.ReadInt16(); // 2
+                        channels = reader.ReadInt16(); // 4
+                        frequency = reader.ReadInt32(); // 8
+                        int byteRate = reader.ReadInt32(); // 12
+                        blockAlignment = reader.ReadInt16(); // 14
+                        bitsPerSample = reader.ReadInt16(); // 16
 
-                            // Read extra data if present
-                            if (chunkSize > 16)
+                        // Read extra data if present
+                        if (chunkSize > 16)
+                        {
+                            int extraDataSize = reader.ReadInt16();
+                            if (audioFormat == FormatIma4)
                             {
-                                int extraDataSize = reader.ReadInt16();
-                                if (audioFormat == FormatIma4)
+                                samplesPerBlock = reader.ReadInt16();
+                                extraDataSize -= 2;
+                            }
+                            if (extraDataSize > 0)
+                            {
+                                if (reader.BaseStream.CanSeek)
+                                    reader.BaseStream.Seek(extraDataSize, SeekOrigin.Current);
+                                else
                                 {
-                                    samplesPerBlock = reader.ReadInt16();
-                                    extraDataSize -= 2;
-                                }
-                                if (extraDataSize > 0)
-                                {
-                                    if (reader.BaseStream.CanSeek)
-                                        reader.BaseStream.Seek(extraDataSize, SeekOrigin.Current);
-                                    else
-                                    {
-                                        for (int i = 0; i < extraDataSize; ++i)
-                                            reader.ReadByte();
-                                    }
+                                    for (int i = 0; i < extraDataSize; ++i)
+                                        reader.ReadByte();
                                 }
                             }
                         }
+                    }
                         break;
                     case "fact":
                         if (audioFormat == FormatIma4)
@@ -208,11 +209,11 @@ namespace Microsoft.Xna.Framework.Audio
                 {
                     case FormatIma4:
                     case FormatMsAdpcm:
-                        sampleCount = ((audioData.Length / blockAlignment) * samplesPerBlock) + SampleAlignment(format, audioData.Length % blockAlignment);
+                        sampleCount = audioData.Length / blockAlignment * samplesPerBlock + SampleAlignment(format, audioData.Length % blockAlignment);
                         break;
                     case FormatPcm:
                     case FormatIeee:
-                        sampleCount = audioData.Length / ((channels * bitsPerSample) / 8);
+                        sampleCount = audioData.Length / (channels * bitsPerSample / 8);
                         break;
                     default:
                         throw new InvalidDataException("Unhandled WAV format " + format.ToString());
@@ -225,7 +226,7 @@ namespace Microsoft.Xna.Framework.Audio
         // Convert buffer containing 24-bit signed PCM wav data to a 16-bit signed PCM buffer
         internal static unsafe byte[] Convert24To16(byte[] data, int offset, int count)
         {
-            if ((offset + count > data.Length) || ((count % 3) != 0))
+            if (offset + count > data.Length || count % 3 != 0)
                 throw new ArgumentException("Invalid 24-bit PCM data received");
             // Sample count includes both channels if stereo
             var sampleCount = count / 3;
@@ -252,7 +253,7 @@ namespace Microsoft.Xna.Framework.Audio
         // Convert buffer containing IEEE 32-bit float wav data to a 16-bit signed PCM buffer
         internal static unsafe byte[] ConvertFloatTo16(byte[] data, int offset, int count)
         {
-            if ((offset + count > data.Length) || ((count % 4) != 0))
+            if (offset + count > data.Length || count % 4 != 0)
                 throw new ArgumentException("Invalid 32-bit float PCM data received");
             // Sample count includes both channels if stereo
             var sampleCount = count / 4;
@@ -276,7 +277,6 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         #region IMA4 decoding
-
         // Step table
         static int[] stepTable = new int[]
         {
@@ -343,11 +343,11 @@ namespace Microsoft.Xna.Framework.Audio
             ImaState channel0 = new ImaState();
             ImaState channel1 = new ImaState();
 
-            int sampleCountFullBlock = ((blockAlignment / channels) - 4) / 4 * 8 + 1;
+            int sampleCountFullBlock = (blockAlignment / channels - 4) / 4 * 8 + 1;
             int sampleCountLastBlock = 0;
-            if ((count % blockAlignment) > 0)
-                sampleCountLastBlock = (((count % blockAlignment) / channels) - 4) / 4 * 8 + 1;
-            int sampleCount = ((count / blockAlignment) * sampleCountFullBlock) + sampleCountLastBlock;
+            if (count % blockAlignment > 0)
+                sampleCountLastBlock = (count % blockAlignment / channels - 4) / 4 * 8 + 1;
+            int sampleCount = count / blockAlignment * sampleCountFullBlock + sampleCountLastBlock;
             var samples = new byte[sampleCount * sizeof(short) * channels];
             int sampleOffset = 0;
 
@@ -425,7 +425,7 @@ namespace Microsoft.Xna.Framework.Audio
                 {
                     for (int nibbles = 2 * (blockSize - 4); nibbles > 0; nibbles -= 2)
                     {
-                        index = (sampleOffset * 2);
+                        index = sampleOffset * 2;
                         int b = buffer[offset];
                         int sample = AdpcmImaWavExpandNibble(ref channel0, b & 0x0f);
                         samples[index] = (byte)sample;
@@ -443,11 +443,9 @@ namespace Microsoft.Xna.Framework.Audio
 
             return samples;
         }
-
         #endregion
 
         #region MS-ADPCM decoding
-
         static int[] adaptationTable = new int[]
         {
             230, 230, 230, 230, 307, 409, 512, 614,
@@ -475,8 +473,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         static int AdpcmMsExpandNibble(ref MsAdpcmState channel, int nibble)
         {
-            int nibbleSign = nibble - (((nibble & 0x08) != 0) ? 0x10 : 0);
-            int predictor = ((channel.sample1 * channel.coeff1) + (channel.sample2 * channel.coeff2)) / 256 + (nibbleSign * channel.delta);
+            int nibbleSign = nibble - ((nibble & 0x08) != 0 ? 0x10 : 0);
+            int predictor = (channel.sample1 * channel.coeff1 + channel.sample2 * channel.coeff2) / 256 + nibbleSign * channel.delta;
 
             if (predictor < -32768)
                 predictor = -32768;
@@ -486,7 +484,7 @@ namespace Microsoft.Xna.Framework.Audio
             channel.sample2 = channel.sample1;
             channel.sample1 = predictor;
 
-            channel.delta = (adaptationTable[nibble] * channel.delta) / 256;
+            channel.delta = adaptationTable[nibble] * channel.delta / 256;
             if (channel.delta < 16)
                 channel.delta = 16;
 
@@ -500,11 +498,11 @@ namespace Microsoft.Xna.Framework.Audio
             MsAdpcmState channel1 = new MsAdpcmState();
             int blockPredictor;
 
-            int sampleCountFullBlock = ((blockAlignment / channels) - 7) * 2 + 2;
+            int sampleCountFullBlock = (blockAlignment / channels - 7) * 2 + 2;
             int sampleCountLastBlock = 0;
-            if ((count % blockAlignment) > 0)
-                sampleCountLastBlock = (((count % blockAlignment) / channels) - 7) * 2 + 2;
-            int sampleCount = ((count / blockAlignment) * sampleCountFullBlock) + sampleCountLastBlock;
+            if (count % blockAlignment > 0)
+                sampleCountLastBlock = (count % blockAlignment / channels - 7) * 2 + 2;
+            int sampleCount = count / blockAlignment * sampleCountFullBlock + sampleCountLastBlock;
             var samples = new byte[sampleCount * sizeof(short) * channels];
             int sampleOffset = 0;
 
@@ -517,7 +515,7 @@ namespace Microsoft.Xna.Framework.Audio
                     blockSize = count;
                 count -= blockAlignment;
 
-                int totalSamples = ((blockSize / channels) - 7) * 2 + 2;
+                int totalSamples = (blockSize / channels - 7) * 2 + 2;
                 if (totalSamples < 2)
                     break;
 
@@ -601,7 +599,7 @@ namespace Microsoft.Xna.Framework.Audio
                     sampleOffset += 4;
                 }
 
-                blockSize -= (offset - offsetStart);
+                blockSize -= offset - offsetStart;
                 if (stereo)
                 {
                     for (int i = 0; i < blockSize; ++i)
@@ -642,7 +640,6 @@ namespace Microsoft.Xna.Framework.Audio
 
             return samples;
         }
-
         #endregion
     }
 }

@@ -42,10 +42,10 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns><c>true</c> if <c>left</c> and <c>right</c> are equal; otherwise, <c>false</c>.</returns>
         public static bool operator ==(JoystickHat left, JoystickHat right)
         {
-            return (left.Down == right.Down) &&
-                (left.Left == right.Left) &&
-                (left.Right == right.Right) &&
-                (left.Up == right.Up);
+            return left.Down == right.Down &&
+                   left.Left == right.Left &&
+                   left.Right == right.Right &&
+                   left.Up == right.Up;
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <see cref="T:Microsoft.Xna.Framework.Input.JoystickHat"/>; otherwise, <c>false</c>.</returns>
         public override bool Equals(object obj)
         {
-            return (obj is JoystickHat) && (this == (JoystickHat)obj);
+            return obj is JoystickHat hat && this == hat;
         }
 
         /// <summary>
@@ -81,13 +81,13 @@ namespace Microsoft.Xna.Framework.Input
             var hash = 0;
 
             if (Left == ButtonState.Pressed)
-                hash |= (1 << 3);
+                hash |= 1 << 3;
             if (Up == ButtonState.Pressed)
-                hash |= (1 << 2);
+                hash |= 1 << 2;
             if (Right == ButtonState.Pressed)
-                hash |= (1 << 1);
+                hash |= 1 << 1;
             if (Down == ButtonState.Pressed)
-                hash |= (1 << 0);
+                hash |= 1 << 0;
 
             return hash;
         }
@@ -102,4 +102,3 @@ namespace Microsoft.Xna.Framework.Input
         }
     }
 }
-

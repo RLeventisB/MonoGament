@@ -2,10 +2,10 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using MonoGame.Framework.Utilities;
+
 using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework.Content;
-using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -17,18 +17,15 @@ namespace Microsoft.Xna.Framework.Content
         {
         }
 
-        protected internal override void Initialize(ContentTypeReaderManager manager)
+        public override void Initialize(ContentTypeReaderManager manager)
         {
-			Type readerType = typeof(T);
-			elementReader = manager.GetTypeReader(readerType);
+            Type readerType = typeof(T);
+            elementReader = manager.GetTypeReader(readerType);
         }
 
-        public override bool CanDeserializeIntoExistingObject
-        {
-            get { return true; }
-        }
+        public override bool CanDeserializeIntoExistingObject => true;
 
-        protected internal override List<T> Read(ContentReader input, List<T> existingInstance)
+        public override List<T> Read(ContentReader input, List<T> existingInstance)
         {
             int count = input.ReadInt32();
             List<T> list = existingInstance;
@@ -36,14 +33,14 @@ namespace Microsoft.Xna.Framework.Content
             for (int i = 0; i < count; i++)
             {
                 if (ReflectionHelpers.IsValueType(typeof(T)))
-				{
-                	list.Add(input.ReadObject<T>(elementReader));
-				}
-				else
-				{
+                {
+                    list.Add(input.ReadObject<T>(elementReader));
+                }
+                else
+                {
                     var readerType = input.Read7BitEncodedInt();
-                	list.Add(readerType > 0 ? input.ReadObject<T>(input.TypeReaders[readerType - 1]) : default(T));
-				}
+                    list.Add(readerType > 0 ? input.ReadObject<T>(input.TypeReaders[readerType - 1]) : default(T));
+                }
             }
             return list;
         }

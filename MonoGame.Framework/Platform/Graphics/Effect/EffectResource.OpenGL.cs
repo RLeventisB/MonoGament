@@ -4,7 +4,7 @@
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    internal partial class EffectResource
+    public partial class EffectResource
     {
         const string AlphaTestEffectName = "Microsoft.Xna.Framework.Platform.Graphics.Effect.Resources.AlphaTestEffect.ogl.mgfxo";
         const string BasicEffectName = "Microsoft.Xna.Framework.Platform.Graphics.Effect.Resources.BasicEffect.ogl.mgfxo";

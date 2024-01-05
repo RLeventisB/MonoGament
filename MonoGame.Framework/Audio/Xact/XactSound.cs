@@ -23,8 +23,8 @@ namespace Microsoft.Xna.Framework.Audio
         private bool _streaming;
 
         private float _cueVolume = 1;
-        private float _cuePitch = 0;
-        private float _cueReverbMix = 0;
+        private float _cuePitch;
+        private float _cueReverbMix;
         private float? _cueFilterFrequency;
         private float? _cueFilterQFactor;
 
@@ -116,10 +116,7 @@ namespace Microsoft.Xna.Framework.Audio
                 foreach (var sound in _soundClips)
                     sound.SetFade(fadeInTime, fadeOutTime);
             }
-            else
-            {
-                // TODO:
-            }
+            // TODO:
         }
 
         public void Play(float volume, AudioEngine engine)

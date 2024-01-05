@@ -17,33 +17,27 @@ namespace Microsoft.Xna.Framework.Graphics
             Normal = normal;
         }
 
-        VertexDeclaration IVertexType.VertexDeclaration
-        {
-            get
-            {
-                return VertexDeclaration;
-            }
-        }
+        VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
 
         public override int GetHashCode()
         {
             unchecked
             {
                 var hashCode = Position.GetHashCode();
-                hashCode = (hashCode * 397) ^ Color.GetHashCode();
-                hashCode = (hashCode * 397) ^ Normal.GetHashCode();
+                hashCode = hashCode * 397 ^ Color.GetHashCode();
+                hashCode = hashCode * 397 ^ Normal.GetHashCode();
                 return hashCode;
             }
         }
 
         public override string ToString()
         {
-            return "{{Position:" + this.Position + " Color:" + this.Color + " Normal:" + this.Normal + "}}";
+            return "{{Position:" + Position + " Color:" + Color + " Normal:" + Normal + "}}";
         }
 
         public static bool operator ==(VertexPositionColorNormal left, VertexPositionColorNormal right)
         {
-            return (((left.Position == right.Position) && (left.Color == right.Color)) && (left.Normal == right.Normal));
+            return left.Position == right.Position && left.Color == right.Color && left.Normal == right.Normal;
         }
 
         public static bool operator !=(VertexPositionColorNormal left, VertexPositionColorNormal right)
@@ -56,10 +50,10 @@ namespace Microsoft.Xna.Framework.Graphics
             if (obj == null)
                 return false;
 
-            if (obj.GetType() != base.GetType())
+            if (obj.GetType() != GetType())
                 return false;
 
-            return (this == ((VertexPositionColorNormal)obj));
+            return this == (VertexPositionColorNormal)obj;
         }
 
         static VertexPositionColorNormal()

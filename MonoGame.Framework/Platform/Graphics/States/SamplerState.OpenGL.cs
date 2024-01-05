@@ -13,7 +13,7 @@ namespace Microsoft.Xna.Framework.Graphics
   {
       private readonly float[] _openGLBorderColor = new float[4];
 
-        internal const TextureParameterName TextureParameterNameTextureMaxAnisotropy = (TextureParameterName)ExtTextureFilterAnisotropic.TextureMaxAnisotropyExt;
+        internal const TextureParameterName TextureParameterNameTextureMaxAnisotropy = ExtTextureFilterAnisotropic.TextureMaxAnisotropyExt;
         internal const TextureParameterName TextureParameterNameTextureMaxLevel = TextureParameterName.TextureMaxLevel;
 
         internal void Activate(GraphicsDevice device, TextureTarget target, bool useMipmaps = false)
@@ -53,7 +53,7 @@ namespace Microsoft.Xna.Framework.Graphics
       case TextureFilter.Anisotropic:
 				if (GraphicsDevice.GraphicsCapabilities.SupportsTextureFilterAnisotropic)
                 {
-                    GL.TexParameter(target, TextureParameterNameTextureMaxAnisotropy, MathHelper.Clamp(this.MaxAnisotropy, 1.0f, GraphicsDevice.GraphicsCapabilities.MaxTextureAnisotropy));
+                    GL.TexParameter(target, TextureParameterNameTextureMaxAnisotropy, MathHelper.Clamp(MaxAnisotropy, 1.0f, GraphicsDevice.GraphicsCapabilities.MaxTextureAnisotropy));
                     GraphicsExtensions.CheckGLError();
                 }
         GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear));
@@ -132,9 +132,9 @@ namespace Microsoft.Xna.Framework.Graphics
       }
 
       // Set up texture addressing.
-      GL.TexParameter(target, TextureParameterName.TextureWrapS, (int)GetWrapMode(AddressU));
+      GL.TexParameter(target, TextureParameterName.TextureWrapS, GetWrapMode(AddressU));
             GraphicsExtensions.CheckGLError();
-            GL.TexParameter(target, TextureParameterName.TextureWrapT, (int)GetWrapMode(AddressV));
+            GL.TexParameter(target, TextureParameterName.TextureWrapT, GetWrapMode(AddressV));
             GraphicsExtensions.CheckGLError();
 #if !GLES
             // Border color is not supported by glTexParameter in OpenGL ES 2.0
@@ -166,9 +166,9 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
             if (GraphicsDevice.GraphicsCapabilities.SupportsTextureMaxLevel)
             {
-                if (this.MaxMipLevel > 0)
+                if (MaxMipLevel > 0)
                 {
-                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterNameTextureMaxLevel, this.MaxMipLevel);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterNameTextureMaxLevel, MaxMipLevel);
                 }
                 else
                 {

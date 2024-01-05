@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework.Input
         /// START button.
         /// </summary>
         Start = 16,
-      
+
         /// <summary>
         /// BACK button.
         /// </summary>
@@ -71,7 +71,7 @@ namespace Microsoft.Xna.Framework.Input
         /// Big button.
         /// </summary>    
         BigButton = 2048,
-       
+
         /// <summary>
         /// A button.
         /// </summary>
@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <summary>
         /// Y button.
         /// </summary>
-        Y = 32768,    
+        Y = 32768,
 
         /// <summary>
         /// Left stick is towards the left.
@@ -140,6 +140,14 @@ namespace Microsoft.Xna.Framework.Input
         /// <summary>
         /// Left stick is towards the right.
         /// </summary>
-        LeftThumbstickRight = 1073741824
+        LeftThumbstickRight = 1073741824,
+
+        // Extensions
+        Misc1EXT = 0x00000400,
+        Paddle1EXT = 0x00010000,
+        Paddle2EXT = 0x00020000,
+        Paddle3EXT = 0x00040000,
+        Paddle4EXT = 0x00080000,
+        TouchPadEXT = 0x00100000
     }
 }

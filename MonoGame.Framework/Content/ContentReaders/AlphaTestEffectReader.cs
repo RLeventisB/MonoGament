@@ -8,7 +8,7 @@ namespace Microsoft.Xna.Framework.Content
 {
     class AlphaTestEffectReader : ContentTypeReader<AlphaTestEffect>
     {
-        protected internal override AlphaTestEffect Read(ContentReader input, AlphaTestEffect existingInstance)
+        public override AlphaTestEffect Read(ContentReader input, AlphaTestEffect existingInstance)
         {
             var effect = new AlphaTestEffect(input.GetGraphicsDevice());
 

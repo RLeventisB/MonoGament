@@ -2,12 +2,10 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Runtime.InteropServices;
 using MonoGame.OpenGL;
+
+using System;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -32,14 +30,14 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (ibo == 0)
             {
-                var sizeInBytes = IndexCount * (this.IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
+                var sizeInBytes = IndexCount * (IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
 
                 GL.GenBuffers(1, out ibo);
                 GraphicsExtensions.CheckGLError();
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
                 GraphicsExtensions.CheckGLError();
                 GL.BufferData(BufferTarget.ElementArrayBuffer,
-                              (IntPtr)sizeInBytes, IntPtr.Zero, _isDynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
+                              sizeInBytes, IntPtr.Zero, _isDynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
                 GraphicsExtensions.CheckGLError();
             }
         }
@@ -127,13 +125,13 @@ namespace Microsoft.Xna.Framework.Graphics
                     // to the device to discard the previous content.
                     GL.BufferData(
                         BufferTarget.ElementArrayBuffer,
-                        (IntPtr)bufferSize,
+                        bufferSize,
                         IntPtr.Zero,
                         _isDynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
                     GraphicsExtensions.CheckGLError();
                 }
 
-                GL.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)sizeInBytes, dataPtr);
+                GL.BufferSubData(BufferTarget.ElementArrayBuffer, offsetInBytes, sizeInBytes, dataPtr);
                 GraphicsExtensions.CheckGLError();
             }
             finally
@@ -146,13 +144,12 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed)
             {
-                if (GraphicsDevice != null)
-                    GraphicsDevice.DisposeBuffer(ibo);
+                GraphicsDevice?.DisposeBuffer(ibo);
             }
             base.Dispose(disposing);
         }
 
-        struct SetDataState<T>
+        public struct SetDataState<T>
             where T : struct
         {
             public IndexBuffer buffer;

@@ -16,24 +16,21 @@ namespace Microsoft.Xna.Framework
     public struct Ray : IEquatable<Ray>
     {
         #region Public Fields
-
         /// <summary>
         /// The direction of this <see cref="Ray"/>.
         /// </summary>
         [DataMember]
         public Vector3 Direction;
-      
+
         /// <summary>
         /// The origin of this <see cref="Ray"/>.
         /// </summary>
         [DataMember]
         public Vector3 Position;
-
         #endregion
 
 
         #region Public Constructors
-
         /// <summary>
         /// Create a <see cref="Ray"/>.
         /// </summary>
@@ -41,15 +38,13 @@ namespace Microsoft.Xna.Framework
         /// <param name="direction">The direction of the <see cref="Ray"/>.</param>
         public Ray(Vector3 position, Vector3 direction)
         {
-            this.Position = position;
-            this.Direction = direction;
+            Position = position;
+            Direction = direction;
         }
-
         #endregion
 
 
         #region Public Methods
-
         /// <summary>
         /// Check if the specified <see cref="Object"/> is equal to this <see cref="Ray"/>.
         /// </summary>
@@ -60,7 +55,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public override bool Equals(object obj)
         {
-            return (obj is Ray) && this.Equals((Ray)obj);
+            return obj is Ray ray && Equals(ray);
         }
 
         /// <summary>
@@ -73,7 +68,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public bool Equals(Ray other)
         {
-            return this.Position.Equals(other.Position) && this.Direction.Equals(other.Direction);
+            return Position.Equals(other.Position) && Direction.Equals(other.Direction);
         }
 
         /// <summary>
@@ -135,7 +130,7 @@ namespace Microsoft.Xna.Framework
                     tMaxY = temp;
                 }
 
-                if ((tMin.HasValue && tMin > tMaxY) || (tMax.HasValue && tMinY > tMax))
+                if (tMin.HasValue && tMin > tMaxY || tMax.HasValue && tMinY > tMax)
                     return null;
 
                 if (!tMin.HasValue || tMinY > tMin) tMin = tMinY;
@@ -159,7 +154,7 @@ namespace Microsoft.Xna.Framework
                     tMaxZ = temp;
                 }
 
-                if ((tMin.HasValue && tMin > tMaxZ) || (tMax.HasValue && tMinZ > tMax))
+                if (tMin.HasValue && tMin > tMaxZ || tMax.HasValue && tMinZ > tMax)
                     return null;
 
                 if (!tMin.HasValue || tMinZ > tMin) tMin = tMinZ;
@@ -168,7 +163,7 @@ namespace Microsoft.Xna.Framework
 
             // having a positive tMax and a negative tMin means the ray is inside the box
             // we expect the intesection distance to be 0 in that case
-            if ((tMin.HasValue && tMin < 0) && tMax > 0) return 0;
+            if (tMin.HasValue && tMin < 0 && tMax > 0) return 0;
 
             // a negative tMin means that the intersection point is behind the ray's origin
             // we discard these as not hitting the AABB
@@ -187,18 +182,18 @@ namespace Microsoft.Xna.Framework
         /// </param>
         public void Intersects(ref BoundingBox box, out float? result)
         {
-			result = Intersects(box);
+            result = Intersects(box);
         }
 
         /*
         public float? Intersects(BoundingFrustum frustum)
         {
             if (frustum == null)
-			{
-				throw new ArgumentNullException("frustum");
-			}
-			
-			return frustum.Intersects(this);			
+            {
+                throw new ArgumentNullException("frustum");
+            }
+
+            return frustum.Intersects(this);
         }
         */
 
@@ -212,8 +207,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public float? Intersects(BoundingSphere sphere)
         {
-            float? result;
-            Intersects(ref sphere, out result);
+            Intersects(ref sphere, out float? result);
             return result;
         }
 
@@ -227,8 +221,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public float? Intersects(Plane plane)
         {
-            float? result;
-            Intersects(ref plane, out result);
+            Intersects(ref plane, out float? result);
             return result;
         }
 
@@ -274,12 +267,11 @@ namespace Microsoft.Xna.Framework
         public void Intersects(ref BoundingSphere sphere, out float? result)
         {
             // Find the vector between where the ray starts the the sphere's centre
-            Vector3 difference = sphere.Center - this.Position;
+            Vector3 difference = sphere.Center - Position;
 
             float differenceLengthSquared = difference.LengthSquared();
             float sphereRadiusSquared = sphere.Radius * sphere.Radius;
 
-            float distanceAlongRay;
 
             // If the distance between the ray start and the sphere's centre is less than
             // the radius of the sphere, it means we've intersected. N.B. checking the LengthSquared is faster.
@@ -289,7 +281,7 @@ namespace Microsoft.Xna.Framework
                 return;
             }
 
-            Vector3.Dot(ref this.Direction, ref difference, out distanceAlongRay);
+            Vector3.Dot(ref Direction, ref difference, out float distanceAlongRay);
             // If the ray is pointing away from the sphere then we don't ever intersect
             if (distanceAlongRay < 0)
             {
@@ -304,7 +296,7 @@ namespace Microsoft.Xna.Framework
             // if x^2 + z^2 - y^2 < 0, we do not intersect
             float dist = sphereRadiusSquared + distanceAlongRay * distanceAlongRay - differenceLengthSquared;
 
-            result = (dist < 0) ? null : distanceAlongRay - (float?)MathF.Sqrt(dist);
+            result = dist < 0 ? null : distanceAlongRay - (float?)MathF.Sqrt(dist);
         }
 
         /// <summary>
@@ -329,16 +321,10 @@ namespace Microsoft.Xna.Framework
             return a.Equals(b);
         }
 
-        internal string DebugDisplayString
-        {
-            get
-            {
-                return string.Concat(
-                    "Pos( ", this.Position.DebugDisplayString, " )  \r\n",
-                    "Dir( ", this.Direction.DebugDisplayString, " )"
-                );
-            }
-        }
+        internal string DebugDisplayString => string.Concat(
+            "Pos( ", Position.DebugDisplayString, " )  \r\n",
+            "Dir( ", Direction.DebugDisplayString, " )"
+        );
 
         /// <summary>
         /// Get a <see cref="String"/> representation of this <see cref="Ray"/>.
@@ -359,7 +345,6 @@ namespace Microsoft.Xna.Framework
             position = Position;
             direction = Direction;
         }
-
         #endregion
     }
 }

@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// The next touch location identifier.
         /// The value 1 is reserved for the mouse touch point.
         /// </summary>
-        private int _nextTouchId = 2;
+        private byte _nextTouchId = 2;
 
         /// <summary>
         /// The current timestamp that we use for setting the timestamp of new TouchLocations
@@ -49,11 +49,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// The mapping between platform specific touch ids
         /// and the touch ids we assign to touch locations.
         /// </summary>
-        private readonly Dictionary<int, int> _touchIds = new Dictionary<int, int>();
+        private readonly Dictionary<int, byte> _touchIds = new Dictionary<int, byte>();
 
         internal readonly Queue<GestureSample> GestureList = new Queue<GestureSample>();
 
-        private TouchPanelCapabilities Capabilities = new TouchPanelCapabilities();
+        private TouchPanelCapabilities Capabilities;
 
         internal readonly GameWindow Window;
 
@@ -148,7 +148,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 }
             }
 
-            var result = (_touchState.Count > 0) ? new TouchCollection(_touchState.ToArray()) : TouchCollection.Empty;
+            var result = _touchState.Count > 0 ? new TouchCollection(_touchState.ToArray()) : TouchCollection.Empty;
             AgeTouches(_touchState);
             return result;
         }
@@ -169,9 +169,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
             // the same id for double tap events.
             //
             // We instead provide consistent ids by generating them
-            // ourselves on the press and looking them up on move 
+            // ourselves on the press and looking them up on move
             // and release events.
-            // 
+            //
             if (state == TouchLocationState.Pressed)
             {
                 if (isMouse)
@@ -182,12 +182,15 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 else
                 {
                     _touchIds[id] = _nextTouchId++;
+                    if (_nextTouchId >= TouchPanel.WrapIndex)
+                    {
+                        _nextTouchId = 2;
+                    }
                 }
             }
 
             // Try to find the touch id.
-            int touchId;
-            if (!_touchIds.TryGetValue(id, out touchId))
+            if (!_touchIds.TryGetValue(id, out byte touchId))
             {
                 // If we got here that means either the device is sending
                 // us bad, out of order, or old touch events.  In any case
@@ -230,12 +233,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
             var windowSize = new Vector2(Window.ClientBounds.Width, Window.ClientBounds.Height);
 
             // Recalculate the touch scale.
-            _touchScale = new Vector2(  _displaySize.X / windowSize.X,
-                                        _displaySize.Y / windowSize.Y);
+            _touchScale = new Vector2(_displaySize.X / windowSize.X,
+                _displaySize.Y / windowSize.Y);
         }
 
         /// <summary>
-        /// This will release all touch locations.  It should only be 
+        /// This will release all touch locations.  It should only be
         /// called on platforms where touch state is reset all at once.
         /// </summary>
         internal void ReleaseAllTouches()
@@ -271,10 +274,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// </summary>
         public int DisplayHeight
         {
-            get
-            {
-                return _displaySize.Y;
-            }
+            get => _displaySize.Y;
             set
             {
                 _displaySize.Y = value;
@@ -292,10 +292,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// </summary>
         public int DisplayWidth
         {
-            get
-            {
-                return _displaySize.X;
-            }
+            get => _displaySize.X;
             set
             {
                 _displaySize.X = value;
@@ -337,9 +334,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
         }
 
         #region Gesture Recognition
-
         /// <summary>
-        /// Maximum distance a touch location can wiggle and 
+        /// Maximum distance a touch location can wiggle and
         /// not be considered to have moved.
         /// </summary>
         internal const float TapJitterTolerance = 35.0f;
@@ -387,14 +383,14 @@ namespace Microsoft.Xna.Framework.Input.Touch
             //  - Drags are classified as horizontal, vertical, free, or none and stay that way.
             //
 
-            // First get a count of touch locations which 
+            // First get a count of touch locations which
             // are not in the released state.
             var heldLocations = 0;
             foreach (var touch in _gestureState)
                 heldLocations += touch.State != TouchLocationState.Released ? 1 : 0;
 
-            // As soon as we have more than one held point then 
-            // tap and hold gestures are disabled until all the 
+            // As soon as we have more than one held point then
+            // tap and hold gestures are disabled until all the
             // points are released.
             if (heldLocations > 1)
             {
@@ -409,126 +405,126 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 {
                     case TouchLocationState.Pressed:
                     case TouchLocationState.Moved:
+                    {
+                        // The DoubleTap event is emitted on first press as
+                        // opposed to Tap which happens on release.
+                        if (touch.State == TouchLocationState.Pressed &&
+                            ProcessDoubleTap(touch))
+                            break;
+
+                        // Any time more than one finger is down and pinch is
+                        // enabled then we exclusively do pinch processing.
+                        if (GestureIsEnabled(GestureType.Pinch) && heldLocations > 1)
                         {
-                            // The DoubleTap event is emitted on first press as
-                            // opposed to Tap which happens on release.
-                            if (touch.State == TouchLocationState.Pressed &&
-                                ProcessDoubleTap(touch))
-                                break;
+                            // Save or update the first pinch point.
+                            if (_pinchTouch[0].State == TouchLocationState.Invalid ||
+                                _pinchTouch[0].Id == touch.Id)
+                                _pinchTouch[0] = touch;
 
-                            // Any time more than one finger is down and pinch is
-                            // enabled then we exclusively do pinch processing.
-                            if (GestureIsEnabled(GestureType.Pinch) && heldLocations > 1)
-                            {
-                                // Save or update the first pinch point.
-                                if (_pinchTouch[0].State == TouchLocationState.Invalid ||
-                                        _pinchTouch[0].Id == touch.Id)
-                                    _pinchTouch[0] = touch;
+                            // Save or update the second pinch point.
+                            else if (_pinchTouch[1].State == TouchLocationState.Invalid ||
+                                     _pinchTouch[1].Id == touch.Id)
+                                _pinchTouch[1] = touch;
 
-                                // Save or update the second pinch point.
-                                else if (_pinchTouch[1].State == TouchLocationState.Invalid ||
-                                            _pinchTouch[1].Id == touch.Id)
-                                    _pinchTouch[1] = touch;
-
-                                // NOTE: Actual pinch processing happens outside and
-                                // below this loop to ensure both points are updated
-                                // before gestures are emitted.
-                                break;
-                            }
-
-                            // If we're not dragging try to process a hold event.
-                            var dist = Vector2.Distance(touch.Position, touch.PressPosition);
-                            if (_dragGestureStarted == GestureType.None && dist < TapJitterTolerance)
-                            {
-                                ProcessHold(touch);
-                                break;
-                            }
-
-                            // If the touch state has changed then do a drag gesture.
-                            if (stateChanged)
-                                ProcessDrag(touch);
+                            // NOTE: Actual pinch processing happens outside and
+                            // below this loop to ensure both points are updated
+                            // before gestures are emitted.
                             break;
                         }
+
+                        // If we're not dragging try to process a hold event.
+                        var dist = Vector2.Distance(touch.Position, touch.PressPosition);
+                        if (_dragGestureStarted == GestureType.None && dist < TapJitterTolerance)
+                        {
+                            ProcessHold(touch);
+                            break;
+                        }
+
+                        // If the touch state has changed then do a drag gesture.
+                        if (stateChanged)
+                            ProcessDrag(touch);
+                        break;
+                    }
 
                     case TouchLocationState.Released:
+                    {
+                        // If the touch state hasn't changed then this
+                        // is an old release event... skip it.
+                        if (!stateChanged)
+                            break;
+
+                        // If this is one of the pinch locations then we
+                        // need to fire off the complete event and stop
+                        // the pinch gesture operation.
+                        if (_pinchGestureStarted &&
+                            (touch.Id == _pinchTouch[0].Id ||
+                             touch.Id == _pinchTouch[1].Id))
                         {
-                            // If the touch state hasn't changed then this
-                            // is an old release event... skip it.
-                            if (!stateChanged)
-                                break;
-
-                            // If this is one of the pinch locations then we
-                            // need to fire off the complete event and stop
-                            // the pinch gesture operation.
-                            if (_pinchGestureStarted &&
-                                    (touch.Id == _pinchTouch[0].Id ||
-                                        touch.Id == _pinchTouch[1].Id))
-                            {
-                                if (GestureIsEnabled(GestureType.PinchComplete))
-                                    GestureList.Enqueue(new GestureSample(
-                                                            GestureType.PinchComplete, touch.Timestamp,
-                                                            Vector2.Zero, Vector2.Zero,
-                                                            Vector2.Zero, Vector2.Zero));
-
-                                _pinchGestureStarted = false;
-                                _pinchTouch[0] = TouchLocation.Invalid;
-                                _pinchTouch[1] = TouchLocation.Invalid;
-                                break;
-                            }
-
-                            // If there are still other pressed locations then there
-                            // is nothing more we can do with this release.
-                            if (heldLocations != 0)
-                                break;
-
-                            // From testing XNA it seems we need a velocity 
-                            // of about 100 to classify this as a flick.
-                            var dist = Vector2.Distance(touch.Position, touch.PressPosition);
-                            if (dist > TapJitterTolerance &&
-                                    touch.Velocity.Length() > 100.0f &&
-                                    GestureIsEnabled(GestureType.Flick))
-                            {
+                            if (GestureIsEnabled(GestureType.PinchComplete))
                                 GestureList.Enqueue(new GestureSample(
-                                                        GestureType.Flick, touch.Timestamp,
-                                                        Vector2.Zero, Vector2.Zero,
-                                                        touch.Velocity, Vector2.Zero));
+                                    GestureType.PinchComplete, touch.Timestamp,
+                                    Vector2.Zero, Vector2.Zero,
+                                    Vector2.Zero, Vector2.Zero));
 
-                                //fall through, a drag should still happen even if a flick does
-                            }
-
-                            // If a drag is active then we need to finalize it.
-                            if (_dragGestureStarted != GestureType.None)
-                            {
-                                if (GestureIsEnabled(GestureType.DragComplete))
-                                    GestureList.Enqueue(new GestureSample(
-                                                            GestureType.DragComplete, touch.Timestamp,
-                                                            Vector2.Zero, Vector2.Zero,
-                                                            Vector2.Zero, Vector2.Zero));
-
-                                _dragGestureStarted = GestureType.None;
-                                break;
-                            }
-
-                            // If all else fails try to process it as a tap.
-                            ProcessTap(touch);
+                            _pinchGestureStarted = false;
+                            _pinchTouch[0] = TouchLocation.Invalid;
+                            _pinchTouch[1] = TouchLocation.Invalid;
                             break;
                         }
+
+                        // If there are still other pressed locations then there
+                        // is nothing more we can do with this release.
+                        if (heldLocations != 0)
+                            break;
+
+                        // From testing XNA it seems we need a velocity
+                        // of about 100 to classify this as a flick.
+                        var dist = Vector2.Distance(touch.Position, touch.PressPosition);
+                        if (dist > TapJitterTolerance &&
+                            touch.Velocity.Length() > 100.0f &&
+                            GestureIsEnabled(GestureType.Flick))
+                        {
+                            GestureList.Enqueue(new GestureSample(
+                                GestureType.Flick, touch.Timestamp,
+                                Vector2.Zero, Vector2.Zero,
+                                touch.Velocity, Vector2.Zero));
+
+                            //fall through, a drag should still happen even if a flick does
+                        }
+
+                        // If a drag is active then we need to finalize it.
+                        if (_dragGestureStarted != GestureType.None)
+                        {
+                            if (GestureIsEnabled(GestureType.DragComplete))
+                                GestureList.Enqueue(new GestureSample(
+                                    GestureType.DragComplete, touch.Timestamp,
+                                    Vector2.Zero, Vector2.Zero,
+                                    Vector2.Zero, Vector2.Zero));
+
+                            _dragGestureStarted = GestureType.None;
+                            break;
+                        }
+
+                        // If all else fails try to process it as a tap.
+                        ProcessTap(touch);
+                        break;
+                    }
                 }
             }
 
-            // If the touch state hasn't changed then there is no 
+            // If the touch state hasn't changed then there is no
             // cleanup to do and no pinch to process.
             if (!stateChanged)
                 return;
 
             // If we have two pinch points then update the pinch state.
             if (GestureIsEnabled(GestureType.Pinch) &&
-                    _pinchTouch[0].State != TouchLocationState.Invalid &&
-                    _pinchTouch[1].State != TouchLocationState.Invalid)
+                _pinchTouch[0].State != TouchLocationState.Invalid &&
+                _pinchTouch[1].State != TouchLocationState.Invalid)
                 ProcessPinch(_pinchTouch);
             else
             {
-                // Make sure a partial pinch state 
+                // Make sure a partial pinch state
                 // is not left hanging around.
                 _pinchGestureStarted = false;
                 _pinchTouch[0] = TouchLocation.Invalid;
@@ -557,9 +553,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
             GestureList.Enqueue(
                 new GestureSample(GestureType.Hold,
-                                    touch.Timestamp,
-                                    touch.Position, Vector2.Zero,
-                                    Vector2.Zero, Vector2.Zero));
+                    touch.Timestamp,
+                    touch.Position, Vector2.Zero,
+                    Vector2.Zero, Vector2.Zero));
         }
 
         private bool ProcessDoubleTap(TouchLocation touch)
@@ -573,16 +569,16 @@ namespace Microsoft.Xna.Framework.Input.Touch
             if (dist > TapJitterTolerance)
                 return false;
 
-            // Check that this tap happened within the standard 
+            // Check that this tap happened within the standard
             // double tap time threshold of 300 milliseconds.
             var elapsed = touch.Timestamp - _lastTap.Timestamp;
             if (elapsed.TotalMilliseconds > 300)
                 return false;
 
             GestureList.Enqueue(new GestureSample(
-                           GestureType.DoubleTap, touch.Timestamp,
-                           touch.Position, Vector2.Zero,
-                           Vector2.Zero, Vector2.Zero));
+                GestureType.DoubleTap, touch.Timestamp,
+                touch.Position, Vector2.Zero,
+                Vector2.Zero, Vector2.Zero));
 
             // Disable taps until after the next release.
             _tapDisabled = true;
@@ -597,19 +593,19 @@ namespace Microsoft.Xna.Framework.Input.Touch
             if (_tapDisabled)
                 return;
 
-            // If the release is too far away from the press 
+            // If the release is too far away from the press
             // position then this cannot be a tap event.
             var dist = Vector2.Distance(touch.PressPosition, touch.Position);
             if (dist > TapJitterTolerance)
                 return;
 
-            // If we pressed and held too long then don't 
+            // If we pressed and held too long then don't
             // generate a tap event for it.
             var elapsed = CurrentTimestamp - touch.PressTimestamp;
             if (elapsed > TimeRequiredForHold)
                 return;
 
-            // Store the last tap for 
+            // Store the last tap for
             // double tap processing.
             _lastTap = touch;
 
@@ -637,8 +633,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
             // Make sure this is a move event and that we have
             // a previous touch location.
-            TouchLocation prevTouch;
-            if (touch.State != TouchLocationState.Moved || !touch.TryGetPreviousLocation(out prevTouch))
+            if (touch.State != TouchLocationState.Moved || !touch.TryGetPreviousLocation(out TouchLocation prevTouch))
                 return;
 
             var delta = touch.Position - prevTouch.Position;
@@ -652,12 +647,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
                 // Once we enter either vertical or horizontal drags
                 // we stick to it... regardless of the delta.
-                if (dragH && ((classify && isHorizontalDelta) || _dragGestureStarted == GestureType.HorizontalDrag))
+                if (dragH && (classify && isHorizontalDelta || _dragGestureStarted == GestureType.HorizontalDrag))
                 {
                     delta.Y = 0;
                     _dragGestureStarted = GestureType.HorizontalDrag;
                 }
-                else if (dragV && ((classify && isVerticalDelta) || _dragGestureStarted == GestureType.VerticalDrag))
+                else if (dragV && (classify && isVerticalDelta || _dragGestureStarted == GestureType.VerticalDrag))
                 {
                     delta.X = 0;
                     _dragGestureStarted = GestureType.VerticalDrag;
@@ -685,20 +680,18 @@ namespace Microsoft.Xna.Framework.Input.Touch
             _holdDisabled = true;
 
             GestureList.Enqueue(new GestureSample(
-                                    _dragGestureStarted, touch.Timestamp,
-                                    touch.Position, Vector2.Zero,
-                                    delta, Vector2.Zero));
+                _dragGestureStarted, touch.Timestamp,
+                touch.Position, Vector2.Zero,
+                delta, Vector2.Zero));
         }
 
         private void ProcessPinch(TouchLocation[] touches)
         {
-            TouchLocation prevPos0;
-            TouchLocation prevPos1;
 
-            if (!touches[0].TryGetPreviousLocation(out prevPos0))
+            if (!touches[0].TryGetPreviousLocation(out TouchLocation prevPos0))
                 prevPos0 = touches[0];
 
-            if (!touches[1].TryGetPreviousLocation(out prevPos1))
+            if (!touches[1].TryGetPreviousLocation(out TouchLocation prevPos1))
                 prevPos1 = touches[1];
 
             var delta0 = touches[0].Position - prevPos0.Position;
@@ -713,9 +706,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
             {
                 if (GestureIsEnabled(GestureType.DragComplete))
                     GestureList.Enqueue(new GestureSample(
-                                            GestureType.DragComplete, timestamp,
-                                            Vector2.Zero, Vector2.Zero,
-                                            Vector2.Zero, Vector2.Zero));
+                        GestureType.DragComplete, timestamp,
+                        Vector2.Zero, Vector2.Zero,
+                        Vector2.Zero, Vector2.Zero));
 
                 _dragGestureStarted = GestureType.None;
             }
@@ -730,7 +723,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
             _tapDisabled = true;
             _holdDisabled = true;
         }
-
         #endregion
     }
 }

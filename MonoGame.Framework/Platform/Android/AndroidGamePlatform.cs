@@ -144,10 +144,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        public override GameRunBehavior DefaultRunBehavior
-        {
-            get { return GameRunBehavior.Asynchronous; }
-        }
+        public override GameRunBehavior DefaultRunBehavior => GameRunBehavior.Asynchronous;
 
         public override void Log(string Message)
         {

@@ -56,8 +56,6 @@ namespace Microsoft.Xna.Framework.Graphics
             // We need the bytecode later for allocating the
             // input layout from the vertex declaration.
             _shaderBytecode = shaderBytecode;
-
-            HashKey = MonoGame.Framework.Utilities.Hash.ComputeHash(Bytecode);
             
             if (stage == ShaderStage.Vertex)
                 CreateVertexShader();

@@ -6,14 +6,15 @@
 // It was released to the public domain by the author (Renaud Bedard).
 // No other license is intended or required.
 
+using MonoGame.OpenAL;
+
+using NVorbis;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Threading;
-using NVorbis;
-using MonoGame.OpenAL;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -160,7 +161,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void SeekToPosition(TimeSpan pos)
         {
-            Reader.DecodedTime = pos;
+            Reader.TimePosition = pos;
             AL.SourceStop(alSourceId);
             ALHelper.CheckError("Failed to stop source.");
         }
@@ -170,7 +171,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (Reader == null)
                 return TimeSpan.Zero;
 
-            return Reader.DecodedTime;
+            return Reader.TimePosition;
         }
 
         public TimeSpan GetLength()
@@ -181,7 +182,7 @@ namespace Microsoft.Xna.Framework.Audio
         float volume;
         public float Volume
         {
-            get { return volume; }
+            get => volume;
             set
             {
                 AL.Source(alSourceId, ALSourcef.Gain, volume = value);
@@ -222,8 +223,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         void Empty()
         {
-            int queued;
-            AL.GetSource(alSourceId, ALGetSourcei.BuffersQueued, out queued);
+            AL.GetSource(alSourceId, ALGetSourcei.BuffersQueued, out int queued);
             ALHelper.CheckError("Failed to fetch queued buffers.");
             if (queued > 0)
             {
@@ -236,8 +236,7 @@ namespace Microsoft.Xna.Framework.Audio
                 {
                     // This is a bug in the OpenAL implementation
                     // Salvage what we can
-                    int processed;
-                    AL.GetSource(alSourceId, ALGetSourcei.BuffersProcessed, out processed);
+                    AL.GetSource(alSourceId, ALGetSourcei.BuffersProcessed, out int processed);
                     ALHelper.CheckError("Failed to fetch processed buffers.");
                     var salvaged = new int[processed];
                     if (processed > 0)
@@ -319,7 +318,10 @@ namespace Microsoft.Xna.Framework.Audio
                     return instance;
                 }
             }
-            private set { lock (singletonMutex) instance = value; }
+            private set
+            {
+                lock (singletonMutex) instance = value;
+            }
         }
 
         public OggStreamer(int bufferSize = DefaultBufferSize, float updateRate = DefaultUpdateRate)
@@ -402,7 +404,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             while (!cancelled)
             {
-                Thread.Sleep((int) (1000 / ((UpdateRate <= 0) ? 1 : UpdateRate)));
+                Thread.Sleep((int)(1000 / (UpdateRate <= 0 ? 1 : UpdateRate)));
                 if (cancelled) break;
 
                 threadLocalStreams.Clear();
@@ -418,11 +420,9 @@ namespace Microsoft.Xna.Framework.Audio
 
                         bool finished = false;
 
-                        int queued;
-                        AL.GetSource(stream.alSourceId, ALGetSourcei.BuffersQueued, out queued);
+                        AL.GetSource(stream.alSourceId, ALGetSourcei.BuffersQueued, out int queued);
                         ALHelper.CheckError("Failed to fetch queued buffers.");
-                        int processed;
-                        AL.GetSource(stream.alSourceId, ALGetSourcei.BuffersProcessed, out processed);
+                        AL.GetSource(stream.alSourceId, ALGetSourcei.BuffersProcessed, out int processed);
                         ALHelper.CheckError("Failed to fetch processed buffers.");
 
                         if (processed == 0 && queued == stream.BufferCount) continue;
@@ -461,8 +461,7 @@ namespace Microsoft.Xna.Framework.Audio
                             pendingFinish = false;
                             lock (iterationMutex)
                                 streams.Remove(stream);
-                            if (stream.FinishedAction != null)
-                                stream.FinishedAction.Invoke();
+                            stream.FinishedAction?.Invoke();
                         }
                         else if (!finished && bufferFilled > 0) // queue only successfully filled buffers
                         {

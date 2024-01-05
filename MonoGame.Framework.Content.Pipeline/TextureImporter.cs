@@ -4,9 +4,9 @@
 
 using System;
 using System.IO;
+using FreeImageAPI;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
-using FreeImageAPI;
 using MonoGame.Framework.Utilities;
 using StbImageSharp;
 
@@ -55,7 +55,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <summary>
         /// Initializes a new instance of TextureImporter.
         /// </summary>
-        public TextureImporter( )
+        public TextureImporter()
         {
         }
 
@@ -73,7 +73,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             switch (ext)
             {
                 case ".dds":
-                    return DdsLoader.Import(filename, context);
+                    return DdsLoader.Import(filename);
                 case ".bmp":
                     return LoadImage(filename);
             }
@@ -83,14 +83,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             var format = FreeImage.GetFileType(filename, 0);
             var fBitmap = FreeImage.Load(format, filename, 0);
             //if freeimage can not recognize the image type
-            if(format == FREE_IMAGE_FORMAT.FIF_UNKNOWN)
+            if (format == FREE_IMAGE_FORMAT.FIF_UNKNOWN)
                 throw new ContentLoadException("TextureImporter failed to load '" + filename + "'");
             //if freeimage can recognize the file headers but can't read its contents
-            else if(fBitmap == IntPtr.Zero)
+            else if (fBitmap == IntPtr.Zero)
                 throw new InvalidContentException("TextureImporter couldn't understand the contents of '" + filename + "'", output.Identity);
             BitmapContent face = null;
-            var height = (int) FreeImage.GetHeight(fBitmap);
-            var width = (int) FreeImage.GetWidth(fBitmap);
+            var height = (int)FreeImage.GetHeight(fBitmap);
+            var width = (int)FreeImage.GetWidth(fBitmap);
             //uint bpp = FreeImage.GetBPP(fBitmap);
             var imageType = FreeImage.GetImageType(fBitmap);
 
@@ -100,7 +100,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             // The bits per pixel and image type may have changed
             uint bpp = FreeImage.GetBPP(fBitmap);
             imageType = FreeImage.GetImageType(fBitmap);
-            var pitch = (int) FreeImage.GetPitch(fBitmap);
+            var pitch = (int)FreeImage.GetPitch(fBitmap);
             var redMask = FreeImage.GetRedMask(fBitmap);
             var greenMask = FreeImage.GetGreenMask(fBitmap);
             var blueMask = FreeImage.GetBlueMask(fBitmap);
@@ -111,7 +111,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             //Converts the pixel data to bytes, do not try to use this call to switch the color channels because that only works for 16bpp bitmaps
             FreeImage.ConvertToRawBits(bytes, fBitmap, pitch, bpp, redMask, greenMask, blueMask, true);
             // Create the Pixel bitmap content depending on the image type
-            switch(imageType)
+            switch (imageType)
             {
                 //case FREE_IMAGE_TYPE.FIT_BITMAP:
                 default:
@@ -139,7 +139,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         private static IntPtr ConvertAndSwapChannels(IntPtr fBitmap, FREE_IMAGE_TYPE imageType)
         {
             IntPtr bgra;
-            switch(imageType)
+            switch (imageType)
             {
                 // Return BGRA images as is
 

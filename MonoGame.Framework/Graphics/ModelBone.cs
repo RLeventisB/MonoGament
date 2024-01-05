@@ -14,13 +14,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		private List<ModelMesh> meshes = new List<ModelMesh>();
 
 		public List<ModelMesh> Meshes {
-			get {
-				return this.meshes;
-			}
-			private set {
-				meshes = value;
-			}
-		}
+			get => meshes;
+            private set => meshes = value;
+        }
 
 		// Summary:
 		//     Gets a collection of bones that are children of this bone.
@@ -44,9 +40,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal Matrix transform;
 		public Matrix Transform 
 		{ 
-			get { return this.transform; } 
-			set { this.transform = value; }
-		}
+			get => transform;
+            set => transform = value;
+        }
 		
 		/// <summary>
 		/// Transform of this node from the root of the model not from the parent

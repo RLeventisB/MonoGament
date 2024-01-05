@@ -2,9 +2,10 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using MonoGame.Framework.Utilities;
+
 using System;
 using System.IO;
-using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework
 {
@@ -15,7 +16,7 @@ namespace Microsoft.Xna.Framework
     {
         static partial void PlatformInit();
 
-        static TitleContainer() 
+        static TitleContainer()
         {
             Location = string.Empty;
             PlatformInit();
@@ -60,13 +61,11 @@ namespace Microsoft.Xna.Framework
 
             return stream;
         }
-
         private static Exception FileNotFoundException(string name, Exception inner)
         {
             return new FileNotFoundException("Error loading \"" + name + "\". File not found.", inner);
         }
-
-        internal static string NormalizeRelativePath(string name)
+        public static string NormalizeRelativePath(string name)
         {
             var uri = new Uri("file:///" + FileHelpers.UrlEncode(name));
             var path = uri.LocalPath;

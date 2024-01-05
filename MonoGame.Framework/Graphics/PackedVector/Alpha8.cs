@@ -19,14 +19,8 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         [CLSCompliant(false)]
         public byte PackedValue
         {
-            get
-            {
-                return packedValue;
-            }
-            set
-            {
-                packedValue = value;
-            }
+            get => packedValue;
+            set => packedValue = value;
         }
 
         /// <summary>
@@ -44,7 +38,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         /// <returns>The packed vector in Vector3 format</returns>
         public float ToAlpha()
         {
-            return (float) (packedValue / 255.0f);
+            return packedValue / 255.0f;
         }
 
         /// <summary>
@@ -66,7 +60,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
                 0.0f,
                 0.0f,
                 0.0f,
-                (float) (packedValue / 255.0f)
+                packedValue / 255.0f
             );
         }
 
@@ -77,7 +71,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         /// <returns>True if the object is equal to the packed vector.</returns>
         public override bool Equals(object obj)
         {
-            return (obj is Alpha8) && Equals((Alpha8) obj);
+            return obj is Alpha8 alpha8 && Equals(alpha8);
         }
 
         /// <summary>
@@ -120,7 +114,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 
         private static byte Pack(float alpha)
         {
-            return (byte) MathF.Round(
+            return (byte)MathF.Round(
                 MathHelper.Clamp(alpha, 0, 1) * 255.0f
             );
         }

@@ -19,18 +19,18 @@ namespace Microsoft.Xna.Framework.Content
             this.resource = resource;
         }
 
-        protected override System.IO.Stream OpenStream(string assetName)
+        protected override Stream OpenStream(string assetName)
         {
-            object obj = this.resource.GetObject(assetName);
+            object obj = resource.GetObject(assetName);
             if (obj == null)
             {
                 throw new ContentLoadException("Resource not found");
             }
-            if (!(obj is byte[]))
+            if (!(obj is byte[] bytes))
             {
                 throw new ContentLoadException("Resource is not in binary format");
             }
-            return new MemoryStream(obj as byte[]);
+            return new MemoryStream(bytes);
         }
     }
 }

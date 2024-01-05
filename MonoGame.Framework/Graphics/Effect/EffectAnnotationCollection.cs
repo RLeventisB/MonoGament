@@ -13,17 +13,11 @@ namespace Microsoft.Xna.Framework.Graphics
             _annotations = annotations;
         }
 
-		public int Count 
-        {
-			get { return _annotations.Length; }
-		}
-		
-		public EffectAnnotation this[int index]
-        {
-            get { return _annotations[index]; }
-        }
-		
-		public EffectAnnotation this[string name]
+        public int Count => _annotations.Length;
+
+        public EffectAnnotation this[int index] => _annotations[index];
+
+        public EffectAnnotation this[string name]
         {
             get 
             {

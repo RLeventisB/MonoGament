@@ -21,10 +21,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return new EffectPassCollection(passes);
         }
 
-        public EffectPass this[int index]
-        {
-            get { return _passes[index]; }
-        }
+        public EffectPass this[int index] => _passes[index];
 
         public EffectPass this[string name]
         {
@@ -40,10 +37,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    }
         }
 
-        public int Count
-        {
-            get { return _passes.Length; }
-        }
+        public int Count => _passes.Length;
 
         public Enumerator GetEnumerator()
         {
@@ -86,10 +80,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 return false;
             }
 
-            public EffectPass Current
-            {
-                get { return _current; }
-            }
+            public EffectPass Current => _current;
 
             public void Dispose()
             {

@@ -32,10 +32,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// </remarks>
 		public float DopplerScale 
         {
-            get
-            {
-                return _dopplerScale;
-            }
+            get => _dopplerScale;
 
             set
             {

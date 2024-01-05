@@ -2,9 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using Microsoft.Xna.Framework;
-
 namespace Microsoft.Xna.Framework.Content
 {
     internal class BoundingFrustumReader : ContentTypeReader<BoundingFrustum>
@@ -13,7 +10,7 @@ namespace Microsoft.Xna.Framework.Content
         {
         }
 
-        protected internal override BoundingFrustum Read(ContentReader input, BoundingFrustum existingInstance)
+        public override BoundingFrustum Read(ContentReader input, BoundingFrustum existingInstance)
         {
             return new BoundingFrustum(input.ReadMatrix());
         }

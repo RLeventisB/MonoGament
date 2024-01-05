@@ -3,10 +3,11 @@
   <Import Project="..\MonoGame.props" />
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <BaseOutputPath>..\Artifacts\MonoGame.Framework.Content.Pipeline</BaseOutputPath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Description>The Monogame Content Pipeline for Windows, Mac and Linux is used to compile raw content to xnb files.</Description>
+    <Description>The Monogame Content Pipeline for Windows, Mac and Linux is used to compile raw
+      content to xnb files.</Description>
     <PackageTags>monogame;content;content pipeline</PackageTags>
     <PackageId>MonoGame.Framework.Content.Pipeline</PackageId>
     <AssemblyName>MonoGame.Framework.Content.Pipeline</AssemblyName>
@@ -14,6 +15,7 @@
     <CopyContentFiles>True</CopyContentFiles>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <DefineConstants>STBSHARP_INTERNAL</DefineConstants>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>
@@ -38,15 +40,13 @@
     <Compile Include="..\MonoGame.Framework\Platform\Utilities\ReflectionHelpers.Default.cs">
       <Link>Utilities\ReflectionHelpers.Default.cs</Link>
     </Compile>
-    <Compile Include="..\MonoGame.Framework\Graphics\GraphicsExtensions.cs">
-      <Link>Utilities\GraphicsExtensions.cs</Link>
-    </Compile>
     <Compile Include="..\MonoGame.Framework\Content\ContentExtensions.cs">
       <Link>Utilities\ContentExtensions.cs</Link>
     </Compile>
-    
+
     <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp" />
-    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp" />
+    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs"
+      LinkBase="Utilities\StbImageWriteSharp" />
   </ItemGroup>
 
   <ItemGroup>
@@ -91,15 +91,23 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(CopyContentFiles)' == 'True'">
-    <Content Include="..\ThirdParty\Dependencies\SharpDX\net40\SharpDX.dll" PackagePath="lib\net6.0" Visible="false" />
-    <Content Include="..\ThirdParty\Dependencies\SharpDX\SharpDX.D3DCompiler.dll" PackagePath="lib\net6.0" Visible="false" />
-    <Content Include="..\ThirdParty\Dependencies\CppNet\CppNet.dll" PackagePath="lib\net6.0" Visible="false" />
-    <Content Include="..\ThirdParty\Dependencies\NVTT\Nvidia.TextureTools.dll" PackagePath="lib\net6.0" Visible="false" />
-    <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll" PackagePath="lib\net6.0" Visible="false" />
-    <Content Include="..\ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll" PackagePath="lib\net6.0" Visible="false" />
-    <Content Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll" PackagePath="lib\net6.0" Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\SharpDX\net40\SharpDX.dll" PackagePath="lib\net6.0"
+      Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\SharpDX\SharpDX.D3DCompiler.dll"
+      PackagePath="lib\net6.0" Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\CppNet\CppNet.dll" PackagePath="lib\net6.0"
+      Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\NVTT\Nvidia.TextureTools.dll"
+      PackagePath="lib\net6.0" Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll"
+      PackagePath="lib\net6.0" Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll"
+      PackagePath="lib\net6.0" Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll"
+      PackagePath="lib\net6.0" Visible="false" />
 
-    <Content Include="..\ThirdParty\Dependencies\FreeImage.NET\Linux\x64\libfreeimage-3.17.0.so" Visible="false">
+    <Content Include="..\ThirdParty\Dependencies\FreeImage.NET\Linux\x64\libfreeimage-3.17.0.so"
+      Visible="false">
       <Link>libFreeImage.so</Link>
       <PackagePath>runtimes\linux-x64\native\libFreeImage.so</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -120,7 +128,8 @@
       <PackagePath>runtimes\linux-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Dependencies\PVRTexLibNET\Linux\x64\libPVRTexLibWrapper.so" Visible="false">
+    <Content Include="..\ThirdParty\Dependencies\PVRTexLibNET\Linux\x64\libPVRTexLibWrapper.so"
+      Visible="false">
       <PackagePath>runtimes\linux-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -144,7 +153,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 
-    <Content Include="..\ThirdParty\Dependencies\FreeImage.NET\MacOS\libfreeimage.dylib" Visible="false">
+    <Content Include="..\ThirdParty\Dependencies\FreeImage.NET\MacOS\libfreeimage.dylib"
+      Visible="false">
       <Link>libFreeImage.dylib</Link>
       <PackagePath>runtimes\osx\native\libFreeImage.dylib</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -165,7 +175,8 @@
       <PackagePath>runtimes\osx\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Dependencies\PVRTexLibNET\OSX\x86\libPVRTexLibWrapper.dylib" Visible="false">
+    <Content Include="..\ThirdParty\Dependencies\PVRTexLibNET\OSX\x86\libPVRTexLibWrapper.dylib"
+      Visible="false">
       <PackagePath>runtimes\osx\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -197,11 +208,13 @@
       <PackagePath>runtimes\win-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Dependencies\FreeImage.NET\Windows\FreeImage.dll" Visible="false">
+    <Content Include="..\ThirdParty\Dependencies\FreeImage.NET\Windows\FreeImage.dll"
+      Visible="false">
       <PackagePath>runtimes\win-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll" Visible="false">
+    <Content Include="..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll"
+      Visible="false">
       <PackagePath>runtimes\win-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -209,7 +222,8 @@
       <PackagePath>runtimes\win-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Dependencies\PVRTexLibNET\Windows\x64\PVRTexLibWrapper.dll" Visible="false">
+    <Content Include="..\ThirdParty\Dependencies\PVRTexLibNET\Windows\x64\PVRTexLibWrapper.dll"
+      Visible="false">
       <PackagePath>runtimes\win-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -223,18 +237,25 @@
     <!-- NuGet warns if we copy assemblies but don't reference them; we suppress those warnings. -->
     <NoWarn>NU5100</NoWarn>
   </PropertyGroup>
-  
+
   <ItemGroup>
-    <Content Include="..\Artifacts\MonoGame.Effect.Compiler\$(Configuration)\*" Exclude="..\Artifacts\MonoGame.Effect.Compiler\$(Configuration)\*.nupkg" Visible="false">
+    <Content Include="..\Artifacts\MonoGame.Effect.Compiler\$(Configuration)\*"
+      Exclude="..\Artifacts\MonoGame.Effect.Compiler\$(Configuration)\*.nupkg" Visible="false">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  
-  <Import Project="..\Switch\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\Switch\MonoGame.Framework.Content.Pipeline.targets')" />
-  <Import Project="..\XBoxOne\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\XBoxOne\MonoGame.Framework.Content.Pipeline.targets')" />
-  <Import Project="..\PlayStation4\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\PlayStation4\MonoGame.Framework.Content.Pipeline.targets')" />
-  <Import Project="..\PlayStation5\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\PlayStation5\MonoGame.Framework.Content.Pipeline.targets')" />
-  <Import Project="..\PSVita\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\PSVita\MonoGame.Framework.Content.Pipeline.targets')" />
-  <Import Project="..\Stadia\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\Stadia\MonoGame.Framework.Content.Pipeline.targets')" />
+
+  <Import Project="..\Switch\MonoGame.Framework.Content.Pipeline.targets"
+    Condition="exists('..\Switch\MonoGame.Framework.Content.Pipeline.targets')" />
+  <Import Project="..\XBoxOne\MonoGame.Framework.Content.Pipeline.targets"
+    Condition="exists('..\XBoxOne\MonoGame.Framework.Content.Pipeline.targets')" />
+  <Import Project="..\PlayStation4\MonoGame.Framework.Content.Pipeline.targets"
+    Condition="exists('..\PlayStation4\MonoGame.Framework.Content.Pipeline.targets')" />
+  <Import Project="..\PlayStation5\MonoGame.Framework.Content.Pipeline.targets"
+    Condition="exists('..\PlayStation5\MonoGame.Framework.Content.Pipeline.targets')" />
+  <Import Project="..\PSVita\MonoGame.Framework.Content.Pipeline.targets"
+    Condition="exists('..\PSVita\MonoGame.Framework.Content.Pipeline.targets')" />
+  <Import Project="..\Stadia\MonoGame.Framework.Content.Pipeline.targets"
+    Condition="exists('..\Stadia\MonoGame.Framework.Content.Pipeline.targets')" />
 
 </Project>
