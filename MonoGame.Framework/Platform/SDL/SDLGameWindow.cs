@@ -101,7 +101,11 @@ namespace Microsoft.Xna.Framework
             Assembly entryAssem = Assembly.GetEntryAssembly();
             if (entryAssem != null)
             {
-                using (var stream = entryAssem.GetManifestResourceStream("Icon.bmp"))
+                using (
+                    var stream =
+                        entryAssem.GetManifestResourceStream(entryAssem.GetName().Name + ".Icon.bmp") ??
+                        entryAssem.GetManifestResourceStream("Icon.bmp") ??
+                        typeof(SdlGameWindow).Assembly.GetManifestResourceStream("MonoGame.bmp"))
                 {
                     if (stream != null)
                         using (var br = new BinaryReader(stream))
@@ -146,7 +150,7 @@ namespace Microsoft.Xna.Framework
             _height = GraphicsDeviceManager.DefaultBackBufferHeight;
 
             _handle = Sdl.Window.Create(
-                AssemblyHelper.GetDefaultWindowTitle(),
+                Title == null ? AssemblyHelper.GetDefaultWindowTitle() : Title,
                 winx, winy, _width, _height, initflags
             );
 

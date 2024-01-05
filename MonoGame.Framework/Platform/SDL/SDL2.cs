@@ -155,16 +155,16 @@ public static class Sdl
         public static bool operator ==(Version version1, Version version2)
         {
             return version1.Major == version2.Major &&
-                   version1.Minor == version2.Minor &&
-                   version1.Patch == version2.Patch;
+                version1.Minor == version2.Minor &&
+                version1.Patch == version2.Patch;
         }
 
         public override bool Equals(object obj)
         {
-            if (!(obj is Version version1))
+            if (!(obj is Version))
                 return false;
 
-            return version == version1;
+            return version == (Version)obj;
         }
 
         public static bool operator !=(Version version1, Version version2)
@@ -195,7 +195,10 @@ public static class Sdl
             {
                 return version.Major * 1_000_000 + version.Patch * 1000;
             }
-            return version.Major * 1_000_000 + version.Minor * 1000 + version.Patch;
+            else
+            {
+                return version.Major * 1_000_000 + version.Minor * 1000 + version.Patch;
+            }
         }
     }
 
@@ -641,7 +644,7 @@ public static class Sdl
 
         public static void SetTitle(IntPtr handle, string title)
         {
-            var bytes = Encoding.UTF8.GetBytes(title);
+            var bytes = Encoding.UTF8.GetBytes(title + '\0');
             SDL_SetWindowTitle(handle, ref bytes[0]);
         }
 

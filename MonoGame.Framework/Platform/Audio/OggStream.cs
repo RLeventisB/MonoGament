@@ -1,7 +1,7 @@
 ﻿// This code originated from:
 //
 //    http://theinstructionlimit.com/ogg-streaming-using-opentk-and-nvorbis
-//    https://github.com/renaudbedard/nvorbis/
+//    https://github.com/NVorbis/NVorbis
 //
 // It was released to the public domain by the author (Renaud Bedard).
 // No other license is intended or required.

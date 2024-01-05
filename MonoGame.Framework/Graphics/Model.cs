@@ -77,33 +77,33 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         internal void BuildHierarchy()
-        {
-            var globalScale = Matrix.CreateScale(0.01f);
+		{
+			var globalScale = Matrix.CreateScale(0.01f);
 
-            foreach (var node in Root.Children)
-            {
-                BuildHierarchy(node, Root.Transform * globalScale, 0);
-            }
-        }
+			foreach(var node in this.Root.Children)
+			{
+				BuildHierarchy(node, this.Root.Transform * globalScale, 0);
+			}
+		}
 
-        private void BuildHierarchy(ModelBone node, Matrix parentTransform, int level)
-        {
-            node.ModelTransform = node.Transform * parentTransform;
+		private void BuildHierarchy(ModelBone node, Matrix parentTransform, int level)
+		{
+			node.ModelTransform = node.Transform * parentTransform;
 
-            foreach (var child in node.Children)
-            {
-                BuildHierarchy(child, node.ModelTransform, level + 1);
-            }
+			foreach (var child in node.Children)
+			{
+				BuildHierarchy(child, node.ModelTransform, level + 1);
+			}
 
-            //string s = string.Empty;
-            //
-            //for (int i = 0; i < level; i++)
-            //{
-            //	s += "\t";
-            //}
-            //
-            //Debug.WriteLine("{0}:{1}", s, node.Name);
-        }
+			//string s = string.Empty;
+			//
+			//for (int i = 0; i < level; i++)
+			//{
+			//	s += "\t";
+			//}
+			//
+			//Debug.WriteLine("{0}:{1}", s, node.Name);
+		}
 
         /// <summary>
         /// Draws the model meshes.
@@ -112,17 +112,17 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="view">The view transform.</param>
         /// <param name="projection">The projection transform.</param>
         public void Draw(Matrix world, Matrix view, Matrix projection)
-        {
-            int boneCount = Bones.Count;
+		{
+            int boneCount = this.Bones.Count;
 
-            if (sharedDrawBoneMatrices == null ||
-                sharedDrawBoneMatrices.Length < boneCount)
-            {
-                sharedDrawBoneMatrices = new Matrix[boneCount];
-            }
+			if (sharedDrawBoneMatrices == null ||
+				sharedDrawBoneMatrices.Length < boneCount)
+			{
+				sharedDrawBoneMatrices = new Matrix[boneCount];
+			}
 
-            // Look up combined bone matrices for the entire model.
-            CopyAbsoluteBoneTransformsTo(sharedDrawBoneMatrices);
+			// Look up combined bone matrices for the entire model.
+			CopyAbsoluteBoneTransformsTo(sharedDrawBoneMatrices);
 
             // Draw the model.
             foreach (ModelMesh mesh in Meshes)
