@@ -65,7 +65,7 @@
         <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp"/>
         <Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp"/>
         <None Include="MonoGame.Framework.Android.targets" Pack="true" PackagePath="build"/>
-        <Compile Include="..\ThirdParty\NVorbis\NVorbis\**\*.cs" LinkBase="ThirdParty\NVorbis" />
+        <Compile Include="..\ThirdParty\NVorbis\**\*.cs" LinkBase="ThirdParty\NVorbis" />
         <EmbeddedNativeLibrary Include="..\ThirdParty\Dependencies\openal-soft\libs\armeabi-v7a\libopenal32.so">
             <Link>libs\armeabi-v7a\libopenal32.so</Link>
         </EmbeddedNativeLibrary>
