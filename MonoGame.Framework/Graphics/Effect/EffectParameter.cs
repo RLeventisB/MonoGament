@@ -152,7 +152,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         break;
 
                     // Scalar types are stored as a float[1].
-                    // Display the first (and only) element's string value.                    
+                    // Display the first (and only) element's string value.
                     case EffectParameterClass.Scalar:
                         valueStr = ((float*)data)[0].ToString();
                         break;
@@ -516,7 +516,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else if (RowCount == 4 && ColumnCount == 2)
             {
-                var fData = (float[])Data;
+                var fData = (float*)Data;
 
                 fData[0] = value.M11;
                 fData[1] = value.M21;
@@ -633,7 +633,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else if (RowCount == 4 && ColumnCount == 2)
             {
-                var fData = (float[])Data;
+                var fData = (float*)Data;
 
                 fData[0] = value.M11;
                 fData[1] = value.M21;
@@ -754,7 +754,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 for (var i = 0; i < value.Length; i++)
                 {
-                    var fData = (float[])Elements[i].Data;
+                    var fData = (float*)Elements[i].Data;
 
                     fData[0] = value[i].M11;
                     fData[1] = value[i].M21;

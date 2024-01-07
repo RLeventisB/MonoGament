@@ -75,9 +75,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // Take care of the single copy case!
-            else if (rows == 1 || (rows == 4 && columns == 4)) {
-                Buffer.BlockCopy(data as Array, 0, _buffer, offset, rows*columns*elementSize);
-            } else
+            else if (rows == 1 || rows == 4 && columns == 4)
+            {
+                Marshal.Copy(data, _buffer, offset, rows * columns * elementSize);
+            }
+            else
             {
 
                 var stride = columns * elementSize;
